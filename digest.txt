@@ -1,0 +1,2130 @@
+Directory structure:
+└── testbed-fe/
+    ├── index.html
+    ├── package.json
+    ├── vite.config.js
+    ├── .env.development
+    ├── .gitingestignore
+    └── src/
+        ├── App.jsx
+        ├── index.css
+        ├── main.jsx
+        ├── api/
+        │   ├── auth.js
+        │   └── axios.js
+        ├── auth/
+        │   ├── authStorage.js
+        │   └── index.js
+        ├── components/
+        │   ├── AppHeader.jsx
+        │   ├── ChangePasswordModal.jsx
+        │   ├── Footer.jsx
+        │   ├── Header.jsx
+        │   └── Sidebar.jsx
+        ├── config/
+        │   ├── endpoints.js
+        │   ├── env.js
+        │   └── index.js
+        ├── guards/
+        │   ├── AuthGuard.jsx
+        │   ├── GuestGuard.jsx
+        │   └── PasswordChangeGuard.jsx
+        ├── hooks/
+        │   └── useAuth.js
+        ├── layouts/
+        │   ├── AppLayout.jsx
+        │   └── PublicLayout.jsx
+        ├── pages/
+        │   ├── About.jsx
+        │   ├── Dashboard.jsx
+        │   ├── LoginPage.jsx
+        │   ├── NotFound.jsx
+        │   ├── PrivacyPolicy.jsx
+        │   └── TermsConditions.jsx
+        ├── providers/
+        │   └── QueryProvider.jsx
+        ├── router/
+        │   └── index.jsx
+        ├── theme/
+        │   └── index.jsx
+        └── utils/
+            └── toast.js
+
+================================================
+FILE: index.html
+================================================
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <title>SBIMS</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+
+
+
+================================================
+FILE: package.json
+================================================
+{
+  "name": "testbed-fe",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@fontsource/atkinson-hyperlegible": "^5.3.0",
+    "@hookform/resolvers": "^5.7.1",
+    "@mui/icons-material": "^9.2.0",
+    "@mui/material": "^9.2.0",
+    "@tanstack/react-query": "^5.101.4",
+    "axios": "^1.19.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "react-hook-form": "^7.84.0",
+    "react-hot-toast": "^2.6.0",
+    "react-router-dom": "^7.18.2",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@tanstack/react-query-devtools": "^5.101.4",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.4",
+    "eslint": "^10.8.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.3",
+    "globals": "^17.7.0",
+    "vite": "^8.2.0"
+  }
+}
+
+
+
+================================================
+FILE: vite.config.js
+================================================
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [react()],
+})
+
+
+
+================================================
+FILE: .env.development
+================================================
+VITE_API_URL=http://localhost:8000/api/v1
+
+
+================================================
+FILE: .gitingestignore
+================================================
+eslint.config.js
+public/
+package-lock.json
+*.md
+src/assets/
+node_modules
+
+
+================================================
+FILE: src/App.jsx
+================================================
+import AppRouter from "./router";
+
+export default function App() {
+  return <AppRouter />;
+}
+
+
+================================================
+FILE: src/index.css
+================================================
+/* Reset */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+/* Typography */
+
+body {
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  background-color: #f5f5f5;
+  color: #212121;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Images */
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+/* Links */
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+
+================================================
+FILE: src/main.jsx
+================================================
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
+import { ThemeProvider, CssBaseline } from "@mui/material";
+import QueryProvider from "./providers/QueryProvider";
+import { Toaster } from "react-hot-toast";
+
+import "@fontsource/atkinson-hyperlegible";
+
+import "./index.css";
+import App from "./App.jsx";
+import theme from "./theme";
+
+createRoot(document.getElementById("root")).render(
+  <StrictMode>
+    <BrowserRouter>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <QueryProvider>
+          <App />
+        </QueryProvider>
+        <Toaster
+          position="top-center"
+          toastOptions={{
+            duration: 4000,
+          }}
+        />
+      </ThemeProvider>
+    </BrowserRouter>
+  </StrictMode>,
+);
+
+
+
+================================================
+FILE: src/api/auth.js
+================================================
+import api from "./axios";
+
+import { endpoints } from "../config";
+
+// This keeps API communication separate from components.
+// The component should not know URLs, Axios details, or response structure.
+
+export const authApi = {
+  async login(credentials) {
+    const response = await api.post(endpoints.auth.login, credentials);
+
+    return response.data.data;
+  },
+
+  async getMe() {
+    const response = await api.get(endpoints.auth.me);
+
+    return response.data.data;
+  },
+
+  async logout() {
+    const response = await api.post(endpoints.auth.logout);
+
+    return response.data;
+  },
+
+  async changePassword(payload) {
+    const response = await api.post(endpoints.auth.changePassword, payload);
+
+    return response.data.data;
+  },
+
+  async refresh(refreshToken) {
+    const response = await api.post(endpoints.auth.refresh, {
+      refreshToken,
+    });
+
+    return response.data.data;
+  },
+};
+
+
+
+================================================
+FILE: src/api/axios.js
+================================================
+import axios from "axios";
+
+import { env, endpoints } from "../config";
+import { authStorage } from "../auth";
+
+const api = axios.create({
+  baseURL: env.API_URL,
+
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+const refreshClient = axios.create({
+  baseURL: env.API_URL,
+
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+let isRefreshing = false;
+
+let refreshQueue = [];
+
+function processQueue(error, token = null) {
+  refreshQueue.forEach((promise) => {
+    if (error) {
+      promise.reject(error);
+    } else {
+      promise.resolve(token);
+    }
+  });
+
+  refreshQueue = [];
+}
+
+api.interceptors.request.use((config) => {
+  const token = authStorage.getAccessToken();
+
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  return config;
+});
+
+api.interceptors.response.use(
+  (response) => response,
+
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (!originalRequest) {
+      return Promise.reject(error);
+    }
+
+    if (error.response?.status !== 401 || originalRequest?._retry) {
+      return Promise.reject(error);
+    }
+
+    const refreshToken = authStorage.getRefreshToken();
+
+    if (!refreshToken) {
+      authStorage.clearSession();
+
+      return Promise.reject(error);
+    }
+
+    if (isRefreshing) {
+      return new Promise((resolve, reject) => {
+        refreshQueue.push({
+          resolve,
+          reject,
+        });
+      }).then((token) => {
+        originalRequest.headers.Authorization = `Bearer ${token}`;
+
+        return api(originalRequest);
+      });
+    }
+
+    originalRequest._retry = true;
+
+    isRefreshing = true;
+
+    try {
+      const response = await refreshClient.post(endpoints.auth.refresh, {
+        refreshToken,
+      });
+
+      const { accessToken, refreshToken: newRefreshToken } = response.data.data;
+
+      authStorage.setTokens({
+        accessToken,
+        refreshToken: newRefreshToken,
+      });
+
+      processQueue(null, accessToken);
+
+      originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+
+      return api(originalRequest);
+    } catch (refreshError) {
+      processQueue(refreshError, null);
+
+      authStorage.clearSession();
+
+      return Promise.reject(refreshError);
+    } finally {
+      isRefreshing = false;
+    }
+  },
+);
+
+export default api;
+
+
+
+================================================
+FILE: src/auth/authStorage.js
+================================================
+const ACCESS_TOKEN_KEY = "sbims_access_token";
+const REFRESH_TOKEN_KEY = "sbims_refresh_token";
+const USER_KEY = "sbims_user";
+
+export const authStorage = {
+  setTokens({ accessToken, refreshToken }) {
+    localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
+
+    localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+  },
+
+  getAccessToken() {
+    return localStorage.getItem(ACCESS_TOKEN_KEY);
+  },
+
+  getRefreshToken() {
+    return localStorage.getItem(REFRESH_TOKEN_KEY);
+  },
+
+  clearSession() {
+    localStorage.removeItem(ACCESS_TOKEN_KEY);
+    localStorage.removeItem(REFRESH_TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
+  },
+
+  hasSession() {
+    return Boolean(this.getAccessToken() && this.getRefreshToken());
+  },
+
+  setUser(user) {
+    localStorage.setItem(USER_KEY, JSON.stringify(user));
+  },
+
+  getUser() {
+    const user = localStorage.getItem(USER_KEY);
+
+    return user ? JSON.parse(user) : null;
+  },
+};
+
+
+
+================================================
+FILE: src/auth/index.js
+================================================
+export { authStorage } from "./authStorage";
+
+
+================================================
+FILE: src/components/AppHeader.jsx
+================================================
+import { AppBar, Box, Button, Toolbar, Typography } from "@mui/material";
+import { Link, useNavigate } from "react-router-dom";
+
+import notify from "../utils/toast";
+import logo from "../assets/logo.webp";
+import useAuth, { useLogout } from "../hooks/useAuth";
+export default function AppHeader() {
+  const { user } = useAuth();
+  const logout = useLogout();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout.mutate(undefined, {
+      onSuccess() {
+        notify.success("Signed out successfully.");
+      },
+
+      onError() {
+        // Token may already be invalid.
+        notify.success("Signed out.");
+      },
+
+      onSettled() {
+        navigate("/", {
+          replace: true,
+        });
+      },
+    });
+  };
+
+  return (
+    <AppBar
+      position="static"
+      color="inherit"
+      elevation={0}
+      sx={{
+        borderBottom: 1,
+        borderColor: "divider",
+        bgcolor: "background.default",
+      }}
+    >
+      <Toolbar
+        sx={{
+          minHeight: 72,
+          display: "flex",
+          justifyContent: "space-between",
+        }}
+      >
+        <Box
+          component={Link}
+          to="/dashboard"
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            textDecoration: "none",
+          }}
+        >
+          <Box
+            component="img"
+            src={logo}
+            alt="SBIMS"
+            sx={{
+              height: 50,
+              width: "auto",
+            }}
+          />
+        </Box>
+
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 2,
+          }}
+        >
+          <Box sx={{ textAlign: "right" }}>
+            <Typography variant="body2" fontWeight={600}>
+              {user?.firstName} {user?.lastName}
+            </Typography>
+
+            <Typography variant="caption" color="text.secondary">
+              {user?.role}
+            </Typography>
+          </Box>
+
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={handleLogout}
+            disabled={logout.isPending}
+          >
+            Logout
+          </Button>
+        </Box>
+      </Toolbar>
+    </AppBar>
+  );
+}
+
+
+
+================================================
+FILE: src/components/ChangePasswordModal.jsx
+================================================
+import { useState } from "react";
+
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  IconButton,
+  InputAdornment,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
+
+import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Controller, useForm } from "react-hook-form";
+
+import { useChangePassword } from "../hooks/useAuth";
+
+import notify from "../utils/toast";
+
+const schema = z
+  .object({
+    currentPassword: z.string().min(1, "Current password is required"),
+
+    newPassword: z.string().min(8, "Password must be at least 8 characters"),
+
+    confirmPassword: z.string().min(1, "Please confirm your password"),
+  })
+  .refine((data) => data.newPassword !== data.currentPassword, {
+    path: ["newPassword"],
+    message: "New password must be different from the current password.",
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    path: ["confirmPassword"],
+    message: "Passwords do not match.",
+  });
+
+export default function ChangePasswordModal({ open }) {
+  const changePassword = useChangePassword();
+
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const { control, handleSubmit, reset } = useForm({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
+    },
+  });
+
+  const onSubmit = async (values) => {
+    try {
+      await changePassword.mutateAsync({
+        currentPassword: values.currentPassword,
+        newPassword: values.newPassword,
+      });
+
+      notify.success("Password updated successfully.");
+
+      reset();
+    } catch (error) {
+      notify.error(
+        error?.response?.data?.message ?? "Unable to change password.",
+      );
+    }
+  };
+
+  return (
+    <Dialog open={open} disableRestoreFocus fullScreen onClose={() => {}}>
+      <DialogContent
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Stack
+          spacing={3}
+          sx={{
+            width: 450,
+            maxWidth: "100%",
+          }}
+        >
+          <Typography variant="h4">Change Your Password</Typography>
+
+          <Typography color="text.secondary">
+            You are using a temporary password assigned by an administrator.
+            Please create a new password before continuing.
+          </Typography>
+
+          <Controller
+            name="currentPassword"
+            control={control}
+            render={({ field, fieldState }) => (
+              <TextField
+                {...field}
+                type={showCurrentPassword ? "text" : "password"}
+                label="Current Password"
+                autoComplete="current-password"
+                error={!!fieldState.error}
+                helperText={fieldState.error?.message}
+                fullWidth
+                slotProps={{
+                  input: {
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          onClick={() =>
+                            setShowCurrentPassword((prev) => !prev)
+                          }
+                          edge="end"
+                        >
+                          {showCurrentPassword ? (
+                            <VisibilityOff />
+                          ) : (
+                            <Visibility />
+                          )}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  },
+                }}
+              />
+            )}
+          />
+
+          <Controller
+            name="newPassword"
+            control={control}
+            render={({ field, fieldState }) => (
+              <TextField
+                {...field}
+                type={showNewPassword ? "text" : "password"}
+                label="New Password"
+                autoComplete="new-password"
+                error={!!fieldState.error}
+                helperText={fieldState.error?.message}
+                fullWidth
+                slotProps={{
+                  input: {
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          onClick={() => setShowNewPassword((prev) => !prev)}
+                          edge="end"
+                        >
+                          {showNewPassword ? <VisibilityOff /> : <Visibility />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  },
+                }}
+              />
+            )}
+          />
+
+          <Controller
+            name="confirmPassword"
+            control={control}
+            render={({ field, fieldState }) => (
+              <TextField
+                {...field}
+                type={showConfirmPassword ? "text" : "password"}
+                label="Confirm Password"
+                autoComplete="new-password"
+                error={!!fieldState.error}
+                helperText={fieldState.error?.message}
+                fullWidth
+                slotProps={{
+                  input: {
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          onClick={() =>
+                            setShowConfirmPassword((prev) => !prev)
+                          }
+                          edge="end"
+                        >
+                          {showConfirmPassword ? (
+                            <VisibilityOff />
+                          ) : (
+                            <Visibility />
+                          )}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  },
+                }}
+              />
+            )}
+          />
+
+          <Button
+            variant="contained"
+            size="large"
+            onClick={handleSubmit(onSubmit)}
+            loading={changePassword.isPending}
+          >
+            Change Password
+          </Button>
+        </Stack>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+
+
+================================================
+FILE: src/components/Footer.jsx
+================================================
+import { Box, Link, Typography } from "@mui/material";
+import { Link as RouterLink } from "react-router-dom";
+
+export default function Footer() {
+  return (
+    <Box
+      component="footer"
+      sx={{
+        py: 3,
+        px: 2,
+        textAlign: "center",
+        color: "text.secondary",
+        borderTop: 1,
+        borderColor: "divider",
+      }}
+    >
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          flexWrap: "wrap",
+          gap: 2,
+          mb: 1.5,
+        }}
+      >
+        <Link
+          component={RouterLink}
+          to="/privacy-policy"
+          underline="hover"
+          color="inherit"
+          variant="caption"
+        >
+          Privacy Policy
+        </Link>
+
+        <Link
+          component={RouterLink}
+          to="/terms-and-conditions"
+          underline="hover"
+          color="inherit"
+          variant="caption"
+        >
+          Terms & Conditions
+        </Link>
+
+        <Link
+          component={RouterLink}
+          to="/about"
+          underline="hover"
+          color="inherit"
+          variant="caption"
+        >
+          About
+        </Link>
+      </Box>
+
+      <Typography variant="body2">
+        © {new Date().getFullYear()} SBIMS
+      </Typography>
+
+      <Typography variant="caption" display="block">
+        Academic Project for Educational Purposes Only
+      </Typography>
+    </Box>
+  );
+}
+
+
+
+================================================
+FILE: src/components/Header.jsx
+================================================
+import { AppBar, Toolbar, Box } from "@mui/material";
+import { Link } from "react-router-dom";
+import logo from "../assets/logo.webp";
+
+export default function Header() {
+  return (
+    <AppBar
+      position="static"
+      color="inherit"
+      elevation={0}
+      sx={{
+        borderBottom: 1,
+        borderColor: "divider",
+        bgcolor: "background.default",
+      }}
+    >
+      <Toolbar sx={{ minHeight: 72 }}>
+        <Box
+          component={Link}
+          to="/"
+          sx={{
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
+          <Box
+            component="img"
+            src={logo}
+            alt="SBIMS"
+            sx={{
+              height: 50,
+              width: "auto"
+            }}
+          />
+        </Box>
+      </Toolbar>
+    </AppBar>
+  );
+}
+
+
+
+================================================
+FILE: src/components/Sidebar.jsx
+================================================
+import {
+  Box,
+  Divider,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+} from "@mui/material";
+
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import PeopleIcon from "@mui/icons-material/People";
+import BusinessIcon from "@mui/icons-material/Business";
+
+import { Link } from "react-router-dom";
+
+const menuItems = [
+  {
+    label: "Dashboard",
+    path: "/dashboard",
+    icon: <DashboardIcon />,
+    roles: [
+      "administrator",
+      "internship_coordinator",
+      "faculty_adviser",
+      "student",
+      "hte_supervisor",
+    ],
+  },
+
+  {
+    label: "Users",
+    path: "/users",
+    icon: <PeopleIcon />,
+    roles: ["administrator"],
+  },
+
+  {
+    label: "Companies",
+    path: "/companies",
+    icon: <BusinessIcon />,
+    roles: ["administrator", "internship_coordinator"],
+  },
+];
+
+export default function Sidebar({ role }) {
+  const allowedItems = menuItems.filter((item) => item.roles.includes(role));
+
+  return (
+    <Box
+      sx={{
+        width: 260,
+        height: "100%",
+        borderRight: 1,
+        borderColor: "divider",
+        bgcolor: "background.paper",
+      }}
+    >
+      <List>
+        {allowedItems.map((item) => (
+          <ListItemButton key={item.path} component={Link} to={item.path}>
+            <ListItemIcon>{item.icon}</ListItemIcon>
+
+            <ListItemText primary={item.label} />
+          </ListItemButton>
+        ))}
+      </List>
+
+      <Divider />
+    </Box>
+  );
+}
+
+
+
+================================================
+FILE: src/config/endpoints.js
+================================================
+const endpoints = {
+  auth: {
+    login: "/auth/login",
+    refresh: "/auth/refresh",
+    logout: "/auth/logout",
+    me: "/auth/me",
+    changePassword: "/auth/change-password",
+  },
+
+  users: {
+    list: "/users",
+    details: (id) => `/users/${id}`,
+  },
+};
+
+export default Object.freeze(endpoints);
+
+
+================================================
+FILE: src/config/env.js
+================================================
+const env = {
+  API_URL: import.meta.env.VITE_API_URL,
+  APP_NAME: import.meta.env.VITE_APP_NAME,
+  APP_ENV: import.meta.env.MODE,
+};
+
+// Only this file reads from import.meta.env
+export default Object.freeze(env);
+
+
+================================================
+FILE: src/config/index.js
+================================================
+export { default as env } from "./env";
+export { default as endpoints } from "./endpoints";
+
+
+================================================
+FILE: src/guards/AuthGuard.jsx
+================================================
+import { Box, CircularProgress } from "@mui/material";
+
+import { Navigate, Outlet } from "react-router-dom";
+
+import useAuth from "../hooks/useAuth";
+
+export default function AuthGuard() {
+  const { user, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <Box
+        sx={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <Outlet />;
+}
+
+
+
+================================================
+FILE: src/guards/GuestGuard.jsx
+================================================
+import { Navigate, Outlet } from "react-router-dom";
+
+import useAuth from "../hooks/useAuth";
+
+export default function GuestGuard() {
+  const { user, isLoading } = useAuth();
+
+  if (isLoading) {
+    return null;
+  }
+
+  if (user) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return <Outlet />;
+}
+
+
+================================================
+FILE: src/guards/PasswordChangeGuard.jsx
+================================================
+import useAuth from "../hooks/useAuth";
+import ChangePasswordModal from "../components/ChangePasswordModal";
+
+export default function PasswordChangeGuard({ children }) {
+  const { user, isLoading } = useAuth();
+
+  if (isLoading) {
+    return null;
+  }
+
+  return (
+    <>
+      {children}
+
+      <ChangePasswordModal open={user?.mustChangePassword === true} />
+    </>
+  );
+}
+
+
+
+================================================
+FILE: src/hooks/useAuth.js
+================================================
+import { useEffect } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
+import { authApi } from "../api/auth";
+
+import { authStorage } from "../auth";
+
+export function useLogin() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: authApi.login,
+
+    onSuccess: (session) => {
+      authStorage.setTokens({
+        accessToken: session.accessToken,
+        refreshToken: session.refreshToken,
+      });
+
+      authStorage.setUser(session.user);
+
+      queryClient.setQueryData(["currentUser"], session.user);
+    },
+  });
+}
+
+export function useCurrentUser() {
+  return useQuery({
+    queryKey: ["currentUser"],
+    queryFn: authApi.getMe,
+    enabled: authStorage.hasSession(),
+    initialData: authStorage.getUser(),
+    staleTime: 1000 * 60 * 5,
+  });
+}
+
+export function useLogout() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: authApi.logout,
+
+    onSettled: () => {
+      authStorage.clearSession();
+
+      queryClient.clear();
+    },
+  });
+}
+
+export function useChangePassword() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: authApi.changePassword,
+
+    onSuccess: (session) => {
+      if (session.accessToken && session.refreshToken) {
+        authStorage.setTokens({
+          accessToken: session.accessToken,
+          refreshToken: session.refreshToken,
+        });
+      }
+
+      // Update persistent storage
+      authStorage.setUser(session.user);
+
+      // Update React Query cache
+      queryClient.setQueryData(["currentUser"], session.user);
+    },
+  });
+}
+
+
+export default function useAuth() {
+  const { data: user, isLoading, isError } = useCurrentUser();
+
+  const logoutMutation = useLogout();
+
+  useEffect(() => {
+    if (isError) {
+      authStorage.clearSession();
+    }
+  }, [isError]);
+
+  return {
+    user,
+    isLoading,
+    isAuthenticated: Boolean(user),
+
+    logout: logoutMutation.mutate,
+  };
+}
+
+
+
+================================================
+FILE: src/layouts/AppLayout.jsx
+================================================
+import { Box } from "@mui/material";
+
+import { Outlet } from "react-router-dom";
+
+import Sidebar from "../components/Sidebar";
+import AppHeader from "../components/AppHeader";
+import Footer from "../components/Footer";
+
+import useAuth from "../hooks/useAuth";
+import PasswordChangeGuard from "../guards/PasswordChangeGuard";
+
+export default function AppLayout() {
+  const { user } = useAuth();
+
+  return (
+    <Box
+      sx={{
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      <AppHeader />
+
+      <Box
+        sx={{
+          flex: 1,
+          display: "flex",
+        }}
+      >
+        <Sidebar role={user?.role} />
+
+        <Box
+          component="main"
+          sx={{
+            flex: 1,
+            p: 3,
+          }}
+        >
+          <PasswordChangeGuard>
+            <Outlet />
+          </PasswordChangeGuard>
+        </Box>
+      </Box>
+
+      <Footer />
+    </Box>
+  );
+}
+
+
+
+================================================
+FILE: src/layouts/PublicLayout.jsx
+================================================
+import { Box } from "@mui/material";
+import { Outlet } from "react-router-dom";
+
+import Header from "../components/Header";
+import Footer from "../components/Footer";
+
+export default function PublicLayout() {
+  return (
+    <Box
+      sx={{
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        bgcolor: "background.default",
+      }}
+    >
+      <Header />
+
+      <Box
+        component="main"
+        sx={{
+          flex: 1,
+          display: "flex",
+        }}
+      >
+        <Outlet />
+      </Box>
+
+      <Footer />
+    </Box>
+  );
+}
+
+
+
+================================================
+FILE: src/pages/About.jsx
+================================================
+import { Container, Divider, Stack, Typography } from "@mui/material";
+
+export default function About() {
+  return (
+    <Container
+      maxWidth="md"
+      sx={{
+        py: 6,
+      }}
+    >
+      <Stack spacing={3}>
+        <Typography variant="h3" fontWeight={700}>
+          About SBIMS
+        </Typography>
+        <Divider />
+
+        <Typography variant="body1">
+          The SBIMS is an academic capstone project designed to explore the
+          design, development, and evaluation of an internship management
+          platform for higher education institutions.
+        </Typography>
+
+        <Typography variant="h5" fontWeight={600}>
+          Project Overview
+        </Typography>
+
+        <Typography>
+          SBIMS aims to provide a centralized system for managing internship
+          related activities, including student records, internship placements,
+          company information, evaluations, and related administrative
+          processes.
+        </Typography>
+
+        <Typography variant="h5" fontWeight={600}>
+          Capstone Project Title
+        </Typography>
+
+        <Typography>
+          Design, Development, and Evaluation of a Serverless-Based Internship
+          Management System for Higher Education Institutions
+        </Typography>
+
+        <Typography variant="h5" fontWeight={600}>
+          Purpose
+        </Typography>
+
+        <Typography>
+          This project was developed to demonstrate the application of modern
+          software development practices, serverless architecture concepts, and
+          information system design principles in creating an internship
+          management solution.
+        </Typography>
+
+        <Typography variant="h5" fontWeight={600}>
+          Development Status
+        </Typography>
+
+        <Typography>
+          SBIMS is currently under active development. Features, interfaces, and
+          system capabilities may change as the project progresses through
+          implementation, testing, and evaluation.
+        </Typography>
+
+        <Typography variant="h5" fontWeight={600}>
+          Prototype Interface
+        </Typography>
+
+        <Typography>
+          This application serves as the user interface representation of the
+          SBIMS functional prototype currently being developed. It provides the
+          frontend experience for interacting with the system and demonstrates
+          the intended workflows, features, and user interactions of the
+          proposed internship management solution.
+        </Typography>
+
+        <Typography variant="h5" fontWeight={600}>
+          Academic Project Notice
+        </Typography>
+
+        <Typography>
+          SBIMS is developed solely for educational, research, demonstration,
+          and evaluation purposes. It is not a commercial software product or
+          service.
+        </Typography>
+
+        <Divider />
+      </Stack>
+    </Container>
+  );
+}
+
+
+
+================================================
+FILE: src/pages/Dashboard.jsx
+================================================
+import { Box, Paper, Stack, Typography } from "@mui/material";
+
+import useAuth from "../hooks/useAuth";
+
+const roleDashboard = {
+  administrator: {
+    title: "Administrator Dashboard",
+    description:
+      "Manage users, system configuration, and administrative operations.",
+  },
+
+  internship_coordinator: {
+    title: "Internship Coordinator Dashboard",
+    description:
+      "Manage internship assignments, monitoring, and coordination activities.",
+  },
+
+  faculty_adviser: {
+    title: "Faculty Adviser Dashboard",
+    description: "Monitor assigned students and internship progress.",
+  },
+
+  student: {
+    title: "Student Dashboard",
+    description: "Manage your internship records and requirements.",
+  },
+
+  hte_supervisor: {
+    title: "HTE Supervisor Dashboard",
+    description: "Review student internship activities and evaluations.",
+  },
+};
+
+export default function Dashboard() {
+  const { user } = useAuth();
+
+  if (!user) {
+    return null;
+  }
+
+  const dashboard = roleDashboard[user.role];
+
+  return (
+    <Box
+      sx={{
+        p: 4,
+        width: "100%",
+      }}
+    >
+      <Paper
+        sx={{
+          p: 4,
+        }}
+      >
+        <Stack spacing={2}>
+          <Typography variant="h4" fontWeight={700}>
+            {dashboard.title}
+          </Typography>
+
+          <Typography>
+            Welcome, {user.firstName} {user.lastName}
+          </Typography>
+
+          <Typography color="text.secondary">
+            {dashboard.description}
+          </Typography>
+
+          <Typography variant="body2">
+            Role: {user.role}
+          </Typography>
+        </Stack>
+      </Paper>
+    </Box>
+  );
+}
+
+
+================================================
+FILE: src/pages/LoginPage.jsx
+================================================
+import { useState } from "react";
+import {
+  Box,
+  Button,
+  Container,
+  IconButton,
+  InputAdornment,
+  Paper,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
+
+import { Visibility, VisibilityOff } from "@mui/icons-material";
+
+import { useNavigate } from "react-router-dom";
+
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+
+import { useLogin } from "../hooks/useAuth";
+import notify from "../utils/toast";
+
+const loginSchema = z.object({
+  email: z.email("Please enter a valid email address."),
+  password: z.string().min(1, "Password is required."),
+});
+
+export default function LoginPage() {
+  const navigate = useNavigate();
+
+  const login = useLogin();
+  const [showPassword, setShowPassword] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const onSubmit = async (values) => {
+    try {
+      const session = await login.mutateAsync(values);
+
+      if (session.user.mustChangePassword) {
+        notify.warning("You must change your password before continuing.");
+      } else {
+        notify.success("Welcome back!");
+      }
+
+      navigate("/dashboard", {
+        replace: true,
+      });
+    } catch (error) {
+      notify.error(error.response?.data?.message ?? "Unable to sign in.");
+    }
+  };
+
+  return (
+    <Container
+      maxWidth="sm"
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        py: 6,
+      }}
+    >
+      <Paper
+        elevation={3}
+        sx={{
+          width: "100%",
+          p: 5,
+        }}
+      >
+        <Stack spacing={4}>
+          <Box sx={{ textAlign: "center" }}>
+            <Typography variant="h5" fontWeight={600}>
+              SBIMS Portal
+            </Typography>
+
+            <Typography variant="body2" color="text.secondary" mt={1}>
+              Sign in to access the system
+            </Typography>
+          </Box>
+
+          <Box component="form" onSubmit={handleSubmit(onSubmit)}>
+            <Stack spacing={2.5}>
+              <TextField
+                label="Email Address"
+                type="email"
+                fullWidth
+                autoComplete="email"
+                {...register("email")}
+                error={!!errors.email}
+                helperText={errors.email?.message}
+              />
+
+              <TextField
+                label="Password"
+                type={showPassword ? "text" : "password"}
+                fullWidth
+                autoComplete="current-password"
+                {...register("password")}
+                error={!!errors.password}
+                helperText={errors.password?.message}
+                slotProps={{
+                  input: {
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          aria-label="toggle password visibility"
+                          onClick={() => setShowPassword((prev) => !prev)}
+                          edge="end"
+                        >
+                          {showPassword ? <VisibilityOff /> : <Visibility />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  },
+                }}
+              />
+
+              <Button
+                type="submit"
+                variant="contained"
+                size="large"
+                fullWidth
+                loading={login.isPending}
+              >
+                Sign In
+              </Button>
+            </Stack>
+          </Box>
+        </Stack>
+      </Paper>
+    </Container>
+  );
+}
+
+
+
+================================================
+FILE: src/pages/NotFound.jsx
+================================================
+import { Button, Container, Stack, Typography } from "@mui/material";
+import { Link as RouterLink } from "react-router-dom";
+
+import useAuth from "../hooks/useAuth";
+
+export default function NotFound() {
+  const { user } = useAuth();
+
+  return (
+    <Container
+      maxWidth="sm"
+      sx={{
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <Stack spacing={3} alignItems="center" textAlign="center">
+        <Typography variant="h1" fontWeight={700}>
+          404
+        </Typography>
+
+        <Typography variant="h5">Page Not Found</Typography>
+
+        <Typography color="text.secondary">
+          The page you're looking for doesn't exist or may have been moved.
+        </Typography>
+
+        <Button component={RouterLink} to={user ? "/dashboard" : "/"} variant="contained" size="large">
+          {user ? "Back to Dashboard" : "Back to Home"}
+        </Button>
+      </Stack>
+    </Container>
+  );
+}
+
+
+
+================================================
+FILE: src/pages/PrivacyPolicy.jsx
+================================================
+import { Container, Stack, Typography, Divider } from "@mui/material";
+
+export default function PrivacyPolicy() {
+  return (
+    <Container
+      maxWidth="md"
+      sx={{
+        py: 6,
+      }}
+    >
+      <Stack spacing={3}>
+        <Typography variant="h3" fontWeight={700}>
+          Privacy Policy
+        </Typography>
+
+        <Typography color="text.secondary">
+          Last updated: August 2026
+        </Typography>
+
+        <Divider />
+
+        <Typography variant="body1">
+          The SBIMS is an academic capstone project developed for educational,
+          research, demonstration, and evaluation purposes. This Privacy Policy
+          explains how information may be collected, stored, and used while
+          interacting with the system.
+        </Typography>
+
+        <Typography variant="h5" fontWeight={600}>
+          1. Educational Purpose
+        </Typography>
+
+        <Typography>
+          SBIMS is not a commercial software service. The system is designed as
+          a prototype internal management system that demonstrates the design,
+          development, and evaluation of an internship management platform for
+          higher education institutions.
+        </Typography>
+
+        <Typography variant="h5" fontWeight={600}>
+          2. Information We Collect
+        </Typography>
+
+        <Typography>
+          Depending on system usage, SBIMS may process information such as:
+        </Typography>
+
+        <Typography component="ul">
+          <li>User account information</li>
+          <li>Name and profile information</li>
+          <li>Email addresses</li>
+          <li>Internship records and related details</li>
+          <li>Company or organization information</li>
+          <li>Internship documents and evaluation records</li>
+          <li>System activity information required for operation</li>
+        </Typography>
+
+        <Typography variant="h5" fontWeight={600}>
+          3. Synthetic and Test Data
+        </Typography>
+
+        <Typography>
+          Users, developers, and evaluators are encouraged to use synthetic,
+          fictional, anonymized, or test information when interacting with
+          SBIMS.
+        </Typography>
+
+        <Typography>
+          Users are advised not to submit real sensitive personal information,
+          including government identification numbers, financial information,
+          private documents, or other personally identifiable information (PII)
+          unless explicitly required for a controlled evaluation activity.
+        </Typography>
+
+        <Typography>
+          The use of disposable or non-personal email addresses is recommended
+          for testing purposes.
+        </Typography>
+
+        <Typography variant="h5" fontWeight={600}>
+          4. Use of Information
+        </Typography>
+
+        <Typography>
+          Information processed by SBIMS is used only for purposes related to
+          system functionality, testing, demonstration, evaluation, and
+          improvement of the academic project.
+        </Typography>
+
+        <Typography variant="h5" fontWeight={600}>
+          5. Data Security
+        </Typography>
+
+        <Typography>
+          Reasonable technical measures are implemented to protect information
+          within the scope of this academic project. However, SBIMS should not
+          be considered a production-grade system unless additional security
+          reviews, compliance assessments, and operational controls are
+          implemented.
+        </Typography>
+
+        <Typography variant="h5" fontWeight={600}>
+          6. Data Retention
+        </Typography>
+
+        <Typography>
+          Data may be retained only as necessary for development, testing,
+          evaluation, and demonstration purposes. Test data may be removed or
+          modified during system maintenance.
+        </Typography>
+
+        <Typography variant="h5" fontWeight={600}>
+          7. User Responsibility
+        </Typography>
+
+        <Typography>
+          Users are responsible for ensuring that information they provide is
+          appropriate for an academic testing environment and does not expose
+          unnecessary personal or confidential information.
+        </Typography>
+
+        <Typography variant="h5" fontWeight={600}>
+          8. Changes to This Policy
+        </Typography>
+
+        <Typography>
+          This Privacy Policy may be updated as the SBIMS project evolves during
+          development and evaluation.
+        </Typography>
+
+        <Divider />
+      </Stack>
+    </Container>
+  );
+}
+
+
+
+================================================
+FILE: src/pages/TermsConditions.jsx
+================================================
+import { Container, Stack, Typography, Divider } from "@mui/material";
+
+export default function TermsConditions() {
+  return (
+    <Container
+      maxWidth="md"
+      sx={{
+        py: 6,
+      }}
+    >
+      <Stack spacing={3}>
+        <Typography variant="h3" fontWeight={700}>
+          Terms and Conditions
+        </Typography>
+
+        <Typography color="text.secondary">
+          Last updated: August 2026
+        </Typography>
+
+        <Divider />
+
+        <Typography>
+          Welcome to the SBIMS. By accessing or using this system, users
+          acknowledge and agree to the following terms and conditions.
+        </Typography>
+
+        <Typography variant="h5" fontWeight={600}>
+          1. Academic Project Use
+        </Typography>
+
+        <Typography>
+          SBIMS is an academic capstone project developed for educational,
+          research, demonstration, and evaluation purposes. The system is not
+          provided as a commercial software service.
+        </Typography>
+
+        <Typography variant="h5" fontWeight={600}>
+          2. Intended Use
+        </Typography>
+
+        <Typography>
+          The system is intended to demonstrate an internship management
+          platform concept for higher education institutions. Any production
+          deployment requires additional development, security review,
+          maintenance, and operational support.
+        </Typography>
+
+        <Typography variant="h5" fontWeight={600}>
+          3. User Accounts
+        </Typography>
+
+        <Typography>
+          Users are responsible for maintaining the security of their account
+          credentials and should avoid sharing account access with unauthorized
+          individuals.
+        </Typography>
+
+        <Typography variant="h5" fontWeight={600}>
+          4. Acceptable Use
+        </Typography>
+
+        <Typography>
+          Users agree not to misuse the system, attempt unauthorized access,
+          disrupt system operation, or submit inappropriate, unlawful, or
+          harmful content.
+        </Typography>
+
+        <Typography variant="h5" fontWeight={600}>
+          5. Data Accuracy
+        </Typography>
+
+        <Typography>
+          Users are responsible for the accuracy of information they provide.
+          Since SBIMS may be used with synthetic or test data, information
+          displayed in the system may not represent real-world records.
+        </Typography>
+
+        <Typography variant="h5" fontWeight={600}>
+          6. Intellectual Property
+        </Typography>
+
+        <Typography>
+          SBIMS and its associated source code, documentation, and materials are
+          part of an academic software project developed by the project team.
+        </Typography>
+
+        <Typography variant="h5" fontWeight={600}>
+          7. Disclaimer
+        </Typography>
+
+        <Typography>
+          SBIMS is provided on an "as-is" basis for academic purposes. The
+          developers do not guarantee uninterrupted availability, complete
+          accuracy, or suitability for production environments.
+        </Typography>
+
+        <Typography variant="h5" fontWeight={600}>
+          8. Limitation of Liability
+        </Typography>
+
+        <Typography>
+          The project developers shall not be held responsible for any loss,
+          damages, or issues resulting from the use of this academic prototype.
+        </Typography>
+
+        <Typography variant="h5" fontWeight={600}>
+          9. Changes to These Terms
+        </Typography>
+
+        <Typography>
+          These Terms and Conditions may be updated as the SBIMS project
+          progresses through development and evaluation.
+        </Typography>
+
+        <Divider />
+      </Stack>
+    </Container>
+  );
+}
+
+
+
+================================================
+FILE: src/providers/QueryProvider.jsx
+================================================
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+      refetchOnWindowFocus: false,
+      staleTime: 1000 * 60 * 5,
+    },
+    mutations: {
+      retry: false,
+    },
+  },
+});
+
+export default function QueryProvider({ children }) {
+  return (
+    <QueryClientProvider client={queryClient}>
+      {children}
+
+      <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
+  );
+}
+
+
+================================================
+FILE: src/router/index.jsx
+================================================
+import { Routes, Route } from "react-router-dom";
+
+import PublicLayout from "../layouts/PublicLayout";
+import LoginPage from "../pages/LoginPage";
+import About from "../pages/About";
+import PrivacyPolicy from "../pages/PrivacyPolicy";
+import TermsConditions from "../pages/TermsConditions";
+
+import Dashboard from "../pages/Dashboard";
+import AppLayout from "../layouts/AppLayout";
+import AuthGuard from "../guards/AuthGuard";
+import GuestGuard from "../guards/GuestGuard";
+
+import NotFound from "../pages/NotFound";
+
+export default function AppRouter() {
+  return (
+    <Routes>
+      {/* Public Routes */}
+      <Route element={<PublicLayout />}>
+        <Route element={<GuestGuard />}>
+          <Route path="/" element={<LoginPage />} />
+        </Route>
+
+        <Route path="/about" element={<About />} />
+
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+
+        <Route path="/terms-and-conditions" element={<TermsConditions />} />
+      </Route>
+
+      {/* Protected Routes */}
+      <Route element={<AuthGuard />}>
+        <Route element={<AppLayout />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+
+          {/*  <Route path="/users" element={<Users />} /> */}
+        </Route>
+      </Route>
+
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+}
+
+
+
+================================================
+FILE: src/theme/index.jsx
+================================================
+import { createTheme } from "@mui/material/styles";
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: "#526D82",
+      light: "#6D8699",
+      dark: "#27374D",
+      contrastText: "#fff",
+    },
+
+    secondary: {
+      main: "#9DB2BF",
+      light: "#DDE6ED",
+      dark: "#7B97A8",
+    },
+
+    background: {
+      default: "#F7F9FB",
+      paper: "#FFFFFF",
+    },
+
+    text: {
+      primary: "#27374D",
+      secondary: "#526D82",
+    },
+
+    divider: "#DDE6ED",
+
+    success: {
+      main: "#2E7D32",
+    },
+
+    warning: {
+      main: "#ED6C02",
+    },
+
+    error: {
+      main: "#D32F2F",
+    },
+
+    info: {
+      main: "#0288D1",
+    },
+  },
+
+  typography: {
+    fontFamily: `"Atkinson Hyperlegible", "Inter", "Roboto", sans-serif`,
+  },
+
+  shape: {
+    borderRadius: 10,
+  },
+
+  components: {
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          borderRadius: 12,
+          boxShadow: "0 2px 8px rgba(39,55,77,0.08)",
+        },
+      },
+    },
+
+    MuiButton: {
+      defaultProps: {
+        disableElevation: true,
+      },
+
+      styleOverrides: {
+        root: {
+          textTransform: "none",
+          borderRadius: 8,
+        },
+      },
+    },
+
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          backgroundImage: "none",
+        },
+      },
+    },
+  },
+});
+
+export default theme;
+
+
+
+================================================
+FILE: src/utils/toast.js
+================================================
+import toast from "react-hot-toast";
+
+const notify = {
+  success(message) {
+    toast.success(message);
+  },
+
+  error(message) {
+    toast.error(message);
+  },
+
+  info(message) {
+    toast.info(message);
+  },
+
+  warning(message) {
+    toast(message, {
+      icon: "⚠️",
+    });
+  },
+};
+
+export default notify;
+
+

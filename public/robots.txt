@@ -1,0 +1,11 @@
+User-agent: *
+
+# Allow these sections
+Allow: /
+
+# Block these sections
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /account/
+
+Sitemap: https://yourdomain.com/sitemap.xml
