@@ -13,7 +13,7 @@ import {
 
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -127,6 +127,15 @@ export default function LoginPage() {
                   },
                 }}
               />
+
+              <Button
+                component={Link}
+                to="/forgot-password"
+                variant="text"
+                size="small"
+              >
+                Forgot Password?
+              </Button>
 
               <Button
                 type="submit"

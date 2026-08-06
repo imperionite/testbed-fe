@@ -37,4 +37,25 @@ export const authApi = {
 
     return response.data.data;
   },
+
+  async forgotPassword(email) {
+    const response = await api.post(endpoints.auth.forgotPassword, { email });
+
+    return response.data;
+  },
+
+  /**
+   * Called AFTER Supabase successfully
+   * changes the password.
+   *
+   * This only updates the application's
+   * profile (must_change_password, etc.)
+   */
+  async completePasswordReset(userId) {
+    const response = await api.post(endpoints.auth.completePasswordReset, {
+      userId,
+    });
+
+    return response.data.data;
+  },
 };

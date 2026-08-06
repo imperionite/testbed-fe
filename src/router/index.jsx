@@ -5,6 +5,8 @@ import LoginPage from "../pages/LoginPage";
 import About from "../pages/About";
 import PrivacyPolicy from "../pages/PrivacyPolicy";
 import TermsConditions from "../pages/TermsConditions";
+import ForgotPasswordPage from "../pages/ForgotPasswordPage";
+import ResetPasswordPage from "../pages/ResetPasswordPage";
 
 import Dashboard from "../pages/Dashboard";
 import AppLayout from "../layouts/AppLayout";
@@ -20,6 +22,8 @@ export default function AppRouter() {
       <Route element={<PublicLayout />}>
         <Route element={<GuestGuard />}>
           <Route path="/" element={<LoginPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
         </Route>
 
         <Route path="/about" element={<About />} />

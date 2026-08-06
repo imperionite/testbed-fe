@@ -42,7 +42,6 @@ export function useLogout() {
 
     onSettled: () => {
       authStorage.clearSession();
-
       queryClient.clear();
     },
   });
@@ -54,23 +53,33 @@ export function useChangePassword() {
   return useMutation({
     mutationFn: authApi.changePassword,
 
-    onSuccess: (session) => {
-      if (session.accessToken && session.refreshToken) {
-        authStorage.setTokens({
-          accessToken: session.accessToken,
-          refreshToken: session.refreshToken,
-        });
-      }
-
-      // Update persistent storage
-      authStorage.setUser(session.user);
-
-      // Update React Query cache
-      queryClient.setQueryData(["currentUser"], session.user);
+    onSuccess: () => {
+      authStorage.clearSession();
+      queryClient.clear();
     },
   });
 }
 
+export function useForgotPassword() {
+  return useMutation({
+    mutationFn: authApi.forgotPassword,
+  });
+}
+
+/**
+ * Completes application-level password reset.
+ *
+ * Supabase already changed the password.
+ *
+ * Backend only:
+ * - clears must_change_password
+ * - updates profile state
+ */
+export function useCompletePasswordReset() {
+  return useMutation({
+    mutationFn: authApi.completePasswordReset,
+  });
+}
 
 export default function useAuth() {
   const { data: user, isLoading, isError } = useCurrentUser();
