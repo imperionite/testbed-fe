@@ -178,6 +178,3 @@ API calls are separated from UI components.
 ```
 Components → Hooks → API Layer → Backend
 ```
-
-
-
