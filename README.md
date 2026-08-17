@@ -179,11 +179,5 @@ API calls are separated from UI components.
 Components → Hooks → API Layer → Backend
 ```
 
-### Centralized Configuration
 
-Environment variables and API endpoints are managed separately for maintainability.
-
-### Reusable Components
-
-Shared UI elements such as layouts, dialogs, headers, and navigation are implemented as reusable components.
 
