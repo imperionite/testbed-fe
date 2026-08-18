@@ -11,11 +11,11 @@ import {
   Typography,
 } from "@mui/material";
 
-import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { Visibility, VisibilityOff, CheckCircle } from "@mui/icons-material";
 
 import { useNavigate, Link } from "react-router-dom";
 
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
@@ -23,7 +23,7 @@ import { useLogin } from "../hooks/useAuth";
 import notify from "../utils/toast";
 
 const loginSchema = z.object({
-  email: z.email("Please enter a valid email address."),
+  email: z.string().email("Please enter a valid email address."),
   password: z.string().min(1, "Password is required."),
 });
 
@@ -36,6 +36,7 @@ export default function LoginPage() {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(loginSchema),
@@ -44,6 +45,14 @@ export default function LoginPage() {
       password: "",
     },
   });
+
+  const passwordValue = useWatch({
+    control,
+    name: "password",
+    defaultValue: "",
+  });
+  
+  const isPasswordValid = passwordValue?.length >= 8;
 
   const onSubmit = async (values) => {
     try {
@@ -87,7 +96,7 @@ export default function LoginPage() {
             </Typography>
 
             <Typography variant="body2" color="text.secondary" mt={1}>
-              Sign in to access the system
+              Enter your credentials to login
             </Typography>
           </Box>
 
@@ -115,6 +124,9 @@ export default function LoginPage() {
                   input: {
                     endAdornment: (
                       <InputAdornment position="end">
+                        {isPasswordValid && (
+                          <CheckCircle color="success" sx={{ mr: 1 }} />
+                        )}
                         <IconButton
                           aria-label="toggle password visibility"
                           onClick={() => setShowPassword((prev) => !prev)}
@@ -133,6 +145,7 @@ export default function LoginPage() {
                 to="/forgot-password"
                 variant="text"
                 size="small"
+                sx={{ alignSelf: "flex-end" }}
               >
                 Forgot Password?
               </Button>
@@ -143,9 +156,22 @@ export default function LoginPage() {
                 size="large"
                 fullWidth
                 loading={login.isPending}
+                sx={{
+                  backgroundColor: "#4F6678",
+                  "&:hover": {
+                    backgroundColor: "#000000",
+                  },
+                }}
               >
                 Sign In
               </Button>
+
+              <Typography variant="body2" color="text.secondary">
+                Don't have an account?{" "}
+                <Link to="/register" style={{ textDecoration: "none", color: "inherit", fontWeight: 600 }}>
+                  Create an account.
+                </Link>
+              </Typography>
             </Stack>
           </Box>
         </Stack>

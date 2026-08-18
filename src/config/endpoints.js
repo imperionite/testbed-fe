@@ -14,6 +14,10 @@ const endpoints = {
     list: "/users",
     details: (id) => `/users/${id}`,
   },
+
+  internships: {
+    root: "/internships",
+  },
 };
 
 export default Object.freeze(endpoints);
