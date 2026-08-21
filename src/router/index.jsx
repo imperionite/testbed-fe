@@ -9,6 +9,7 @@ import ForgotPasswordPage from "../pages/ForgotPasswordPage";
 import ResetPasswordPage from "../pages/ResetPasswordPage";
 
 import Dashboard from "../pages/Dashboard";
+import UserManagementPage from "../features/users/UserManagementPage";
 import AppLayout from "../layouts/AppLayout";
 import AuthGuard from "../guards/AuthGuard";
 import GuestGuard from "../guards/GuestGuard";
@@ -37,8 +38,7 @@ export default function AppRouter() {
       <Route element={<AuthGuard />}>
         <Route element={<AppLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
-
-          {/*  <Route path="/users" element={<Users />} /> */}
+          <Route path="/userandroles" element={<UserManagementPage />} />
         </Route>
       </Route>
 

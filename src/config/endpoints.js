@@ -13,6 +13,8 @@ const endpoints = {
   users: {
     list: "/users",
     details: (id) => `/users/${id}`,
+    role: (id) => `/users/${id}/role`,
+    status: (id) => `/users/${id}/status`,
   },
 };
 

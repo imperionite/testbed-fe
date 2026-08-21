@@ -1,4 +1,5 @@
 import { Box } from "@mui/material";
+import { useState } from "react";
 
 import { Outlet } from "react-router-dom";
 
@@ -11,6 +12,7 @@ import PasswordChangeGuard from "../guards/PasswordChangeGuard";
 
 export default function AppLayout() {
   const { user } = useAuth();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
     <Box
@@ -20,21 +22,28 @@ export default function AppLayout() {
         flexDirection: "column",
       }}
     >
-      <AppHeader />
+      <AppHeader onMenuClick={() => setMobileMenuOpen(true)} />
 
       <Box
         sx={{
           flex: 1,
           display: "flex",
+          alignItems: "stretch",
+          flexDirection: "row",
         }}
       >
-        <Sidebar role={user?.role} />
+        <Sidebar
+          role={user?.role}
+          mobileOpen={mobileMenuOpen}
+          onMobileClose={() => setMobileMenuOpen(false)}
+        />
 
         <Box
           component="main"
           sx={{
             flex: 1,
-            p: 3,
+            minWidth: 0,
+            p: { xs: 2, sm: 3 },
           }}
         >
           <PasswordChangeGuard>
