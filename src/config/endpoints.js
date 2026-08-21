@@ -18,6 +18,19 @@ const endpoints = {
   internships: {
     root: "/internships",
   },
+
+  students: {
+    root: "/students",
+    me: "/students/me",
+  },
+
+  htes: {
+    root: "/htes",
+  },
+
+  attendance: {
+    root: "/attendance",
+  },
 };
 
 export default Object.freeze(endpoints);
