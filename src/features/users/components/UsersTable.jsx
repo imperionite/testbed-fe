@@ -3,7 +3,7 @@ import {
   MaterialReactTable,
   useMaterialReactTable,
 } from "material-react-table";
-import { Box, Button } from "@mui/material";
+import { Box, Button, CircularProgress } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
 
 import { createUserTableColumns } from "./userTableColumns";
@@ -24,6 +24,7 @@ export default function UsersTable({
   const [confirmation, setConfirmation] = useState(null);
   const [roleChooserOpen, setRoleChooserOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState("");
+  const [pendingAction, setPendingAction] = useState(null);
   const resolveRole = useRef(null);
 
   const askForConfirmation = (message) =>
@@ -80,12 +81,15 @@ export default function UsersTable({
     positionActionsColumn: "last",
     positionGlobalFilter: "right",
     icons: {
-      SaveIcon: (props) => (
-        <CheckIcon
-          {...props}
-          sx={{ ...props.sx, color: "success.main" }}
-        />
-      ),
+      SaveIcon: (props) =>
+        pendingAction ? (
+          <CircularProgress size={18} color="inherit" />
+        ) : (
+          <CheckIcon
+            {...props}
+            sx={{ ...props.sx, color: "success.main" }}
+          />
+        ),
     },
     displayColumnDefOptions: {
       "mrt-row-actions": {
@@ -121,6 +125,7 @@ export default function UsersTable({
           }
 
           try {
+            setPendingAction(`row-${row.original.id}`);
             if (roleChanged) {
               await onRoleChange({ id: row.original.id, role: values.role });
             }
@@ -137,6 +142,8 @@ export default function UsersTable({
             notify.error(
               error.response?.data?.message || "Failed to update user.",
             );
+          } finally {
+            setPendingAction(null);
           }
         }
       : undefined,
@@ -216,15 +223,20 @@ export default function UsersTable({
                 .getSelectedRowModel()
                 .rows.map((row) => row.original.id);
 
-              onBulkRoleChange({ ids, role })
-                .then(() => notify.success("Roles updated successfully."))
-                .catch((error) => {
+              setPendingAction("bulk-role");
+              try {
+                await onBulkRoleChange({ ids, role });
+                notify.success("Roles updated successfully.");
+              } catch (error) {
                   console.error("Failed to update roles:", error);
                   notify.error("Failed to update roles.");
-                });
+              } finally {
+                setPendingAction(null);
+              }
             }}
+            startIcon={pendingAction === "bulk-role" ? <CircularProgress size={16} /> : null}
           >
-            Change role
+            {pendingAction === "bulk-role" ? "Updating..." : "Change role"}
           </Button>
           <Button
             size="small"
@@ -239,17 +251,22 @@ export default function UsersTable({
                 .getSelectedRowModel()
                 .rows.map((row) => row.original.id);
 
-              onBulkStatusChange({ ids, isActive: true })
-                .then(() => notify.success("Users activated successfully."))
-                .catch((error) => {
+              setPendingAction("bulk-activate");
+              try {
+                await onBulkStatusChange({ ids, isActive: true });
+                notify.success("Users activated successfully.");
+              } catch (error) {
                   console.error("Failed to activate users:", error);
                   notify.error(
                     error.response?.data?.message || "Failed to activate users.",
                   );
-                });
+              } finally {
+                setPendingAction(null);
+              }
             }}
+            startIcon={pendingAction === "bulk-activate" ? <CircularProgress size={16} /> : null}
           >
-            Activate
+            {pendingAction === "bulk-activate" ? "Activating..." : "Activate"}
           </Button>
           <Button
             size="small"
@@ -264,17 +281,22 @@ export default function UsersTable({
                 .getSelectedRowModel()
                 .rows.map((row) => row.original.id);
 
-              onBulkStatusChange({ ids, isActive: false })
-                .then(() => notify.success("Users deactivated successfully."))
-                .catch((error) => {
+              setPendingAction("bulk-deactivate");
+              try {
+                await onBulkStatusChange({ ids, isActive: false });
+                notify.success("Users deactivated successfully.");
+              } catch (error) {
                   console.error("Failed to deactivate users:", error);
                   notify.error(
                     error.response?.data?.message || "Failed to deactivate users.",
                   );
-                });
+              } finally {
+                setPendingAction(null);
+              }
             }}
+            startIcon={pendingAction === "bulk-deactivate" ? <CircularProgress size={16} /> : null}
           >
-            Deactivate
+            {pendingAction === "bulk-deactivate" ? "Deactivating..." : "Deactivate"}
           </Button>
         </Box>
       ) : null,

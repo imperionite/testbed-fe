@@ -25,6 +25,7 @@ export default function UserForm({
   mode,
   defaultValues = {},
   onSubmit,
+  onInvalid,
   formId = "user-form",
 }) {
   const { getFieldRule } = getUserFormPermissions(role, mode);
@@ -57,7 +58,7 @@ export default function UserForm({
     <Stack
       component="form"
       id={formId}
-      onSubmit={handleSubmit(handleSubmitData)}
+      onSubmit={handleSubmit(handleSubmitData, onInvalid)}
       spacing={2}
     >
       {visibleFields.map((field) => {

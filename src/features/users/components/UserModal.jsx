@@ -135,6 +135,7 @@ export default function UserModal({
           mode={mode}
           defaultValues={defaultValues}
           onSubmit={handleSubmit}
+          onInvalid={() => setIsSaving(false)}
         />
       </DialogContent>
 
@@ -169,7 +170,12 @@ export default function UserModal({
         {mode === MODES.CREATE && (
           <>
             {canCreate && (
-              <Button onClick={handleSubmitButtonPressed} variant="contained">
+              <Button
+                onClick={handleSubmitButtonPressed}
+                variant="contained"
+                disabled={isSaving}
+                startIcon={isSaving ? <CircularProgress size={20} /> : null}
+              >
                 Submit
               </Button>
             )}
