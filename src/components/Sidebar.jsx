@@ -1,6 +1,7 @@
 import {
   Box,
   Divider,
+  Drawer,
   List,
   ListItemButton,
   ListItemIcon,
@@ -28,8 +29,8 @@ const menuItems = [
   },
 
   {
-    label: "Users",
-    path: "/users",
+    label: "User & Roles",
+    path: "/userandroles",
     icon: <PeopleIcon />,
     roles: ["administrator"],
   },
@@ -42,22 +43,29 @@ const menuItems = [
   },
 ];
 
-export default function Sidebar({ role }) {
+export default function Sidebar({ role, mobileOpen, onMobileClose }) {
   const allowedItems = menuItems.filter((item) => item.roles.includes(role));
 
-  return (
+  const navigation = (
     <Box
       sx={{
-        width: 260,
-        height: "100%",
+        width: { xs: 280, sm: 220, md: 260 },
+        flexShrink: 0,
+        alignSelf: "stretch",
         borderRight: 1,
         borderColor: "divider",
         bgcolor: "background.paper",
+        height: "100%",
       }}
     >
       <List>
         {allowedItems.map((item) => (
-          <ListItemButton key={item.path} component={Link} to={item.path}>
+          <ListItemButton
+            key={item.path}
+            component={Link}
+            to={item.path}
+            onClick={onMobileClose}
+          >
             <ListItemIcon>{item.icon}</ListItemIcon>
 
             <ListItemText primary={item.label} />
@@ -67,5 +75,19 @@ export default function Sidebar({ role }) {
 
       <Divider />
     </Box>
+  );
+
+  return (
+    <>
+      <Box sx={{ display: { xs: "none", sm: "block" } }}>{navigation}</Box>
+      <Drawer
+        open={mobileOpen}
+        onClose={onMobileClose}
+        ModalProps={{ keepMounted: true }}
+        sx={{ display: { xs: "block", sm: "none" } }}
+      >
+        {navigation}
+      </Drawer>
+    </>
   );
 }

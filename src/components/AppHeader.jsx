@@ -1,10 +1,18 @@
-import { AppBar, Box, Button, Toolbar, Typography } from "@mui/material";
+import {
+  AppBar,
+  Box,
+  Button,
+  IconButton,
+  Toolbar,
+  Typography,
+} from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
 import { Link, useNavigate } from "react-router-dom";
 
 import notify from "../utils/toast";
 import logo from "../assets/logo.webp";
 import useAuth, { useLogout } from "../hooks/useAuth";
-export default function AppHeader() {
+export default function AppHeader({ onMenuClick }) {
   const { user } = useAuth();
   const logout = useLogout();
   const navigate = useNavigate();
@@ -44,8 +52,17 @@ export default function AppHeader() {
           minHeight: 72,
           display: "flex",
           justifyContent: "space-between",
+          gap: 1,
+          px: { xs: 2, sm: 3 },
         }}
       >
+        <IconButton
+          aria-label="Open navigation menu"
+          onClick={onMenuClick}
+          sx={{ display: { xs: "inline-flex", sm: "none" } }}
+        >
+          <MenuIcon />
+        </IconButton>
         <Box
           component={Link}
           to="/dashboard"
@@ -60,7 +77,7 @@ export default function AppHeader() {
             src={logo}
             alt="SBIMS"
             sx={{
-              height: 50,
+              height: { xs: 38, sm: 50 },
               width: "auto",
             }}
           />
@@ -70,15 +87,20 @@ export default function AppHeader() {
           sx={{
             display: "flex",
             alignItems: "center",
-            gap: 2,
+            gap: { xs: 1, sm: 2 },
+            minWidth: 0,
           }}
         >
-          <Box sx={{ textAlign: "right" }}>
+          <Box sx={{ textAlign: "right", minWidth: 0 }}>
             <Typography variant="body2" fontWeight={600}>
               {user?.firstName} {user?.lastName}
             </Typography>
 
-            <Typography variant="caption" color="text.secondary">
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ display: { xs: "none", sm: "block" } }}
+            >
               {user?.role}
             </Typography>
           </Box>
