@@ -4,7 +4,10 @@ import { internshipsApi } from "../../../api/internships";
 export function useInternships(options = {}) {
   return useQuery({
     queryKey: ["internships"],
-    queryFn: () => internshipsApi.listInternships(),
+    queryFn: () => {
+      console.log("Fetching internships...");
+      return internshipsApi.listInternships();
+    },
     ...options,
   });
 }
