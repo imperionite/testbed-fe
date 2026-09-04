@@ -27,3 +27,6 @@ diges.txt
 .env.development
 .env
 digest.txt
+
+src/mock/
+public/mockServiceWorker.js

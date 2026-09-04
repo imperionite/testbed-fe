@@ -43,7 +43,6 @@ export default function Dashboard() {
   return (
     <Box
       sx={{
-        p: 4,
         width: "100%",
       }}
     >

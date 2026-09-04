@@ -11,7 +11,6 @@ export default function PublicLayout() {
         minHeight: "100vh",
         display: "flex",
         flexDirection: "column",
-        bgcolor: "background.default",
       }}
     >
       <Header />

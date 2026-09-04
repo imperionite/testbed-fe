@@ -7,8 +7,12 @@ import PrivacyPolicy from "../pages/PrivacyPolicy";
 import TermsConditions from "../pages/TermsConditions";
 import ForgotPasswordPage from "../pages/ForgotPasswordPage";
 import ResetPasswordPage from "../pages/ResetPasswordPage";
+import StudentsRoute from "../features/students/StudentsRoute";
+import StudentProfilePage from "../features/students/StudentProfilePage";
 
 import Dashboard from "../pages/Dashboard";
+import UserManagementPage from "../features/users/UserManagementPage";
+import HteManagementPage from "../features/htes/HTEManagementPage";
 import AppLayout from "../layouts/AppLayout";
 import AuthGuard from "../guards/AuthGuard";
 import GuestGuard from "../guards/GuestGuard";
@@ -37,8 +41,10 @@ export default function AppRouter() {
       <Route element={<AuthGuard />}>
         <Route element={<AppLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
-
-          {/*  <Route path="/users" element={<Users />} /> */}
+          <Route path="/userandroles" element={<UserManagementPage />} />
+          <Route path="/companies" element={<HteManagementPage />} />
+          <Route path="/students" element={<StudentsRoute />} />
+          <Route path="/students/me" element={<StudentProfilePage />} />
         </Route>
       </Route>
 
