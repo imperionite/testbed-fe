@@ -6,7 +6,7 @@ export function useStudentMutations() {
   const queryClient = useQueryClient();
 
   const invalidate = () => {
-    console.log("Invalidating students and internships...");
+    
     queryClient.invalidateQueries({ queryKey: ["students"] });
     // Invalidate internships to sync status changes
     queryClient.invalidateQueries({ queryKey: ["internships"] });

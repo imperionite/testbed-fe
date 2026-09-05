@@ -22,6 +22,11 @@ export const internshipsApi = {
     return data.data;
   },
 
+  async updateInternship(id, payload) {
+    const { data } = await api.patch(endpoints.internships.details(id), payload);
+    return data.data;
+  },
+
   async getOwnInternship() {
     const { data } = await api.get(endpoints.internships.me);
     return data.data;

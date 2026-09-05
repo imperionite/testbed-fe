@@ -28,8 +28,15 @@ export function useInternshipMutations() {
     onSuccess: invalidateInternships,
   });
 
+  const updateInternship = useMutation({
+    mutationFn: ({ id, payload }) =>
+      internshipsApi.updateInternship(id, payload),
+    onSuccess: invalidateInternships,
+  });
+
   return {
     createInternship,
     updateStatus,
+    updateInternship,
   };
 }

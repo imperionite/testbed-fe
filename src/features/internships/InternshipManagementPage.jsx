@@ -1,19 +1,27 @@
 import { Box, Typography, Button, Alert, CircularProgress, Stack } from "@mui/material";
 import { Add as AddIcon, FilterList as FilterListIcon } from "@mui/icons-material";
 import { useMaterialReactTable } from "@glebcha/material-react-table";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import CardStat from "../../components/common/CardStat";
 import InternshipTable from "./components/InternshipTable";
 import InternshipModal from "./components/InternshipModal";
 import { useInternships } from "./hooks/useInternshipMutations";
-import { useState } from "react";
 import useAuth from "../../hooks/useAuth";
+import { MODES } from "./form/formConfig";
 
 export default function InternshipManagementPage() {
   const { user } = useAuth();
-  const [modalOpen, setModalOpen] = useState(false);
+  const [modalState, setModalState] = useState({ open: false, mode: MODES.CREATE, internship: null });
   
   const { data: internships = [], isLoading, isError, refetch } = useInternships();
+
+  const handleOpenModal = (mode, internship = null) => {
+    setModalState({ open: true, mode, internship });
+  };
+
+  const handleCloseModal = () => {
+    setModalState({ open: false, mode: MODES.CREATE, internship: null });
+  };
 
   const columns = useMemo(
     () => [
@@ -88,11 +96,12 @@ export default function InternshipManagementPage() {
     enableColumnPinning: true,
     enableStickyHeader: true,
     positionActionsColumn: "last",
-    renderRowActionMenuItems: () => [
-        <Box key="action" sx={{px: 2, py: 1}}>Actions</Box>
+    renderRowActionMenuItems: ({ row }) => [
+        <Button key="view" onClick={() => handleOpenModal(MODES.VIEW, row.original)}>View</Button>,
+        <Button key="edit" onClick={() => handleOpenModal("edit", row.original)}>Edit</Button>
     ],
     displayColumnDefOptions: {
-      "mrt-row-actions": { size: 50 },
+      "mrt-row-actions": { size: 150 },
     },
     muiPaginationProps: {
         showFirstButton: false,
@@ -109,7 +118,7 @@ export default function InternshipManagementPage() {
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
         <Typography variant="h4" fontWeight={600}>Internship Overview</Typography>
         {canManage && (
-          <Button variant="contained" startIcon={<AddIcon />} onClick={() => setModalOpen(true)}>
+          <Button variant="contained" startIcon={<AddIcon />} onClick={() => handleOpenModal(MODES.CREATE)}>
             Add New Intern
           </Button>
         )}
@@ -144,7 +153,12 @@ export default function InternshipManagementPage() {
         <InternshipTable table={table}/>
       )}
 
-      <InternshipModal open={modalOpen} mode="create" onClose={() => setModalOpen(false)} />
+      <InternshipModal 
+        open={modalState.open} 
+        mode={modalState.mode} 
+        internship={modalState.internship}
+        onClose={handleCloseModal} 
+      />
     </Box>
   );
 }

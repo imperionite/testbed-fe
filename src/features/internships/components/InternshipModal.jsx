@@ -15,9 +15,13 @@ export default function InternshipModal({ open, mode, internship, onClose }) {
         p: 4
       }}>
         <Typography variant="h6">
-          {mode === 'create' ? 'Add New Intern' : 'View Internship'}
+          {mode === 'create' ? 'Add New Intern' : mode === 'view' ? 'View Internship' : 'Edit Internship'}
         </Typography>
-        {mode === 'create' && <InternshipForm onClose={onClose} />}
+        <InternshipForm 
+          mode={mode}
+          internship={internship}
+          onClose={onClose} 
+        />
         <Button sx={{ mt: 2 }} onClick={onClose}>Close</Button>
       </Box>
     </Modal>
