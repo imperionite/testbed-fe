@@ -1,3 +1,4 @@
+import React from "react";
 import { Box, TextField, MenuItem, Button, Stack } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -18,10 +19,10 @@ export default function InternshipForm({ mode, internship, onClose }) {
 
   const isViewOrEdit = mode !== MODES.CREATE;
 
-  const { control, handleSubmit, formState: { errors, dirtyFields } } = useForm({
+  const { control, handleSubmit, formState: { errors } } = useForm({
     resolver: zodResolver(getValidationSchema(mode)),
     defaultValues: { 
-        studentId: internship?.student_id || "", 
+        studentId: students.some(s => s.id === internship?.student_id) ? internship?.student_id : "", 
         hteId: internship?.hte_id || "", 
         requiredHours: internship?.required_hours || 480,
         status: internship?.status || "pending",
@@ -34,29 +35,31 @@ export default function InternshipForm({ mode, internship, onClose }) {
         createInternship.mutate({
             studentId: data.studentId,
             hteId: data.hteId,
-            requiredHours: Number(data.requiredHours)
+            requiredHours: data.requiredHours ? Number(data.requiredHours) : null
         }, { onSuccess: onClose });
     } else {
         const promises = [];
         
-        if (dirtyFields.status) {
+        if (data.status !== internship.status) {
             promises.push(updateStatus.mutateAsync({ 
                 id: internship.id, 
                 status: data.status 
             }));
         }
-        if (dirtyFields.facultyAdviserId) {
+        
+        if (data.facultyAdviserId !== (internship.faculty_adviser_id || "")) {
             promises.push(assignAdviser.mutateAsync({ 
                 id: internship.id, 
                 facultyAdviserId: data.facultyAdviserId === "" ? null : data.facultyAdviserId 
             }));
         }
-        if (dirtyFields.hteId || dirtyFields.requiredHours) {
+        
+        if (data.hteId !== internship.hte_id || Number(data.requiredHours) !== (internship.required_hours || 480)) {
             promises.push(updateInternship.mutateAsync({ 
                 id: internship.id, 
                 payload: {
                     hteId: data.hteId,
-                    requiredHours: data.requiredHours ? Number(data.requiredHours) : undefined
+                    requiredHours: data.requiredHours ? Number(data.requiredHours) : null
                 }
             }));
         }

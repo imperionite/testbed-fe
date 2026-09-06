@@ -1,7 +1,33 @@
 import React from "react";
-import { describe, expect, it } from "vitest";
-import { renderToStaticMarkup } from "react-dom/server";
+import { describe, expect, it, vi } from "vitest";
+import { render } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import InternshipModal from "../src/features/internships/components/InternshipModal";
+
+// Mock hooks to provide data that matches sampleInternship
+vi.mock("../src/features/students/hooks/useStudents", () => ({
+  useStudents: () => ({ data: [{ id: "student-1" }] }),
+}));
+
+vi.mock("../src/features/htes/hooks/useHtes", () => ({
+  useHtes: () => ({ data: [{ id: "hte-1", company_name: "Company A" }] }),
+}));
+
+vi.mock("../src/features/users/hooks/useUsers", () => ({
+  useUsers: () => ({ data: [] }),
+}));
+
+// Mock mutations to prevent errors in form
+vi.mock("../src/features/internships/hooks/useInternshipMutations", () => ({
+  useInternshipMutations: () => ({
+    createInternship: { mutate: vi.fn() },
+    updateInternship: { mutateAsync: vi.fn() },
+    updateStatus: { mutateAsync: vi.fn() },
+    assignAdviser: { mutateAsync: vi.fn() },
+  }),
+}));
+
+const queryClient = new QueryClient();
 
 const sampleInternship = {
   id: "intern-1",
@@ -13,40 +39,46 @@ const sampleInternship = {
 
 describe("InternshipModal mode behavior", () => {
   it("shows Add New Intern title in create mode", () => {
-    const markup = renderToStaticMarkup(
-      <InternshipModal
-        open
-        mode="create"
-        onClose={() => {}}
-      />,
+    const { getByText } = render(
+      <QueryClientProvider client={queryClient}>
+        <InternshipModal
+            open
+            mode="create"
+            onClose={() => {}}
+        />
+      </QueryClientProvider>
     );
 
-    expect(markup).toContain("Add New Intern");
+    expect(getByText("Add New Intern")).toBeDefined();
   });
 
   it("shows View Internship title in view mode", () => {
-    const markup = renderToStaticMarkup(
-      <InternshipModal
-        open
-        mode="view"
-        internship={sampleInternship}
-        onClose={() => {}}
-      />,
+    const { getByText } = render(
+        <QueryClientProvider client={queryClient}>
+            <InternshipModal
+                open
+                mode="view"
+                internship={sampleInternship}
+                onClose={() => {}}
+            />
+        </QueryClientProvider>
     );
 
-    expect(markup).toContain("View Internship");
+    expect(getByText("View Internship")).toBeDefined();
   });
 
   it("shows Edit Internship title in edit mode", () => {
-    const markup = renderToStaticMarkup(
-      <InternshipModal
-        open
-        mode="edit"
-        internship={sampleInternship}
-        onClose={() => {}}
-      />,
+    const { getByText } = render(
+        <QueryClientProvider client={queryClient}>
+            <InternshipModal
+                open
+                mode="edit"
+                internship={sampleInternship}
+                onClose={() => {}}
+            />
+        </QueryClientProvider>
     );
 
-    expect(markup).toContain("Edit Internship");
+    expect(getByText("Edit Internship")).toBeDefined();
   });
 });
