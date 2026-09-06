@@ -40,16 +40,25 @@ export default function InternshipForm({ mode, internship, onClose }) {
         const promises = [];
         
         if (dirtyFields.status) {
-            promises.push(updateStatus.mutateAsync({ id: internship.id, status: data.status }));
+            promises.push(updateStatus.mutateAsync({ 
+                id: internship.id, 
+                status: data.status 
+            }));
         }
         if (dirtyFields.facultyAdviserId) {
-            promises.push(assignAdviser.mutateAsync({ id: internship.id, facultyAdviserId: data.facultyAdviserId }));
+            promises.push(assignAdviser.mutateAsync({ 
+                id: internship.id, 
+                facultyAdviserId: data.facultyAdviserId === "" ? null : data.facultyAdviserId 
+            }));
         }
         if (dirtyFields.hteId || dirtyFields.requiredHours) {
-            promises.push(updateInternship.mutateAsync({ id: internship.id, payload: {
-                hteId: data.hteId,
-                requiredHours: Number(data.requiredHours)
-            }}));
+            promises.push(updateInternship.mutateAsync({ 
+                id: internship.id, 
+                payload: {
+                    hteId: data.hteId,
+                    requiredHours: data.requiredHours ? Number(data.requiredHours) : undefined
+                }
+            }));
         }
 
         Promise.all(promises).then(onClose);

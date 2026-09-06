@@ -18,7 +18,7 @@ export const internshipsApi = {
   },
 
   async updateInternshipStatus(id, status) {
-    const { data } = await api.patch(endpoints.internships.status(id), { status });
+    const { data } = await api.patch(endpoints.internships.status(id), { status: status });
     return data.data;
   },
 
@@ -29,7 +29,7 @@ export const internshipsApi = {
 
   async assignFacultyAdviser(id, facultyAdviserId) {
     const { data } = await api.patch(endpoints.internships.adviser(id), {
-      facultyAdviserId,
+      facultyAdviserId: facultyAdviserId,
     });
     return data.data;
   },
