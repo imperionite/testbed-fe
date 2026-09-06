@@ -34,6 +34,7 @@ const endpoints = {
     list: "/internships",
     details: (id) => `/internships/${id}`,
     status: (id) => `/internships/${id}/status`,
+    adviser: (id) => `/internships/${id}/adviser`,
     me: "/internships/me",
   },
 };

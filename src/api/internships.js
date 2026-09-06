@@ -27,6 +27,13 @@ export const internshipsApi = {
     return data.data;
   },
 
+  async assignFacultyAdviser(id, facultyAdviserId) {
+    const { data } = await api.patch(endpoints.internships.adviser(id), {
+      facultyAdviserId,
+    });
+    return data.data;
+  },
+
   async getOwnInternship() {
     const { data } = await api.get(endpoints.internships.me);
     return data.data;

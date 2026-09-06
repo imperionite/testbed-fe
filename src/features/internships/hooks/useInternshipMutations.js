@@ -4,10 +4,7 @@ import { internshipsApi } from "../../../api/internships";
 export function useInternships(options = {}) {
   return useQuery({
     queryKey: ["internships"],
-    queryFn: () => {
-      console.log("Fetching internships...");
-      return internshipsApi.listInternships();
-    },
+    queryFn: () => internshipsApi.listInternships(),
     ...options,
   });
 }
@@ -29,8 +26,13 @@ export function useInternshipMutations() {
   });
 
   const updateInternship = useMutation({
-    mutationFn: ({ id, payload }) =>
-      internshipsApi.updateInternship(id, payload),
+    mutationFn: ({ id, payload }) => internshipsApi.updateInternship(id, payload),
+    onSuccess: invalidateInternships,
+  });
+
+  const assignAdviser = useMutation({
+    mutationFn: ({ id, facultyAdviserId }) =>
+      internshipsApi.assignFacultyAdviser(id, facultyAdviserId),
     onSuccess: invalidateInternships,
   });
 
@@ -38,5 +40,6 @@ export function useInternshipMutations() {
     createInternship,
     updateStatus,
     updateInternship,
+    assignAdviser,
   };
 }

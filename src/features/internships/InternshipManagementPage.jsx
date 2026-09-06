@@ -1,5 +1,5 @@
-import { Box, Typography, Button, Alert, CircularProgress, Stack } from "@mui/material";
-import { Add as AddIcon, FilterList as FilterListIcon } from "@mui/icons-material";
+import { Box, Typography, Button, Alert, CircularProgress, Stack, IconButton } from "@mui/material";
+import { Add as AddIcon, FilterList as FilterListIcon, Edit as EditIcon } from "@mui/icons-material";
 import { useMaterialReactTable } from "@glebcha/material-react-table";
 import { useMemo, useState } from "react";
 import CardStat from "../../components/common/CardStat";
@@ -81,6 +81,15 @@ export default function InternshipManagementPage() {
             </Box>
         ),
       },
+      {
+        id: "actions",
+        header: "Actions",
+        Cell: ({ row }) => (
+          <IconButton onClick={() => handleOpenModal(MODES.EDIT, row.original)}>
+            <EditIcon />
+          </IconButton>
+        ),
+      },
     ],
     []
   );
@@ -96,12 +105,8 @@ export default function InternshipManagementPage() {
     enableColumnPinning: true,
     enableStickyHeader: true,
     positionActionsColumn: "last",
-    renderRowActionMenuItems: ({ row }) => [
-        <Button key="view" onClick={() => handleOpenModal(MODES.VIEW, row.original)}>View</Button>,
-        <Button key="edit" onClick={() => handleOpenModal("edit", row.original)}>Edit</Button>
-    ],
     displayColumnDefOptions: {
-      "mrt-row-actions": { size: 150 },
+      "mrt-row-actions": { size: 100 },
     },
     muiPaginationProps: {
         showFirstButton: false,
