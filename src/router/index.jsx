@@ -9,6 +9,7 @@ import ForgotPasswordPage from "../pages/ForgotPasswordPage";
 import ResetPasswordPage from "../pages/ResetPasswordPage";
 import StudentsRoute from "../features/students/StudentsRoute";
 import StudentProfilePage from "../features/students/StudentProfilePage";
+import InternshipManagementPage from "../features/internships/InternshipManagementPage";
 
 import Dashboard from "../pages/Dashboard";
 import UserManagementPage from "../features/users/UserManagementPage";
@@ -43,6 +44,7 @@ export default function AppRouter() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/userandroles" element={<UserManagementPage />} />
           <Route path="/companies" element={<HteManagementPage />} />
+          <Route path="/internships" element={<InternshipManagementPage />} />
           <Route path="/students" element={<StudentsRoute />} />
           <Route path="/students/me" element={<StudentProfilePage />} />
         </Route>

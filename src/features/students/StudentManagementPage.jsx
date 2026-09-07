@@ -25,6 +25,7 @@ export default function StudentManagementPage() {
     isLoading: isStudentsLoading,
     isError: isStudentsError,
     error: studentsError,
+    refetch,
   } = useStudents(user?.role);
   const { data: userData = [], isLoading: isUsersLoading } = useUsers();
   const modalState = useStudentModalState();
@@ -44,10 +45,14 @@ export default function StudentManagementPage() {
       const userRecord =
         userData?.find((u) => u.id === studentUserId) || student.user || {};
       const meta = userRecord.user_metadata || {};
+      
+      // Extract status from nested currentInternship if it exists
+      const internshipStatus = student.currentInternship?.status || student.internship_status || 'pending';
 
       return {
         ...student,
         userId: studentUserId,
+        internship_status: internshipStatus,
         email: student.email || userRecord.email || meta.email || "",
         firstName:
           student.firstName ||
@@ -83,9 +88,15 @@ export default function StudentManagementPage() {
     return <Typography color="error">Access denied.</Typography>;
   if (isStudentsError)
     return (
-      <Alert severity="error">
-        {studentsError?.message || "Error loading students."}
-      </Alert>
+      <Box sx={{ p: 3 }}>
+        <Alert severity="error">
+          <Typography variant="h6">Error Loading Students</Typography>
+          {studentsError?.message || "An unexpected error occurred while fetching student records. Please contact your system administrator."}
+          <Box sx={{ mt: 2 }}>
+            <Button variant="outlined" color="inherit" onClick={refetch}>Retry</Button>
+          </Box>
+        </Alert>
+      </Box>
     );
 
   return (
