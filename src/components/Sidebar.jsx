@@ -49,6 +49,13 @@ const menuItems = [
     icon: <SchoolOutlinedIcon />,
     roles: ["administrator", "internship_coordinator", "student"],
   },
+
+  {
+    label: "Evaluations",
+    path: "/evaluations",
+    icon: <SchoolOutlinedIcon />,
+    roles: ["hte_supervisor", "internship_coordinator", "student"],
+  },
 ];
 
 export default function Sidebar({ role, mobileOpen, onMobileClose }) {
@@ -57,7 +64,7 @@ export default function Sidebar({ role, mobileOpen, onMobileClose }) {
   const navigation = (
     <Box
       sx={{
-        width: { xs: 20, sm: 220, md: 230 },
+        width: { xs: 230, sm: 220, md: 230 },
         flexShrink: 0,
         alignSelf: "stretch",
         borderRight: 1,

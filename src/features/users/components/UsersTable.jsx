@@ -21,6 +21,7 @@ export default function UsersTable({
   onUserClick,
 }) {
   const [rowSelection, setRowSelection] = useState({});
+  const [columnVisibility, setColumnVisibility] = useState({});
   const [confirmation, setConfirmation] = useState(null);
   const [roleChooserOpen, setRoleChooserOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState("");
@@ -69,7 +70,7 @@ export default function UsersTable({
     enableGlobalFilter: true,
     enablePagination: true,
     enableRowSelection: permissions.canSelectRows,
-    enableHiding: false,
+    enableHiding: true,
     enableClickToCopy: true,
     enableColumnActions: false,
     enableColumnPinning: true,
@@ -113,10 +114,12 @@ export default function UsersTable({
     state: {
       rowSelection,
       columnVisibility: {
+        ...columnVisibility,
         "mrt-row-actions": selectedRowCount === 0,
       },
     },
     onRowSelectionChange: setRowSelection,
+    onColumnVisibilityChange: setColumnVisibility,
     onEditingRowSave: permissions.canEdit
       ? async ({ exitEditingMode, row, values }) => {
           const roleChanged = values.role !== row.original.role;

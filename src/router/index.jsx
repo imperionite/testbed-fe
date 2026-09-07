@@ -18,6 +18,7 @@ import AuthGuard from "../guards/AuthGuard";
 import GuestGuard from "../guards/GuestGuard";
 
 import NotFound from "../pages/NotFound";
+import EvaluationManagementPage from "../features/evaluations/EvaluationManagementPage";
 
 export default function AppRouter() {
   return (
@@ -45,6 +46,7 @@ export default function AppRouter() {
           <Route path="/companies" element={<HteManagementPage />} />
           <Route path="/students" element={<StudentsRoute />} />
           <Route path="/students/me" element={<StudentProfilePage />} />
+          <Route path="/evaluations" element={<EvaluationManagementPage />} />
         </Route>
       </Route>
 

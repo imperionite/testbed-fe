@@ -6,17 +6,16 @@ import {
 import { Box, Button, CircularProgress } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
 
-import { createHteTableColumns } from "./hteTableColumns";
+import { createEvaluationTableColumns } from "./evaluationTableColumns";
 import notify from "../../../utils/toast";
 import ActionConfirmDialog from "../../../components/common/ActionConfirmDialog";
 
-export default function HtesTable({
-  htes,
+export default function EvaluationsTable({
+  evaluations,
   permissions,
-  supervisorMap = {},
-  onStatusChange,
+  internMap = {},
   onBulkStatusChange,
-  onHteClick,
+  onEvaluationClick,
 }) {
   const [rowSelection, setRowSelection] = useState({});
   const [columnVisibility, setColumnVisibility] = useState({});
@@ -35,18 +34,17 @@ export default function HtesTable({
 
   const columns = useMemo(
     () =>
-      createHteTableColumns({
-        canEdit: permissions.canEdit,
-        supervisorMap,
+      createEvaluationTableColumns({
+        internMap,
       }),
-    [permissions.canEdit, supervisorMap],
+    [internMap],
   );
 
   const selectedRowCount = Object.keys(rowSelection).length;
 
   const table = useMaterialReactTable({
     columns,
-    data: htes,
+    data: evaluations,
     enableSorting: true,
     enableColumnFilters: true,
     enableGlobalFilter: true,
@@ -59,8 +57,7 @@ export default function HtesTable({
     enableDensityToggle: true,
     enableStickyHeader: true,
     enableStickyFooter: true,
-    enableEditing: permissions.canEdit,
-    editDisplayMode: "row",
+    enableEditing: false,
     positionActionsColumn: "last",
     positionGlobalFilter: "right",
     initialState: {
@@ -102,40 +99,6 @@ export default function HtesTable({
     },
     onRowSelectionChange: setRowSelection,
     onColumnVisibilityChange: setColumnVisibility,
-    onEditingRowSave: permissions.canEdit
-      ? async ({ exitEditingMode, row, values }) => {
-          const statusChanged =
-            String(values.is_active) !== String(row.original.is_active);
-
-          if (!statusChanged) {
-            exitEditingMode();
-            return;
-          }
-
-          if (!(await askForConfirmation("Are you sure you want to save these changes?"))) {
-            return;
-          }
-
-          try {
-            setPendingAction(`row-${row.original.id}`);
-            if (statusChanged) {
-              await onStatusChange({
-                id: row.original.id,
-                isActive: values.is_active === true || values.is_active === "true",
-              });
-            }
-            exitEditingMode();
-            notify.success("HTE updated successfully.");
-          } catch (error) {
-            console.error("Failed to update HTE:", error);
-            notify.error(
-              error.response?.data?.message || "Failed to update HTE.",
-            );
-          } finally {
-            setPendingAction(null);
-          }
-        }
-      : undefined,
     muiTableContainerProps: {
       sx: {
         maxHeight: 600,
@@ -165,10 +128,10 @@ export default function HtesTable({
           return;
         }
 
-        onHteClick?.(row.original);
+        onEvaluationClick?.(row.original);
       },
       sx: {
-        cursor: onHteClick ? "pointer" : "default",
+        cursor: onEvaluationClick ? "pointer" : "default",
       },
     }),
     renderBottomToolbarCustomActions: ({ table: currentTable }) =>
@@ -176,63 +139,40 @@ export default function HtesTable({
         <Box sx={{ display: "flex", gap: 1 }}>
           <Button
             size="small"
-            variant="outlined"
-            disabled={!currentTable.getSelectedRowModel().rows.length}
+            variant="contained"
+            disabled={
+              pendingAction !== null ||
+              !currentTable
+                .getSelectedRowModel()
+                .rows.some((row) => row.original.status === "Draft")
+            }
             onClick={async () => {
-              if (!(await askForConfirmation("Are you sure you want to activate the selected HTEs?"))) {
+              const ids = currentTable
+                .getSelectedRowModel()
+                .rows
+                .filter((row) => row.original.status === "Draft")
+                .map((row) => row.original.id);
+
+              if (!ids.length || !(await askForConfirmation("Are you sure you want to submit the selected draft evaluations? Once an evaluation is submitted, it is final and cannot be undone."))) {
                 return;
               }
 
-              const ids = currentTable
-                .getSelectedRowModel()
-                .rows.map((row) => row.original.id);
-
-              setPendingAction("bulk-activate");
+              setPendingAction("bulk-submit");
               try {
-                await onBulkStatusChange({ ids, isActive: true });
-                notify.success("HTEs activated successfully.");
+                await onBulkStatusChange({ ids });
+                notify.success("Evaluations submitted successfully.");
               } catch (error) {
-                console.error("Failed to activate HTE:", error);
+                console.error("Failed to submit evaluations:", error);
                 notify.error(
-                  error.response?.data?.message || "Failed to activate HTE.",
+                  error.response?.data?.message || "Failed to submit evaluations.",
                 );
               } finally {
                 setPendingAction(null);
               }
             }}
-            startIcon={pendingAction === "bulk-activate" ? <CircularProgress size={16} /> : null}
+            startIcon={pendingAction === "bulk-submit" ? <CircularProgress size={16} /> : null}
           >
-            {pendingAction === "bulk-activate" ? "Activating..." : "Activate"}
-          </Button>
-          <Button
-            size="small"
-            variant="outlined"
-            disabled={!currentTable.getSelectedRowModel().rows.length}
-            onClick={async () => {
-              if (!(await askForConfirmation("Are you sure you want to deactivate the selected HTEs?"))) {
-                return;
-              }
-
-              const ids = currentTable
-                .getSelectedRowModel()
-                .rows.map((row) => row.original.id);
-
-              setPendingAction("bulk-deactivate");
-              try {
-                await onBulkStatusChange({ ids, isActive: false });
-                notify.success("HTEs deactivated successfully.");
-              } catch (error) {
-                console.error("Failed to deactivate HTEs:", error);
-                notify.error(
-                  error.response?.data?.message || "Failed to deactivate HTEs.",
-                );
-              } finally {
-                setPendingAction(null);
-              }
-            }}
-            startIcon={pendingAction === "bulk-deactivate" ? <CircularProgress size={16} /> : null}
-          >
-            {pendingAction === "bulk-deactivate" ? "Deactivating..." : "Deactivate"}
+            {pendingAction === "bulk-submit" ? "Submitting..." : "Submit drafts"}
           </Button>
         </Box>
       ) : null,

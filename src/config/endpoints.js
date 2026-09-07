@@ -29,6 +29,14 @@ const endpoints = {
     status: (id) => `/htes/${id}/status`,
     supervisor: (id) => `/htes/${id}/supervisor`,
   },
+
+  evaluations: {
+    create: "/evaluations",
+    my_list: "/evaluations/me",
+    by_intern:  (id) => `/evaluations/internship/${id}`,
+    details: (id) => `/evaluations/${id}`,
+    submit: (id) => `/evaluations/${id}/submit`,
+  } 
 };
 
 export default Object.freeze(endpoints);
