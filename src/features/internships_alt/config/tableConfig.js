@@ -50,14 +50,23 @@ export const userTableConfig = {
     },
     columnOrder: [
       "email",
-      "firstName",
-      "lastName",
-      "middleName",
+      "first_name",
+      "last_name",
+      "middle_name",
       "suffix",
       "role",
       "isActive",
       "createdAt",
       "mrt-row-actions",
     ],
+  },
+};
+
+export const internshipTableConfig = {
+  ...defaultTableConfig,
+  initialState: {
+    columnPinning: {
+      right: ["mrt-row-actions"],
+    },
   },
 };
