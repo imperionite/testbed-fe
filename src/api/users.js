@@ -11,18 +11,27 @@ const TEST_USER_EMAILS = [
   "sbims-test-first-login@maildrop.cc",
 ];
 
+const normalizeUser = (user) => ({
+  ...user,
+  createdAt: user.createdAt ?? user.created_at,
+  firstName: user.firstName ?? user.first_name,
+  middleName: user.middleName ?? user.middle_name,
+  lastName: user.lastName ?? user.last_name,
+  isActive: user.isActive ?? user.is_active,
+});
+
 export const usersApi = {
   async listUsers() {
     const response = await api.get(endpoints.users.list);
 
     return response.data.data.filter(
       (user) => !TEST_USER_EMAILS.includes(user.email)
-    );
+    ).map(normalizeUser);
   },
 
   async getUser(id) {
     const response = await api.get(endpoints.users.details(id));
-    return response.data.data;
+    return normalizeUser(response.data.data);
   },
 
   async createUser(payload) {

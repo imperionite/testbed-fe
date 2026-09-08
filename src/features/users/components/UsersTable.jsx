@@ -1,308 +1,212 @@
-import { useMemo, useRef, useState } from "react";
+import React, { useMemo } from "react";
 import {
   MaterialReactTable,
   useMaterialReactTable,
 } from "@glebcha/material-react-table";
-import { Box, Button, CircularProgress } from "@mui/material";
+import {
+  CircularProgress,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Button,
+  IconButton,
+  Tooltip,
+} from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
+import EditIcon from "@mui/icons-material/Edit";
 
-import { createUserTableColumns } from "./userTableColumns";
-import notify from "../../../utils/toast";
-import ActionConfirmDialog from "../../../components/common/ActionConfirmDialog";
-import RoleChooserDialog from "./RoleChooserDialog";
+// Import our configuration registries and custom hooks
+import { userTableConfig } from "../config/tableConfig.js";
+import { useTableState } from "../hooks/useTableState.js";
+import { useTableActions } from "../hooks/useTableActions.jsx";
+import { createUserTableColumns } from "./UserTableColumns.jsx";
 
-export default function UsersTable({
-  users,
-  permissions,
+// Import decomposed components
+import BulkActionToolbar from "./shared/BulkActionToolbar.jsx";
+import RoleChooserDialog from "./RoleChooserDialog.jsx";
+
+/**
+ * @typedef {Object} UsersTableProps
+ * @property {Array} users - Array of user objects to display
+ * @property {Object} permissions - Current user's permissions
+ * @property {Array} columns - Table column definitions
+ * @property {Function} [onEditRow] - Handler for opening the external edit modal
+ * @property {Function} onRoleChange - Async API handler for single user role updates
+ * @property {Function} onStatusChange - Async API handler for single user status updates
+ * @property {Function} onBulkRoleChange - Async API handler for multi-user role updates
+ * @property {Function} onBulkStatusChange - Async API handler for multi-user status updates
+ */
+
+/**
+ * UsersTable component that displays users with inline editing, row selection,
+ * and bulk action toolbar capabilities.
+ */
+export function UsersTable({
+  users = [],
+  permissions = {},
+  columns,
+  onEditRow,
   onRoleChange,
   onStatusChange,
   onBulkRoleChange,
   onBulkStatusChange,
-  onUserClick,
 }) {
-  const [rowSelection, setRowSelection] = useState({});
-  const [confirmation, setConfirmation] = useState(null);
-  const [roleChooserOpen, setRoleChooserOpen] = useState(false);
-  const [selectedRole, setSelectedRole] = useState("");
-  const [pendingAction, setPendingAction] = useState(null);
-  const resolveRole = useRef(null);
-
-  const askForConfirmation = (message) =>
-    new Promise((resolve) => {
-      setConfirmation({ message, resolve });
-    });
-
-  const closeConfirmation = (confirmed) => {
-    confirmation?.resolve(confirmed);
-    setConfirmation(null);
-  };
-
-  const chooseRole = () => {
-    setSelectedRole("");
-    setRoleChooserOpen(true);
-    return new Promise((resolve) => {
-      resolveRole.current = resolve;
-    });
-  };
-
-  const resolveRoleChooser = (role) => {
-    resolveRole.current?.(role);
-    resolveRole.current = null;
-    setRoleChooserOpen(false);
-  };
-
-  const columns = useMemo(
-    () =>
-      createUserTableColumns({
-        canEdit: permissions.canEdit,
-      }),
+  // 1. Manage UI states (selection, confirmation, and roleChooser dialogs)
+  const tableState = useTableState();
+  const defaultColumns = useMemo(
+    () => createUserTableColumns({ canEdit: permissions.canEdit }),
     [permissions.canEdit],
   );
+  const tableColumns = columns ?? defaultColumns;
 
-  const selectedRowCount = Object.keys(rowSelection).length;
+  // 2. Manage business actions and coordinate mutations
+  const tableActions = useTableActions({
+    permissions,
+    onRoleChange,
+    onStatusChange,
+    onBulkRoleChange,
+    onBulkStatusChange,
+    askForConfirmation: tableState.askForConfirmation,
+    askForRole: tableState.askForRole,
+    clearSelection: () => tableState.setRowSelection({}),
+  });
 
+  // 3. Setup core table structure combining static config and runtime states
   const table = useMaterialReactTable({
-    columns,
+    // Spread our standard configurations (sorting, pinning, pagination sizing)
+    ...userTableConfig,
+
+    columns: tableColumns,
     data: users,
-    enableSorting: true,
-    enableColumnFilters: true,
-    enableGlobalFilter: true,
-    enablePagination: true,
+
+    // Permission-driven row interactions
     enableRowSelection: permissions.canSelectRows,
-    enableHiding: false,
-    enableClickToCopy: true,
-    enableColumnActions: false,
-    enableColumnPinning: true,
-    enableDensityToggle: true,
-    enableStickyHeader: true,
-    enableStickyFooter: true,
     enableEditing: permissions.canEdit,
-    editDisplayMode: "row",
-    positionActionsColumn: "last",
-    positionGlobalFilter: "right",
-    initialState: {
-      columnFiltersOpen: false,
-      pagination: { pageIndex: 0, pageSize: 5 },
-      sorting: [{ id: "created_at", desc: true }],
-      columnPinning: {
-      right: ["mrt-row-actions"],
+    enableRowActions: permissions.canEdit,
+
+    // Runtime selection and column states
+    state: {
+      rowSelection: tableState.rowSelection,
+      columnVisibility: {
+        // Hide row actions if some rows are selected (prioritizing the Bulk Toolbar)
+        "mrt-row-actions": tableState.selectedRowCount === 0,
       },
     },
+
+    // Handlers wired cleanly to our custom hooks
+    onRowSelectionChange: tableState.setRowSelection,
+    onEditingRowSave: tableActions.handleInlineEdit,
+
+    // Open the external form only from the row action icon.
+    renderRowActions: ({ row, table: rowActionsTable }) => (
+      <Tooltip title="Edit user">
+        <IconButton
+          aria-label={`Edit ${row.original.email}`}
+          onClick={(event) => {
+            event.stopPropagation();
+            rowActionsTable.setEditingRow(null);
+            onEditRow?.(row.original);
+          }}
+          size="small"
+        >
+          <EditIcon fontSize="small" />
+        </IconButton>
+      </Tooltip>
+    ),
+
+    // Custom inline saving loader
     icons: {
       SaveIcon: (props) =>
-        pendingAction ? (
+        tableActions.pendingAction?.startsWith("row-") ? (
           <CircularProgress size={18} color="inherit" />
         ) : (
-          <CheckIcon
-            {...props}
-            sx={{ ...props.sx, color: "success.main" }}
-          />
+          <CheckIcon {...props} sx={{ ...props.sx, color: "success.main" }} />
         ),
     },
-    displayColumnDefOptions: {
-      "mrt-row-actions": {
-        size: 104,
-        muiTableBodyCellProps: {
-          sx: {
-            minWidth: 104,
-            whiteSpace: "nowrap",
+
+    // Render the bulk actions toolbar at the bottom of the table
+    renderBottomToolbarCustomActions: () => (
+      <BulkActionToolbar
+        selectedCount={tableState.selectedRowCount}
+        actions={[
+          {
+            key: "change-role",
+            label: "Change Role",
+            variant: "contained",
+            onClick: () =>
+              tableActions.handleBulkRoleChange(
+                table.getSelectedRowModel().rows
+              ),
           },
-        },
-      },
-    },
-    state: {
-      rowSelection,
-      columnVisibility: {
-        "mrt-row-actions": selectedRowCount === 0,
-      },
-    },
-    onRowSelectionChange: setRowSelection,
-    onEditingRowSave: permissions.canEdit
-      ? async ({ exitEditingMode, row, values }) => {
-          const roleChanged = values.role !== row.original.role;
-          const statusChanged =
-            String(values.is_active) !== String(row.original.is_active);
-
-          if (!roleChanged && !statusChanged) {
-            exitEditingMode();
-            return;
-          }
-
-          if (!(await askForConfirmation("Are you sure you want to save these changes?"))) {
-            return;
-          }
-
-          try {
-            setPendingAction(`row-${row.original.id}`);
-            if (roleChanged) {
-              await onRoleChange({ id: row.original.id, role: values.role });
-            }
-            if (statusChanged) {
-              await onStatusChange({
-                id: row.original.id,
-                isActive: values.is_active === true || values.is_active === "true",
-              });
-            }
-            exitEditingMode();
-            notify.success("User updated successfully.");
-          } catch (error) {
-            console.error("Failed to update user:", error);
-            notify.error(
-              error.response?.data?.message || "Failed to update user.",
-            );
-          } finally {
-            setPendingAction(null);
-          }
-        }
-      : undefined,
-    muiTableContainerProps: {
-      sx: {
-        maxHeight: 600,
-        maxWidth: "100%",
-        overflowX: "auto",
-      },
-    },
-    muiTableProps: {
-      sx: {
-        tableLayout: "fixed",
-      },
-    },
-    muiTableHeadCellProps: {
-      sx: {
-        position: "sticky",
-        top: 0,
-        zIndex: 2,
-      },
-    },
-    muiTableBodyRowProps: ({ row }) => ({
-      onClick: (event) => {
-        if (
-          event.target.closest("button") ||
-          event.target.closest("input") ||
-          event.target.closest('[role="checkbox"]')
-        ) {
-          return;
-        }
-
-        onUserClick?.(row.original);
-      },
-      sx: {
-        cursor: onUserClick ? "pointer" : "default",
-      },
-    }),
-    renderBottomToolbarCustomActions: ({ table: currentTable }) =>
-      permissions.canBulkEdit ? (
-        <Box sx={{ display: "flex", gap: 1 }}>
-          <Button
-            size="small"
-            variant="contained"
-            disabled={!currentTable.getSelectedRowModel().rows.length}
-            onClick={async () => {
-              const role = await chooseRole();
-              if (!role) return;
-              if (!(await askForConfirmation("Are you sure you want to change the selected users' roles?"))) {
-                return;
-              }
-
-              const ids = currentTable
-                .getSelectedRowModel()
-                .rows.map((row) => row.original.id);
-
-              setPendingAction("bulk-role");
-              try {
-                await onBulkRoleChange({ ids, role });
-                notify.success("Roles updated successfully.");
-              } catch (error) {
-                console.error("Failed to update roles:", error);
-                notify.error("Failed to update roles.");
-              } finally {
-                setPendingAction(null);
-              }
-            }}
-            startIcon={pendingAction === "bulk-role" ? <CircularProgress size={16} /> : null}
-          >
-            {pendingAction === "bulk-role" ? "Updating..." : "Change role"}
-          </Button>
-          <Button
-            size="small"
-            variant="outlined"
-            disabled={!currentTable.getSelectedRowModel().rows.length}
-            onClick={async () => {
-              if (!(await askForConfirmation("Are you sure you want to activate the selected users?"))) {
-                return;
-              }
-
-              const ids = currentTable
-                .getSelectedRowModel()
-                .rows.map((row) => row.original.id);
-
-              setPendingAction("bulk-activate");
-              try {
-                await onBulkStatusChange({ ids, isActive: true });
-                notify.success("Users activated successfully.");
-              } catch (error) {
-                console.error("Failed to activate users:", error);
-                notify.error(
-                  error.response?.data?.message || "Failed to activate users.",
-                );
-              } finally {
-                setPendingAction(null);
-              }
-            }}
-            startIcon={pendingAction === "bulk-activate" ? <CircularProgress size={16} /> : null}
-          >
-            {pendingAction === "bulk-activate" ? "Activating..." : "Activate"}
-          </Button>
-          <Button
-            size="small"
-            variant="outlined"
-            disabled={!currentTable.getSelectedRowModel().rows.length}
-            onClick={async () => {
-              if (!(await askForConfirmation("Are you sure you want to deactivate the selected users?"))) {
-                return;
-              }
-
-              const ids = currentTable
-                .getSelectedRowModel()
-                .rows.map((row) => row.original.id);
-
-              setPendingAction("bulk-deactivate");
-              try {
-                await onBulkStatusChange({ ids, isActive: false });
-                notify.success("Users deactivated successfully.");
-              } catch (error) {
-                console.error("Failed to deactivate users:", error);
-                notify.error(
-                  error.response?.data?.message || "Failed to deactivate users.",
-                );
-              } finally {
-                setPendingAction(null);
-              }
-            }}
-            startIcon={pendingAction === "bulk-deactivate" ? <CircularProgress size={16} /> : null}
-          >
-            {pendingAction === "bulk-deactivate" ? "Deactivating..." : "Deactivate"}
-          </Button>
-        </Box>
-      ) : null,
+          {
+            key: "activate",
+            label: "Activate",
+            onClick: () =>
+              tableActions.handleBulkActivate(table.getSelectedRowModel().rows),
+          },
+          {
+            key: "deactivate",
+            label: "Deactivate",
+            onClick: () =>
+              tableActions.handleBulkDeactivate(
+                table.getSelectedRowModel().rows
+              ),
+          },
+        ]}
+        isPending={tableActions.isPending}
+        pendingAction={tableActions.pendingAction}
+      />
+    ),
   });
 
   return (
     <>
+      {/* 1. Main Grid Rendering */}
       <MaterialReactTable table={table} />
-      <ActionConfirmDialog
-        open={Boolean(confirmation)}
-        message={confirmation?.message}
-        onConfirm={() => closeConfirmation(true)}
-        onCancel={() => closeConfirmation(false)}
-      />
+
+      {/* 2. Generic Action Confirmation Dialog */}
+      <Dialog
+        open={Boolean(tableState.confirmation)}
+        onClose={() => tableState.closeConfirmation(false)}
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogTitle>Confirm Action</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            {tableState.confirmation?.message}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => tableState.closeConfirmation(false)}>
+            Cancel
+          </Button>
+          <Button
+            onClick={() => tableState.closeConfirmation(true)}
+            variant="contained"
+            color="primary"
+            autoFocus
+          >
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* 3. Bulk Role Selection Chooser */}
       <RoleChooserDialog
-        open={roleChooserOpen}
-        value={selectedRole}
-        onChange={setSelectedRole}
-        onConfirm={() => resolveRoleChooser(selectedRole)}
-        onCancel={() => resolveRoleChooser(null)}
+        open={tableState.roleChooser?.open}
+        value={tableState.roleChooser?.value}
+        onChange={(value) => tableState.roleChooser.setValue(value)}
+        onConfirm={() =>
+          tableState.closeRoleChooser(tableState.roleChooser.value)
+        }
+        onCancel={() => tableState.closeRoleChooser(null)}
+        isLoading={tableActions.pendingAction === "bulk-role"}
       />
     </>
   );
 }
+
+export default UsersTable;

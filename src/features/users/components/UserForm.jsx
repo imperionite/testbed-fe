@@ -1,131 +1,52 @@
-import React from "react";
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Chip,
-  FormControl,
-  FormControlLabel,
-  InputLabel,
-  MenuItem,
-  Select,
-  Stack,
-  Switch,
-  TextField,
-} from "@mui/material";
-import { userFormConfig } from "../form/formConfig";
-import {
-  getUserFormPermissions,
-  getVisibleUserFields,
-} from "../userPermissions";
-import getValidationSchema from "../form/UserValidationSchema";
-import { formatAccountStatus, formatUserDate } from "../form/fieldFormatters";
+import React from 'react';
+import { Stack } from '@mui/material';
+import FormField from './shared/FormField';
+import { getVisibleUserFields, getUserFormPermissions } from '../userPermissions';
+import { formatUserDate, formatAccountStatus } from '../form/fieldFormatters';
 
-export default function UserForm({
-  role,
-  mode,
-  defaultValues = {},
-  onSubmit,
-  onInvalid,
-  formId = "user-form",
-}) {
-  const { getFieldRule } = getUserFormPermissions(role, mode);
-  const schema = getValidationSchema(mode);
+/**
+ * @typedef {Object} UserFormProps
+ * @property {string} role - Current user's role (admin, instructor, student)
+ * @property {'view' | 'edit' | 'create'} mode - Form mode
+ * @property {Object} control - React Hook Form control object
+ * @property {Object} errors - Form field errors object from react-hook-form
+ */
 
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
-    resolver: zodResolver(schema),
-    defaultValues,
-    mode: "onBlur",
-  });
-
-  const handleSubmitData = (data) => {
-    const payload = userFormConfig.reduce((acc, field) => {
-      if (getFieldRule(field) !== "hidden" && data[field.name] !== undefined) {
-        acc[field.name] = data[field.name];
-      }
-      return acc;
-    }, {});
-
-    onSubmit?.(payload);
-  };
-
+/**
+ * UserForm component that dynamically renders user input fields based on
+ * Role-Based Access Control (RBAC) visibility rules and form mode.
+ * 
+ * Fully integrated with react-hook-form and the FormField shared component.
+ */
+export function UserForm({ role, mode, control, errors }) {
+  // 1. Get the list of fields that are visible for this role and mode
   const visibleFields = getVisibleUserFields(role, mode);
+  
+  // 2. Get permission helper to determine field-level editability rules
+  const { getFieldRule } = getUserFormPermissions(role, mode);
 
   return (
-    <Stack
-      component="form"
-      id={formId}
-      onSubmit={handleSubmit(handleSubmitData, onInvalid)}
-      spacing={2}
-    >
+    <Stack component="form" spacing={2.5} sx={{ mt: 1 }}>
       {visibleFields.map((field) => {
         const rule = getFieldRule(field);
-        const isDisabled = rule === "readonly";
-        const isRequired = rule === "required";
-
+        
         return (
-          <Controller
+          <FormField
             key={field.name}
-            name={field.name}
+            field={field}
             control={control}
-            render={({ field: rhfField }) => (
-              field.type === "select" ? (
-                <FormControl fullWidth size="small" error={!!errors[field.name]}>
-                  <InputLabel>{field.label}</InputLabel>
-                  <Select
-                    {...rhfField}
-                    label={field.label}
-                    disabled={isDisabled}
-                  >
-                    {field.options.map((option) => (
-                      <MenuItem key={option.value} value={option.value}>
-                        {option.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              ) : field.type === "status" && isDisabled ? (
-                <Chip
-                  label={formatAccountStatus(rhfField.value)}
-                  color={rhfField.value === true ? "success" : "error"}
-                  variant="filled"
-                />
-              ) : field.type === "status" ? (
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={rhfField.value === true}
-                      onChange={(event) => rhfField.onChange(event.target.checked)}
-                      disabled={isDisabled}
-                    />
-                  }
-                  label={formatAccountStatus(rhfField.value)}
-                />
-              ) : (
-                <TextField
-                  {...rhfField}
-                  value={
-                    field.format === "date"
-                      ? formatUserDate(rhfField.value)
-                      : rhfField.value ?? ""
-                  }
-                  label={field.label}
-                  type={field.type}
-                  disabled={isDisabled}
-                  required={isRequired}
-                  error={!!errors[field.name]}
-                  helperText={errors[field.name]?.message}
-                  fullWidth
-                  size="small"
-                />
-              )
-            )}
+            error={errors?.[field.name]}
+            isDisabled={rule === 'readonly' || mode === 'view'}
+            isRequired={rule === 'required'}
+            formatters={{ 
+              date: formatUserDate, 
+              status: formatAccountStatus 
+            }}
           />
         );
       })}
     </Stack>
   );
 }
+
+export default UserForm;
