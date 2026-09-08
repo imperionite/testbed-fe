@@ -47,7 +47,7 @@ export const userFormConfig = [
     },
   },
   {
-    name: "created_at",
+    name: "createdAt",
     label: "Created At",
     type: "text",
     format: "date",
@@ -72,7 +72,7 @@ export const userFormConfig = [
     },
   },
   {
-    name: "last_name",
+    name: "lastName",
     label: "Last Name",
     type: "text",
     rbac: {
@@ -84,7 +84,7 @@ export const userFormConfig = [
     },
   },
   {
-    name: "first_name",
+    name: "firstName",
     label: "First Name",
     type: "text",
     rbac: {
@@ -96,7 +96,7 @@ export const userFormConfig = [
     },
   },
   {
-    name: "middle_name",
+    name: "middleName",
     label: "Middle Name",
     type: "text",
     rbac: {
@@ -133,7 +133,7 @@ export const userFormConfig = [
     },
   },
   {
-    name: "is_active",
+    name: "isActive",
     label: "Account Status",
     type: "status",
     rbac: {

@@ -54,12 +54,12 @@ const createUserValidationSchema = z.object({
     (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value),
     "Must be a valid email",
   ),
-  first_name: requiredString("First name", 50),
-  middle_name: optionalNullableString(
+  firstName: requiredString("First name", 50),
+  middleName: optionalNullableString(
     50,
     "Middle name must be at most 50 characters",
   ),
-  last_name: requiredString("Last name", 50),
+  lastName: requiredString("Last name", 50),
   suffix: z.string().optional().nullable(),
   role: roleValidator,
   password: requiredString("Password")
@@ -86,15 +86,15 @@ const editUserValidationSchema = z.object({
     (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value),
     "Must be a valid email",
   ),
-  first_name: requiredString("First name", 50),
-  middle_name: optionalNullableString(
+  firstName: requiredString("First name", 50),
+  middleName: optionalNullableString(
     50,
     "Middle name must be at most 50 characters",
   ),
-  last_name: requiredString("Last name", 50),
+  lastName: requiredString("Last name", 50),
   suffix: z.string().optional().nullable(),
   role: roleValidator,
-  is_active: z.boolean({ invalid_type_error: "Status is required" }),
+  isActive: z.boolean({ invalid_type_error: "Status is required" }),
 });
 
 export default getValidationSchema;

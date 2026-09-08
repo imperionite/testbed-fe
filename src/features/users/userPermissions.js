@@ -12,8 +12,8 @@ export function getUserManagementPermissions(role) {
 		canView: isAdmin,
 		canCreate: isAdmin,
 		canEdit: isAdmin,
-		canEditRole: isAdmin,
-		canToggleStatus: isAdmin,
+		canChangeRole: isAdmin,
+		canChangeStatus: isAdmin,
 		canBulkEdit: isAdmin,
 		canSelectRows: isAdmin,
 	};
