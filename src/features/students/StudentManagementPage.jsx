@@ -17,6 +17,7 @@ import { useStudentModalState } from "./hooks/useStudentModalState";
 import { getStudentManagementPermissions } from "./studentPermissions";
 import { MODES } from "./form/formConfig";
 import { useMemo } from "react";
+import { mapStudentData } from "./utils/studentUtils";
 
 export default function StudentManagementPage() {
   const { user, isLoading: isAuthLoading } = useAuth();
@@ -40,45 +41,10 @@ export default function StudentManagementPage() {
     const studentsArr = Array.isArray(students) ? students : [students];
 
     return studentsArr.map((student) => {
-      // Backend contract: student.id IS the user.id
-      const studentUserId = student.id;
       const userRecord =
-        userData?.find((u) => u.id === studentUserId) || student.user || {};
-      const meta = userRecord.user_metadata || {};
+        userData?.find((u) => u.id === student.id) || student.user || {};
       
-      // Extract status from nested currentInternship if it exists
-      const internshipStatus = student.currentInternship?.status || student.internship_status || 'pending';
-
-      return {
-        ...student,
-        userId: studentUserId,
-        internship_status: internshipStatus,
-        email: student.email || userRecord.email || meta.email || "",
-        firstName:
-          student.firstName ||
-          student.first_name ||
-          userRecord.firstName ||
-          userRecord.first_name ||
-          meta.firstName ||
-          meta.first_name ||
-          "",
-        middleName:
-          student.middleName ||
-          student.middle_name ||
-          userRecord.middleName ||
-          userRecord.middle_name ||
-          meta.middleName ||
-          meta.middle_name ||
-          "",
-        lastName:
-          student.lastName ||
-          student.last_name ||
-          userRecord.lastName ||
-          userRecord.last_name ||
-          meta.lastName ||
-          meta.last_name ||
-          "",
-      };
+      return mapStudentData(student, userRecord);
     });
   }, [students, userData]);
 
