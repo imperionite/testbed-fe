@@ -1,11 +1,13 @@
-import { Box, Typography, Button, Alert, CircularProgress, Stack, IconButton } from "@mui/material";
-import { Add as AddIcon, FilterList as FilterListIcon, Edit as EditIcon } from "@mui/icons-material";
+import { Box, Typography, Button, Alert, CircularProgress, Stack, IconButton, Tooltip } from "@mui/material";
+import { Add as AddIcon, FilterList as FilterListIcon, Edit as EditIcon, PersonAdd as PersonAddIcon, EditNote as EditNoteIcon } from "@mui/icons-material";
 import { useMaterialReactTable } from "@glebcha/material-react-table";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useCallback } from "react";
 import CardStat from "../../components/common/CardStat";
 import InternshipTable from "./components/InternshipTable";
 import InternshipModal from "./components/InternshipModal";
-import { useInternships } from "./hooks/useInternshipMutations";
+import { BadgeStatus } from "./components/BadgeStatus";
+import { useInternships, useInternshipMutations } from "./hooks/useInternshipMutations";
+import { useTableActions } from "./hooks/useTableActions";
 import useAuth from "../../hooks/useAuth";
 import { MODES } from "./form/formConfig";
 
@@ -14,6 +16,16 @@ export default function InternshipManagementPage() {
   const [modalState, setModalState] = useState({ open: false, mode: MODES.CREATE, internship: null });
   
   const { data: internships = [], isLoading, isError, refetch } = useInternships();
+  const { updateStatus, assignAdviser, updateInternship } = useInternshipMutations();
+
+  // Integrated Table Actions
+  const { handleBulkStatusChange } = useTableActions({
+    permissions: { canEdit: true, canBulkEdit: true },
+    onStatusChange: (data) => updateStatus.mutateAsync(data),
+    onBulkStatusChange: async ({ ids, status }) => {
+        await Promise.all(ids.map(id => updateStatus.mutateAsync({ id, status })));
+    }
+  });
 
   const handleOpenModal = (mode, internship = null) => {
     setModalState({ open: true, mode, internship });
@@ -76,94 +88,117 @@ export default function InternshipManagementPage() {
         accessorKey: "status",
         header: "Status",
         Cell: ({ cell }) => (
-            <Box sx={{textTransform: 'capitalize'}}>
-                {cell.getValue()}
-            </Box>
+            <BadgeStatus value={cell.getValue()} />
         ),
       },
       {
         id: "actions",
         header: "Actions",
         Cell: ({ row }) => (
-          <IconButton onClick={() => handleOpenModal(MODES.EDIT, row.original)}>
-            <EditIcon />
-          </IconButton>
+          <Stack direction="row" spacing={1}>
+            <Tooltip title="Update Status">
+              <IconButton size="small" onClick={() => handleOpenModal(MODES.EDIT_STATUS, row.original)}>
+                <EditNoteIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Assign Adviser">
+              <IconButton size="small" onClick={() => handleOpenModal(MODES.EDIT_ADVISER, row.original)}>
+                <PersonAddIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Edit Details">
+              <IconButton size="small" onClick={() => handleOpenModal(MODES.EDIT_DETAILS, row.original)}>
+                <EditIcon />
+              </IconButton>
+            </Tooltip>
+          </Stack>
         ),
       },
-    ],
-    []
-  );
+      ],
+      []
+      );
 
-  const table = useMaterialReactTable({
-    columns,
-    data: internships,
-    enableSorting: true,
-    enableColumnFilters: true,
-    enablePagination: true,
-    enableHiding: false,
-    enableColumnActions: false,
-    enableColumnPinning: true,
-    enableStickyHeader: true,
-    positionActionsColumn: "last",
-    displayColumnDefOptions: {
-      "mrt-row-actions": { size: 100 },
-    },
-    muiPaginationProps: {
-        showFirstButton: false,
-        showLastButton: false,
-    },
-  });
+      const table = useMaterialReactTable({
+        columns,
+        data: internships,
+        enableSorting: true,
+        enableColumnFilters: true,
+        enablePagination: true,
+        enableHiding: false,
+        enableColumnActions: false,
+        enableColumnPinning: true,
+        enableStickyHeader: true,
+        positionActionsColumn: "last",
+        displayColumnDefOptions: {
+          "mrt-row-actions": { size: 100 },
+        },
+        muiPaginationProps: {
+            showFirstButton: false,
+            showLastButton: false,
+        },
+      });
 
-  // RBAC: Only Admin/Coordinator can manage
-  const canManage = user?.role === "administrator" || user?.role === "internship_coordinator";
+      const handleUpdateStatus = async (data) => {
+      await updateStatus.mutateAsync({ id: modalState.internship.id, status: data.status });
+      handleCloseModal();
+      };
 
-  return (
-    <Box sx={{ p: 3, bgcolor: "background.default", minHeight: "100vh" }}>
-      {/* Header Section */}
-      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
-        <Typography variant="h4" fontWeight={600}>Internship Overview</Typography>
-        {canManage && (
-          <Button variant="contained" startIcon={<AddIcon />} onClick={() => handleOpenModal(MODES.CREATE)}>
-            Add New Intern
-          </Button>
-        )}
-      </Box>
+      const handleAssignAdviser = async (data) => {
+      await assignAdviser.mutateAsync({ id: modalState.internship.id, facultyAdviserId: data.facultyAdviserId || null });
+      handleCloseModal();
+      };
 
-      {/* Summary Metrics */}
-      <Stack direction="row" spacing={2} sx={{ mb: 4 }}>
-        <CardStat title="Deployed Interns" value={internships.filter(i => i.status === 'active').length} />
-        <CardStat title="Pending Interns" value={internships.filter(i => i.status === 'pending').length} />
-        <CardStat title="Completed Internships" value={internships.filter(i => i.status === 'completed').length} />
-        <CardStat title="HTE Partners" value={new Set(internships.map(i => i.hte_id)).size} />
-      </Stack>
+      const handleUpdateDetails = async (data) => {
+      await updateInternship.mutateAsync({ id: modalState.internship.id, payload: data });
+      handleCloseModal();
+      };
 
-      {/* Toolbar & Controls */}
-      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
-        <Typography variant="h6">Interns List</Typography>
-        <Stack direction="row" spacing={1}>
-          <Button variant="outlined" startIcon={<FilterListIcon />}
-            onClick={() => table.setShowColumnFilters(!table.getState().showColumnFilters)}
-          >
-            Filters
-          </Button>
+      return (
+      <Box sx={{ p: 3, bgcolor: "background.default", minHeight: "100vh" }}>
+        {/* Header Section */}
+        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
+            <Typography variant="h4" fontWeight={600}>Internship Overview</Typography>
+            <Button variant="contained" startIcon={<AddIcon />} onClick={() => handleOpenModal(MODES.CREATE)}>
+                Add New Intern
+            </Button>
+        </Box>
+
+        {/* Summary Metrics */}
+        <Stack direction="row" spacing={2} sx={{ mb: 4 }}>
+            <CardStat title="Deployed Interns" value={internships.filter(i => i.status === 'active').length} />
+            <CardStat title="Pending Interns" value={internships.filter(i => i.status === 'pending').length} />
+            <CardStat title="Completed Internships" value={internships.filter(i => i.status === 'completed').length} />
+            <CardStat title="HTE Partners" value={new Set(internships.map(i => i.hte_id)).size} />
         </Stack>
+
+        {/* Toolbar & Controls */}
+        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+            <Typography variant="h6">Interns List</Typography>
+            <Button variant="outlined" startIcon={<FilterListIcon />}
+                onClick={() => table.setShowColumnFilters(!table.getState().showColumnFilters)}
+            >
+                Filters
+            </Button>
+        </Box>
+
+        {/* Data Table */}
+        {isLoading ? (
+            <CircularProgress/>
+        ) : isError ? (
+            <Alert action={<Button onClick={refetch} color="inherit" size="small">Retry</Button>} severity="error">Error loading data</Alert>
+        ) : (
+            <InternshipTable table={table}/>
+        )}
+
+        <InternshipModal 
+            open={modalState.open} 
+            mode={modalState.mode} 
+            internship={modalState.internship}
+            onClose={handleCloseModal} 
+            onUpdateStatus={handleUpdateStatus}
+            onAssignAdviser={handleAssignAdviser}
+            onUpdateDetails={handleUpdateDetails}
+        />
       </Box>
-
-      {/* Data Table */}
-      {isLoading ? (
-        <CircularProgress/>
-      ) : isError ? (
-        <Alert action={<Button onClick={refetch} color="inherit" size="small">Retry</Button>} severity="error">Error loading data</Alert>
-      ) : (
-        <InternshipTable table={table}/>
-      )}
-
-      <InternshipModal 
-        open={modalState.open} 
-        mode={modalState.mode} 
-        internship={modalState.internship}
-        onClose={handleCloseModal} 
-      />
-    </Box>
-  );
-}
+      );
+      }

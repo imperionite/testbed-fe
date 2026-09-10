@@ -25,6 +25,12 @@ export function useInternshipMutations() {
     onSuccess: invalidateInternships,
   });
 
+  const bulkUpdateStatus = useMutation({
+    mutationFn: ({ ids, status }) =>
+      Promise.all(ids.map((id) => internshipsApi.updateInternshipStatus(id, status))),
+    onSuccess: invalidateInternships,
+  });
+
   const updateInternship = useMutation({
     mutationFn: ({ id, payload }) => internshipsApi.updateInternship(id, payload),
     onSuccess: invalidateInternships,
@@ -39,6 +45,7 @@ export function useInternshipMutations() {
   return {
     createInternship,
     updateStatus,
+    bulkUpdateStatus,
     updateInternship,
     assignAdviser,
   };
