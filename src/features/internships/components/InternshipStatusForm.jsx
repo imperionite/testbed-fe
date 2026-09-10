@@ -15,8 +15,13 @@ export default function InternshipStatusForm({ internship, mode, onSubmit, onCan
   });
 
   const getDisabledStatus = (option) => {
-    if (isCompleted) return true;
-    if (currentStatus === "active" && option === "pending") return true;
+    // If already in that status, disable it to prevent redundant API calls
+    if (currentStatus === option) return true;
+
+    // Logic constraints
+    if (isCompleted) return true; // Completed locks all
+    if (currentStatus === "active" && option === "pending") return true; // Active cannot revert to pending
+    
     return false;
   };
 

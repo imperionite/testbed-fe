@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Box, TextField, MenuItem, Button, Stack } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,7 +9,7 @@ import { useUsers } from "../../users/hooks/useUsers";
 import { useInternshipMutations } from "../hooks/useInternshipMutations";
 import { MODES } from "../form/formConfig";
 
-export default function InternshipForm({ mode, internship, onClose }) {
+export default function InternshipForm({ mode, internships = [], internship, onClose, onSubmit }) {
   const { data: students = [], isLoading: isStudentsLoading, isError: isStudentsError } = useStudents("administrator");
   const { data: htes = [] } = useHtes();
   const { data: users = [] } = useUsers();
@@ -18,6 +18,18 @@ export default function InternshipForm({ mode, internship, onClose }) {
   const { createInternship, updateInternship, updateStatus, assignAdviser } = useInternshipMutations();
 
   const isViewOrEdit = mode !== MODES.CREATE;
+
+  // Filter students who already have an active or pending internship
+  const studentsWithInternships = new Set(
+    internships
+      .filter(i => i.status === 'active' || i.status === 'pending')
+      .map(i => i.student_id)
+  );
+
+  const availableStudents = useMemo(() => {
+      if (mode !== MODES.CREATE) return students;
+      return students.filter(s => !studentsWithInternships.has(s.id));
+  }, [students, studentsWithInternships, mode]);
 
   const { control, handleSubmit, formState: { errors } } = useForm({
     resolver: zodResolver(getValidationSchema(mode)),
@@ -30,13 +42,13 @@ export default function InternshipForm({ mode, internship, onClose }) {
     },
   });
 
-  const onSubmit = (data) => {
+  const onSubmitHandler = (data) => {
     if (mode === MODES.CREATE) {
-        createInternship.mutate({
+        onSubmit({
             studentId: data.studentId,
             hteId: data.hteId,
             requiredHours: data.requiredHours ? Number(data.requiredHours) : null
-        }, { onSuccess: onClose });
+        });
     } else {
         const promises = [];
         
@@ -69,7 +81,7 @@ export default function InternshipForm({ mode, internship, onClose }) {
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ mt: 2 }}>
+    <Box component="form" onSubmit={handleSubmit(onSubmitHandler)} sx={{ mt: 2 }}>
       <Stack spacing={2}>
         <Controller
           name="studentId"
@@ -78,16 +90,24 @@ export default function InternshipForm({ mode, internship, onClose }) {
             <TextField 
                 {...field} 
                 select 
-                label={isStudentsLoading ? "Loading..." : isStudentsError ? "Error Loading Students" : "Student"} 
-                disabled={isViewOrEdit || isStudentsLoading || isStudentsError} 
+                label={isStudentsLoading ? "Loading..." : isStudentsError ? "Error Loading Students" : (mode === MODES.CREATE && availableStudents.length === 0 ? "No Students Available" : "Student")} 
+                disabled={isViewOrEdit || isStudentsLoading || isStudentsError || (mode === MODES.CREATE && availableStudents.length === 0)} 
                 error={!!errors.studentId || isStudentsError} 
                 helperText={errors.studentId?.message || (isStudentsError ? "Unable to load students. Please refresh or contact admin." : "")}
             >
-              {students.map((s) => (
-                <MenuItem key={s.id} value={s.id}>
-                  {s.student_profiles?.student_number || s.id}
-                </MenuItem>
-              ))}
+              {availableStudents.map((s) => {
+                const userProfile = s.profiles || {};
+                const firstName = userProfile.first_name || "";
+                const lastName = userProfile.last_name || "";
+                const fullName = [firstName, lastName].filter(Boolean).join(" ");
+                const displayName = fullName.trim() || s.student_number || s.id;
+                
+                return (
+                  <MenuItem key={s.id} value={s.id}>
+                    {displayName}
+                  </MenuItem>
+                );
+              })}
             </TextField>
           )}
         />

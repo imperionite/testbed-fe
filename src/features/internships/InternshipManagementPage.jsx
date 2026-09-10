@@ -10,6 +10,7 @@ import InternshipModal from "./components/InternshipModal";
 import { BadgeStatus } from "./components/BadgeStatus";
 import AttendanceViewModal from "../attendance/components/AttendanceViewModal";
 import { useInternships, useInternshipMutations } from "./hooks/useInternshipMutations";
+import { useInternshipsData } from "./hooks/useInternshipsData";
 import { useTableActions } from "./hooks/useTableActions";
 import useAuth from "../../hooks/useAuth";
 import { MODES } from "./form/formConfig";
@@ -30,7 +31,7 @@ export default function InternshipManagementPage() {
   const [modalState, setModalState] = useState({ open: false, mode: MODES.CREATE, internship: null });
   const [attendanceModalState, setAttendanceModalState] = useState({ open: false, internship: null });
   
-  const { data: internships = [], isLoading, isError, refetch } = useInternships();
+  const { internships, studentMap, adviserMap, isLoading, isError, refetch } = useInternshipsData();
   const { createInternship, updateStatus, assignAdviser, updateInternship } = useInternshipMutations();
 
   // Integrated Table Actions
@@ -70,27 +71,17 @@ export default function InternshipManagementPage() {
         id: "name",
         header: "Name",
         accessorFn: (row) => {
-          const profile = row.student_profiles || {};
-          const firstName = profile.firstName || profile.first_name || "";
-          const middleName = profile.middleName || profile.middle_name || "";
-          const lastName = profile.lastName || profile.last_name || "";
-
-          const fullName = [firstName, middleName, lastName].filter(Boolean).join(" ");
-          
-          return fullName.trim() || profile.student_number || "N/A";
+          const student = studentMap[row.student_id] || {};
+          const fullName = [student.firstName, student.lastName].filter(Boolean).join(" ");
+          return fullName.trim() || row.student_profiles?.student_number || "N/A";
         },
         Cell: ({ row }) => {
-          const profile = row.original.student_profiles || {};
-          const firstName = profile.firstName || profile.first_name || "";
-          const middleName = profile.middleName || profile.middle_name || "";
-          const lastName = profile.lastName || profile.last_name || "";
-
-          const fullName = [firstName, middleName, lastName].filter(Boolean).join(" ");
-          
+          const student = studentMap[row.original.student_id] || {};
+          const fullName = [student.firstName, student.lastName].filter(Boolean).join(" ");
           return (
             <Box>
-              <Typography variant="body2">{fullName.trim() || "N/A"}</Typography>
-              <Typography variant="caption" color="text.secondary">{profile.student_number}</Typography>
+              <Typography variant="body2">{fullName.trim() || "Student #" + (row.original.student_profiles?.student_number || "N/A")}</Typography>
+              <Typography variant="caption" color="text.secondary">Program: {row.original.student_profiles?.program || "N/A"}</Typography>
             </Box>
           );
         },
@@ -100,13 +91,16 @@ export default function InternshipManagementPage() {
         header: "HTE Partner",
       },
       {
-        accessorKey: "student_profiles.program",
-        header: "Program",
+        id: "facultyAdviser",
+        header: "Faculty Adviser",
+        accessorFn: (row) => {
+            const adviser = row.faculty_advisers || adviserMap[row.faculty_adviser_id];
+            return adviser ? `${adviser.first_name} ${adviser.last_name}` : "Not Assigned";
+        },
       },
       {
-        accessorKey: "internship_period",
-        header: "Internship Period",
-        Cell: () => "TBD",
+        accessorKey: "student_profiles.program",
+        header: "Program",
       },
       {
         accessorKey: "progress",
@@ -151,7 +145,7 @@ export default function InternshipManagementPage() {
         ),
       },
       ],
-      []
+      [studentMap, adviserMap]
       );
 
       const table = useMaterialReactTable({
@@ -230,6 +224,7 @@ export default function InternshipManagementPage() {
             open={modalState.open} 
             mode={modalState.mode} 
             internship={modalState.internship}
+            internships={internships}
             onClose={handleCloseModal} 
             onUpdateStatus={handleUpdateStatus}
             onAssignAdviser={handleAssignAdviser}

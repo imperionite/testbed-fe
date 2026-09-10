@@ -17,7 +17,7 @@ const style = {
   p: 4,
 };
 
-export default function InternshipModal({ open, mode, internship, onClose, onUpdateStatus, onAssignAdviser, onUpdateDetails, onCreate }) {
+export default function InternshipModal({ open, mode, internship, internships, onClose, onUpdateStatus, onAssignAdviser, onUpdateDetails, onCreate }) {
   const isCompleted = internship?.status === 'completed';
 
   const getForm = () => {
@@ -36,7 +36,7 @@ export default function InternshipModal({ open, mode, internship, onClose, onUpd
 
     switch (mode) {
       case MODES.CREATE:
-        return <InternshipForm mode={mode} onSubmit={onCreate} onCancel={onClose} />;
+        return <InternshipForm mode={mode} internships={internships} onSubmit={onCreate} onCancel={onClose} />;
       case MODES.EDIT_STATUS:
         return <InternshipStatusForm internship={internship} mode={mode} onSubmit={onUpdateStatus} onCancel={onClose} />;
       case MODES.EDIT_ADVISER:

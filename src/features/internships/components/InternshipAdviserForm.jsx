@@ -7,16 +7,30 @@ import { useUsers } from "../../users/hooks/useUsers";
 import { MODES } from "../form/formConfig";
 
 export default function InternshipAdviserForm({ internship, mode, onSubmit, onCancel }) {
-  const { data: users = [] } = useUsers();
+  const { data: users = [], isLoading } = useUsers();
   const facultyAdvisers = users.filter(u => u.role === 'faculty_adviser');
   
-  const { control, handleSubmit, formState: { errors } } = useForm({
+  const { control, handleSubmit, formState: { errors, isDirty }, reset } = useForm({
     resolver: zodResolver(getValidationSchema(mode)),
     defaultValues: { facultyAdviserId: internship?.faculty_adviser_id || "" },
   });
 
+  const handleFormSubmit = (data) => {
+    if (!isDirty) {
+      onCancel(); // Close if no changes
+      return;
+    }
+    onSubmit(data);
+  };
+
+  React.useEffect(() => {
+    reset({ facultyAdviserId: internship?.faculty_adviser_id || "" });
+  }, [internship, reset]);
+
+  if (isLoading) return <Box>Loading Faculty Advisers...</Box>;
+
   return (
-    <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ mt: 2 }}>
+    <Box component="form" onSubmit={handleSubmit(handleFormSubmit)} sx={{ mt: 2 }}>
       <Stack spacing={2}>
         <Controller
           name="facultyAdviserId"
@@ -34,7 +48,7 @@ export default function InternshipAdviserForm({ internship, mode, onSubmit, onCa
         />
         <Stack direction="row" spacing={2}>
             <Button onClick={onCancel} variant="outlined">Cancel</Button>
-            <Button type="submit" variant="contained">Assign Adviser</Button>
+            <Button type="submit" variant="contained" disabled={!isDirty}>Assign Adviser</Button>
         </Stack>
       </Stack>
     </Box>
