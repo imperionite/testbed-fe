@@ -1,22 +1,37 @@
 import { Box, Typography, Button, Alert, CircularProgress, Stack, IconButton, Tooltip } from "@mui/material";
-import { Add as AddIcon, FilterList as FilterListIcon, Edit as EditIcon, PersonAdd as PersonAddIcon, EditNote as EditNoteIcon } from "@mui/icons-material";
+import { Add as AddIcon, FilterList as FilterListIcon, Edit as EditIcon, PersonAdd as PersonAddIcon, EditNote as EditNoteIcon, History as HistoryIcon } from "@mui/icons-material";
 import { useMaterialReactTable } from "@glebcha/material-react-table";
 import { useMemo, useState, useCallback } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { attendanceApi } from "../../api/attendance";
 import CardStat from "../../components/common/CardStat";
 import InternshipTable from "./components/InternshipTable";
 import InternshipModal from "./components/InternshipModal";
 import { BadgeStatus } from "./components/BadgeStatus";
+import AttendanceViewModal from "../attendance/components/AttendanceViewModal";
 import { useInternships, useInternshipMutations } from "./hooks/useInternshipMutations";
 import { useTableActions } from "./hooks/useTableActions";
 import useAuth from "../../hooks/useAuth";
 import { MODES } from "./form/formConfig";
 
+function ProgressCell({ internshipId, requiredHours }) {
+  const { data, isLoading } = useQuery({
+    queryKey: ["renderedHours", internshipId],
+    queryFn: () => attendanceApi.getRenderedHours(internshipId),
+    enabled: !!internshipId,
+  });
+  
+  if (isLoading) return "Loading...";
+  return `${data?.totalHours || 0} / ${requiredHours || 0} hours`;
+}
+
 export default function InternshipManagementPage() {
   const { user } = useAuth();
   const [modalState, setModalState] = useState({ open: false, mode: MODES.CREATE, internship: null });
+  const [attendanceModalState, setAttendanceModalState] = useState({ open: false, internship: null });
   
   const { data: internships = [], isLoading, isError, refetch } = useInternships();
-  const { updateStatus, assignAdviser, updateInternship } = useInternshipMutations();
+  const { createInternship, updateStatus, assignAdviser, updateInternship } = useInternshipMutations();
 
   // Integrated Table Actions
   const { handleBulkStatusChange } = useTableActions({
@@ -34,6 +49,20 @@ export default function InternshipManagementPage() {
   const handleCloseModal = () => {
     setModalState({ open: false, mode: MODES.CREATE, internship: null });
   };
+
+  const handleCreate = async (data) => {
+      await createInternship.mutateAsync(data);
+      handleCloseModal();
+  };
+
+  const handleOpenAttendance = (internship) => {
+    setAttendanceModalState({ open: true, internship });
+  };
+
+  const handleCloseAttendance = () => {
+    setAttendanceModalState({ open: false, internship: null });
+  };
+
 
   const columns = useMemo(
     () => [
@@ -82,7 +111,9 @@ export default function InternshipManagementPage() {
       {
         accessorKey: "progress",
         header: "Progress",
-        Cell: ({ row }) => `0 / ${row.original.required_hours || 0} hours`,
+        Cell: ({ row }) => (
+            <ProgressCell internshipId={row.original.id} requiredHours={row.original.required_hours} />
+        ),
       },
       {
         accessorKey: "status",
@@ -109,6 +140,11 @@ export default function InternshipManagementPage() {
             <Tooltip title="Edit Details">
               <IconButton size="small" onClick={() => handleOpenModal(MODES.EDIT_DETAILS, row.original)}>
                 <EditIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="View Attendance">
+              <IconButton size="small" onClick={() => handleOpenAttendance(row.original)}>
+                <HistoryIcon />
               </IconButton>
             </Tooltip>
           </Stack>
@@ -198,6 +234,12 @@ export default function InternshipManagementPage() {
             onUpdateStatus={handleUpdateStatus}
             onAssignAdviser={handleAssignAdviser}
             onUpdateDetails={handleUpdateDetails}
+            onCreate={handleCreate}
+        />
+        <AttendanceViewModal 
+            open={attendanceModalState.open}
+            onClose={handleCloseAttendance}
+            internshipId={attendanceModalState.internship?.id}
         />
       </Box>
       );

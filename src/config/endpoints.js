@@ -37,6 +37,15 @@ const endpoints = {
     adviser: (id) => `/internships/${id}/adviser`,
     me: "/internships/me",
   },
+
+  attendance: {
+    list: "/attendance",
+    me: "/attendance/me",
+    details: (id) => `/attendance/${id}`,
+    internship: (id) => `/attendance/internship/${id}`,
+    renderedHours: (id) => `/attendance/internship/${id}/rendered-hours`,
+    validation: (id) => `/attendance/${id}/validation`,
+  },
 };
 
 export default Object.freeze(endpoints);

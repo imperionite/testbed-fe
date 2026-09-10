@@ -25,7 +25,9 @@ export default function InternshipAdviserForm({ internship, mode, onSubmit, onCa
             <TextField {...field} select label="Faculty Adviser" error={!!errors.facultyAdviserId} helperText={errors.facultyAdviserId?.message}>
               <MenuItem value="">None</MenuItem>
               {facultyAdvisers.map((u) => (
-                <MenuItem key={u.id} value={u.id}>{u.email}</MenuItem>
+                <MenuItem key={u.id} value={u.id}>
+                    {u.first_name} {u.last_name}
+                </MenuItem>
               ))}
             </TextField>
           )}

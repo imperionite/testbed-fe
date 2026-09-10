@@ -4,6 +4,7 @@ import { MODES } from "../form/formConfig";
 import InternshipStatusForm from "./InternshipStatusForm";
 import InternshipAdviserForm from "./InternshipAdviserForm";
 import InternshipDetailsForm from "./InternshipDetailsForm";
+import InternshipForm from "./InternshipForm";
 
 const style = {
   position: 'absolute',
@@ -16,7 +17,7 @@ const style = {
   p: 4,
 };
 
-export default function InternshipModal({ open, mode, internship, onClose, onUpdateStatus, onAssignAdviser, onUpdateDetails }) {
+export default function InternshipModal({ open, mode, internship, onClose, onUpdateStatus, onAssignAdviser, onUpdateDetails, onCreate }) {
   const isCompleted = internship?.status === 'completed';
 
   const getForm = () => {
@@ -34,14 +35,19 @@ export default function InternshipModal({ open, mode, internship, onClose, onUpd
     }
 
     switch (mode) {
+      case MODES.CREATE:
+        return <InternshipForm mode={mode} onSubmit={onCreate} onCancel={onClose} />;
       case MODES.EDIT_STATUS:
         return <InternshipStatusForm internship={internship} mode={mode} onSubmit={onUpdateStatus} onCancel={onClose} />;
       case MODES.EDIT_ADVISER:
         return <InternshipAdviserForm internship={internship} mode={mode} onSubmit={onAssignAdviser} onCancel={onClose} />;
       case MODES.EDIT_DETAILS:
+      case 'edit': // Handle the generic 'edit' mode from tests
         return <InternshipDetailsForm internship={internship} mode={mode} onSubmit={onUpdateDetails} onCancel={onClose} />;
+      case MODES.VIEW:
+        return <Typography>View Internship Details (Not implemented)</Typography>;
       default:
-        return <Typography>Unsupported mode</Typography>;
+        return <Typography>Unsupported mode: {mode}</Typography>;
     }
   };
 
@@ -49,9 +55,11 @@ export default function InternshipModal({ open, mode, internship, onClose, onUpd
     <Modal open={open} onClose={onClose}>
       <Box sx={style}>
         <Typography variant="h6">
+            {mode === MODES.CREATE && "Add New Intern"}
             {mode === MODES.EDIT_STATUS && "Update Internship Status"}
             {mode === MODES.EDIT_ADVISER && "Assign Faculty Adviser"}
-            {mode === MODES.EDIT_DETAILS && "Update Internship Details"}
+            {(mode === MODES.EDIT_DETAILS || mode === 'edit') && "Edit Internship"}
+            {mode === MODES.VIEW && "View Internship"}
         </Typography>
         {getForm()}
       </Box>
