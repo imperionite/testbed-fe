@@ -1,7 +1,7 @@
 import { Box, Typography, Button, Alert, CircularProgress, Stack, IconButton, Tooltip } from "@mui/material";
 import { Add as AddIcon, FilterList as FilterListIcon, Edit as EditIcon, PersonAdd as PersonAddIcon, EditNote as EditNoteIcon, History as HistoryIcon } from "@mui/icons-material";
 import { useMaterialReactTable } from "@glebcha/material-react-table";
-import { useMemo, useState, useCallback } from "react";
+import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { attendanceApi } from "../../api/attendance";
 import CardStat from "../../components/common/CardStat";
@@ -9,10 +9,8 @@ import InternshipTable from "./components/InternshipTable";
 import InternshipModal from "./components/InternshipModal";
 import { BadgeStatus } from "./components/BadgeStatus";
 import AttendanceViewModal from "../attendance/components/AttendanceViewModal";
-import { useInternships, useInternshipMutations } from "./hooks/useInternshipMutations";
+import { useInternshipMutations } from "./hooks/useInternshipMutations";
 import { useInternshipsData } from "./hooks/useInternshipsData";
-import { useTableActions } from "./hooks/useTableActions";
-import useAuth from "../../hooks/useAuth";
 import { MODES } from "./form/formConfig";
 
 function ProgressCell({ internshipId, requiredHours }) {
@@ -27,21 +25,11 @@ function ProgressCell({ internshipId, requiredHours }) {
 }
 
 export default function InternshipManagementPage() {
-  const { user } = useAuth();
   const [modalState, setModalState] = useState({ open: false, mode: MODES.CREATE, internship: null });
   const [attendanceModalState, setAttendanceModalState] = useState({ open: false, internship: null });
   
   const { internships, studentMap, adviserMap, isLoading, isError, refetch } = useInternshipsData();
   const { createInternship, updateStatus, assignAdviser, updateInternship } = useInternshipMutations();
-
-  // Integrated Table Actions
-  const { handleBulkStatusChange } = useTableActions({
-    permissions: { canEdit: true, canBulkEdit: true },
-    onStatusChange: (data) => updateStatus.mutateAsync(data),
-    onBulkStatusChange: async ({ ids, status }) => {
-        await Promise.all(ids.map(id => updateStatus.mutateAsync({ id, status })));
-    }
-  });
 
   const handleOpenModal = (mode, internship = null) => {
     setModalState({ open: true, mode, internship });
