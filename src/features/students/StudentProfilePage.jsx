@@ -69,7 +69,9 @@ export default function StudentProfilePage() {
       <Card sx={{ maxWidth: 800, mx: 'auto', p: 2 }}>
         <CardContent>
           <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
-            <Typography variant="h5" fontWeight={600}>My Profile</Typography>
+            <Typography variant="h5" fontWeight={600}>
+              {student.profiles ? `${student.profiles.first_name || ""} ${student.profiles.last_name || ""}`.trim() : "My Profile"}
+            </Typography>
             {!isEditing ? (
               <Button variant="contained" onClick={() => setIsEditing(true)}>Edit Profile</Button>
             ) : (

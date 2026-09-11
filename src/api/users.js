@@ -55,4 +55,9 @@ export const usersApi = {
     });
     return normalizeUser(response.data.data);
   },
+
+  async getUsersByRole(role) {
+    const response = await api.get(`/users/role/${role}`);
+    return response.data.data.map(normalizeUser);
+  },
 };
