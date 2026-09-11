@@ -36,23 +36,23 @@ export const usersApi = {
 
   async createUser(payload) {
     const response = await api.post(endpoints.users.list, payload);
-    return response.data.data;
+    return normalizeUser(response.data.data);
   },
 
   async updateUser(id, payload) {
     const response = await api.patch(endpoints.users.details(id), payload);
-    return response.data.data;
+    return normalizeUser(response.data.data);
   },
 
   async updateUserRole(id, payload) {
     const response = await api.patch(endpoints.users.role(id), payload);
-    return response.data.data;
+    return normalizeUser(response.data.data);
   },
 
   async updateStatus(id, payload) {
     const response = await api.patch(endpoints.users.status(id), {
       isActive: payload.isActive === true,
     });
-    return response.data.data;
+    return normalizeUser(response.data.data);
   },
 };

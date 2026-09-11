@@ -21,7 +21,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import { userTableConfig } from "../config/tableConfig.js";
 import { useTableState } from "../hooks/useTableState.js";
 import { useTableActions } from "../hooks/useTableActions.jsx";
-import { createUserTableColumns } from "./UserTableColumns.jsx";
+import { createUserTableColumns } from "./userTableColumns.jsx";
 
 // Import decomposed components
 import BulkActionToolbar from "./shared/BulkActionToolbar.jsx";
@@ -75,7 +75,6 @@ export function UsersTable({
 
   // 3. Setup core table structure combining static config and runtime states
   const table = useMaterialReactTable({
-    // Spread our standard configurations (sorting, pinning, pagination sizing)
     ...userTableConfig,
 
     columns: tableColumns,

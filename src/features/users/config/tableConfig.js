@@ -12,7 +12,7 @@ export const defaultTableConfig = {
   enableClickToCopy: true,
   enableColumnActions: false,
   enableColumnPinning: true,
-  enableRowActions: true,
+  enableRowActions: false,
   enableDensityToggle: true,
   enableStickyHeader: true,
   enableStickyFooter: true,
@@ -26,10 +26,10 @@ export const defaultTableConfig = {
   // Action column sizing configurations
   displayColumnDefOptions: {
     "mrt-row-actions": {
-      size: 104,
+      size: 105,
       muiTableBodyCellProps: {
         sx: {
-          minWidth: 104,
+          minWidth: 70,
           whiteSpace: "nowrap",
         },
       },

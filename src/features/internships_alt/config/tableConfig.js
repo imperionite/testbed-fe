@@ -50,9 +50,9 @@ export const userTableConfig = {
     },
     columnOrder: [
       "email",
-      "first_name",
-      "last_name",
-      "middle_name",
+      "firstName",
+      "lastName",
+      "middleName",
       "suffix",
       "role",
       "isActive",
