@@ -9,7 +9,7 @@ import ForgotPasswordPage from "../pages/ForgotPasswordPage";
 import ResetPasswordPage from "../pages/ResetPasswordPage";
 import StudentsRoute from "../features/students/StudentsRoute";
 import StudentProfilePage from "../features/students/StudentProfilePage";
-import InternshipManagementPage from "../features/internships_alt/InternshipManagementPage";
+import InternshipManagementPage from "../features/internships/InternshipManagementPage";
 
 import Dashboard from "../pages/Dashboard";
 import UserManagementPage from "../features/users/UserManagementPage";
