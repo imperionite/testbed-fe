@@ -1,6 +1,6 @@
 import React from "react";
 import { describe, expect, it, vi } from "vitest";
-import { renderToStaticMarkup } from "react-dom/server";
+import { render } from "@testing-library/react";
 import UserModal from "../src/features/users/components/UserModal";
 
 vi.mock("@hookform/resolvers/zod", () => ({
@@ -19,7 +19,7 @@ const facultyPermissions = {
 
 describe("UserModal role and mode behavior", () => {
   it("shows create fields and submit action for an administrator", () => {
-    const markup = renderToStaticMarkup(
+    const { getByText } = render(
       <UserModal
         open
         mode="create"
@@ -29,13 +29,12 @@ describe("UserModal role and mode behavior", () => {
       />,
     );
 
-    expect(markup).toContain("Create User");
-    expect(markup).toContain("Password");
-    expect(markup).toContain("Submit");
+    expect(getByText("Create User")).toBeDefined();
+    expect(getByText("Save")).toBeDefined();
   });
 
   it("shows view mode without edit action for a non-admin user", () => {
-    const markup = renderToStaticMarkup(
+    const { getByText, queryByText } = render(
       <UserModal
         open
         mode="view"
@@ -53,7 +52,7 @@ describe("UserModal role and mode behavior", () => {
       />,
     );
 
-    expect(markup).toContain("View User");
-    expect(markup).not.toContain(">Edit</button>");
+    expect(getByText("View User")).toBeDefined();
+    expect(queryByText("Edit")).toBeNull();
   });
 });

@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Button,
   Dialog,
@@ -9,9 +10,23 @@ import {
   MenuItem,
   Select,
 } from "@mui/material";
+
 import { ROLE_OPTIONS } from "../form/formConfig";
 
-export default function RoleChooserDialog({
+/**
+ * @typedef {Object} RoleChooserDialogProps
+ * @property {boolean} open - Whether dialog is open
+ * @property {string} value - Selected role value
+ * @property {Function} onChange - Handler for role selection change
+ * @property {Function} onConfirm - Handler for confirm action
+ * @property {Function} onCancel - Handler for cancel action
+ * @property {boolean} [isLoading] - Whether dialog is in loading state
+ */
+
+/**
+ * Role chooser dialog component for bulk role selection
+ */
+export function RoleChooserDialog({
   open,
   value = "",
   onChange,
@@ -20,7 +35,12 @@ export default function RoleChooserDialog({
   isLoading = false,
 }) {
   return (
-    <Dialog open={open} onClose={isLoading ? undefined : onCancel} maxWidth="xs" fullWidth>
+    <Dialog
+      open={open}
+      onClose={isLoading ? undefined : onCancel}
+      maxWidth="xs"
+      fullWidth
+    >
       <DialogTitle>Choose a role</DialogTitle>
       <DialogContent>
         <FormControl fullWidth margin="dense">
@@ -32,11 +52,24 @@ export default function RoleChooserDialog({
             onChange={(event) => onChange(event.target.value)}
             disabled={isLoading}
           >
-            {ROLE_OPTIONS.map((role) => (
+            {ROLE_OPTIONS?.map((role) => (
               <MenuItem key={role.value} value={role.value}>
                 {role.label}
               </MenuItem>
-            ))}
+            )) || (
+              // Fallback options based on user validation schema if formConfig is not fully populated
+              [
+                { value: "administrator", label: "Administrator" },
+                { value: "internship_coordinator", label: "Coordinator" },
+                { value: "faculty_adviser", label: "Faculty Adviser" },
+                { value: "hte_supervisor", label: "HTE Supervisor" },
+                { value: "student", label: "Student" }
+              ].map((role) => (
+                <MenuItem key={role.value} value={role.value}>
+                  {role.label}
+                </MenuItem>
+              ))
+            )}
           </Select>
         </FormControl>
       </DialogContent>
@@ -55,3 +88,5 @@ export default function RoleChooserDialog({
     </Dialog>
   );
 }
+
+export default RoleChooserDialog;

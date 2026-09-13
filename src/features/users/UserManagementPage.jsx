@@ -1,13 +1,19 @@
+import React from "react";
 import { Alert, Button, CircularProgress, Typography } from "@mui/material";
 import { Add as AddIcon } from "@mui/icons-material";
+
+// Reusable custom layout and stats components
 import CardStat from "../../components/common/CardStat";
+
+// Refactored features components and hooks
 import UsersTable from "./components/UsersTable";
 import UserModal from "./components/UserModal";
-import { useUserModalState } from "./hooks/useUserModalState";
-import useAuth from "../../hooks/useAuth";
+import { useModalState } from "./hooks/useModalState";
 import { useUsers } from "./hooks/useUsers";
 import { useUserMutations } from "./hooks/useUserMutations";
 import { getUserManagementPermissions } from "./userPermissions";
+
+import useAuth from "../../hooks/useAuth";
 import notify from "../../utils/toast";
 
 // ============================================
@@ -46,11 +52,13 @@ const styles = {
 };
 
 // ============================================
-// MAIN COMPONENT
+// MAIN PAGE COMPONENT
 // ============================================
-export default function UserManagementLayout() {
+export default function UserManagementPage() {
   const { user } = useAuth();
   const permissions = getUserManagementPermissions(user?.role);
+
+  // 1. Hook for fetching data (Query)
   const {
     data: userData = [],
     isLoading,
@@ -60,7 +68,11 @@ export default function UserManagementLayout() {
   } = useUsers({
     enabled: permissions.canView,
   });
-  const modalState = useUserModalState();
+
+  // 2. Hook for centralized modal/dialog state management
+  const modalState = useModalState();
+
+  // 3. Hook for asynchronous user data mutations
   const {
     createUser,
     updateUser,
@@ -74,10 +86,10 @@ export default function UserManagementLayout() {
     <div style={styles.container}>
       {/* ==================== TOP SECTION ==================== */}
       <div style={styles.topSection}>
-        {/* Header: Title + Action Button */}
+        {/* Header: Title + Primary Action Button */}
         <div style={styles.headerSection}>
           <Typography variant="h5" fontWeight={600}>
-          Active Accounts by Role
+            Active Accounts by Role
           </Typography>
           <Button
             startIcon={<AddIcon />}
@@ -89,28 +101,47 @@ export default function UserManagementLayout() {
           </Button>
         </div>
 
-        {/* Stats Cards */}
+        {/* Stats Cards Dashboard */}
         <div style={styles.cardsSection}>
           <CardStat
             title="Students"
-            value={userData.filter((u) => u.is_active === true && u.role === "student").length}
+            value={
+              userData.filter(
+                (u) => u.isActive === true && u.role === "student"
+              ).length
+            }
           />
           <CardStat
             title="Administrators"
-            value={userData.filter((u) => u.is_active === true && u.role === "administrator").length}
+            value={
+              userData.filter(
+                (u) => u.isActive === true && u.role === "administrator"
+              ).length
+            }
           />
           <CardStat
             title="HTE Supervisors"
-            value={userData.filter((u) => u.is_active === true && u.role === "hte_supervisor").length}
+            value={
+              userData.filter(
+                (u) => u.isActive === true && u.role === "hte_supervisor"
+              ).length
+            }
           />
           <CardStat
             title="Faculty Advisers"
-            value={userData.filter((u) => u.is_active === true && u.role === "faculty_adviser").length}
+            value={
+              userData.filter(
+                (u) => u.isActive === true && u.role === "faculty_adviser"
+              ).length
+            }
           />
           <CardStat
             title="Internship Coordinators"
             value={
-              userData.filter((u) => u.is_active === true && u.role === "internship_coordinator").length
+              userData.filter(
+                (u) =>
+                  u.isActive === true && u.role === "internship_coordinator"
+              ).length
             }
           />
         </div>
@@ -118,21 +149,27 @@ export default function UserManagementLayout() {
 
       {/* ==================== MAIN SECTION ==================== */}
       <div style={styles.mainSection}>
-        {/* Table Header */}
+        {/* Table Title Header */}
         <div style={styles.tableHeader}>
           <Typography variant="h5" fontWeight={600}>
-          User List
+            User List
           </Typography>
         </div>
 
-        {/* Data Table */}
+        {/* Data Grid Table Container */}
         <div style={styles.tableContainer}>
           {!permissions.canView ? (
             <Alert severity="error">
               You do not have permission to view users.
             </Alert>
           ) : isLoading ? (
-            <div style={{ display: "flex", justifyContent: "center", padding: "32px" }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                padding: "32px",
+              }}
+            >
               <CircularProgress size={28} />
             </div>
           ) : isError ? (
@@ -172,20 +209,23 @@ export default function UserManagementLayout() {
               onStatusChange={updateStatus.mutateAsync}
               onBulkRoleChange={bulkUpdateRole.mutateAsync}
               onBulkStatusChange={bulkUpdateStatus.mutateAsync}
-              onUserClick={(selectedUser) =>
-                modalState.open("view", selectedUser)
+              onEditRow={(selectedUser) =>
+                modalState.open("edit", selectedUser)
               }
             />
           )}
         </div>
       </div>
 
-      {permissions.canView && (
+      {/* ==================== DIALOGS / MODALS ==================== */}
+      {permissions.canView && modalState.isOpen && (
         <UserModal
-          key={`${modalState.mode}-${modalState.selectedUser?.id ?? "new"}-${modalState.isOpen}`}
+          key={`${modalState.mode}-${modalState.selectedEntity?.id ?? "new"}-${
+            modalState.isOpen
+          }`}
           open={modalState.isOpen}
           mode={modalState.mode}
-          user={modalState.selectedUser}
+          user={modalState.selectedEntity}
           permissions={permissions}
           onClose={modalState.close}
           onSuccess={notify.success}

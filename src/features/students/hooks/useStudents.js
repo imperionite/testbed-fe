@@ -7,5 +7,6 @@ export function useStudents(role) {
   return useQuery({
     queryKey: ["students", isStaff ? "all" : "me"],
     queryFn: isStaff ? studentApi.listStudents : studentApi.getMyProfile,
+    retry: 1, // Limit retries to avoid spamming the failing endpoint
   });
 }

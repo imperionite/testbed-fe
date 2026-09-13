@@ -1,12 +1,11 @@
-import { Chip } from "@mui/material";
+import { Badge } from "./shared/Badge.jsx";
 
 function BadgeRole({ value }) {
   return (
-    <Chip
-      label={value}
-      size="small"
-      color="default"
+    <Badge
+      value={value}
       variant="outlined"
+      size="small"
       sx={{
         color: "text.primary",
         borderColor: "divider",

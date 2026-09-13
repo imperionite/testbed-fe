@@ -17,6 +17,7 @@ import { useStudentModalState } from "./hooks/useStudentModalState";
 import { getStudentManagementPermissions } from "./studentPermissions";
 import { MODES } from "./form/formConfig";
 import { useMemo } from "react";
+import { mapStudentData } from "./utils/studentUtils";
 
 export default function StudentManagementPage() {
   const { user, isLoading: isAuthLoading } = useAuth();
@@ -25,6 +26,7 @@ export default function StudentManagementPage() {
     isLoading: isStudentsLoading,
     isError: isStudentsError,
     error: studentsError,
+    refetch,
   } = useStudents(user?.role);
   const { data: userData = [], isLoading: isUsersLoading } = useUsers();
   const modalState = useStudentModalState();
@@ -39,41 +41,10 @@ export default function StudentManagementPage() {
     const studentsArr = Array.isArray(students) ? students : [students];
 
     return studentsArr.map((student) => {
-      // Backend contract: student.id IS the user.id
-      const studentUserId = student.id;
       const userRecord =
-        userData?.find((u) => u.id === studentUserId) || student.user || {};
-      const meta = userRecord.user_metadata || {};
-
-      return {
-        ...student,
-        userId: studentUserId,
-        email: student.email || userRecord.email || meta.email || "",
-        firstName:
-          student.firstName ||
-          student.first_name ||
-          userRecord.firstName ||
-          userRecord.first_name ||
-          meta.firstName ||
-          meta.first_name ||
-          "",
-        middleName:
-          student.middleName ||
-          student.middle_name ||
-          userRecord.middleName ||
-          userRecord.middle_name ||
-          meta.middleName ||
-          meta.middle_name ||
-          "",
-        lastName:
-          student.lastName ||
-          student.last_name ||
-          userRecord.lastName ||
-          userRecord.last_name ||
-          meta.lastName ||
-          meta.last_name ||
-          "",
-      };
+        userData?.find((u) => u.id === student.id) || student.user || {};
+      
+      return mapStudentData(student, userRecord);
     });
   }, [students, userData]);
 
@@ -83,9 +54,15 @@ export default function StudentManagementPage() {
     return <Typography color="error">Access denied.</Typography>;
   if (isStudentsError)
     return (
-      <Alert severity="error">
-        {studentsError?.message || "Error loading students."}
-      </Alert>
+      <Box sx={{ p: 3 }}>
+        <Alert severity="error">
+          <Typography variant="h6">Error Loading Students</Typography>
+          {studentsError?.message || "An unexpected error occurred while fetching student records. Please contact your system administrator."}
+          <Box sx={{ mt: 2 }}>
+            <Button variant="outlined" color="inherit" onClick={refetch}>Retry</Button>
+          </Box>
+        </Alert>
+      </Box>
     );
 
   return (
