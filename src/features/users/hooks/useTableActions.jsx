@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo } from "react";
 import notify from "../../../utils/toast";
-import { formatSentenceCase } from "../../shared/fieldFormatters";
+import { formatSentenceCase } from "../form/fieldFormatters";
 
 /**
  * Hook for managing table action handlers (inline editing & bulk operations).

@@ -33,16 +33,6 @@ export const usersApi = {
     const response = await api.get(endpoints.users.details(id));
     return normalizeUser(response.data.data);
   },
-  
-  async getUsersByRole(role) {
-    const response = await api.get(`/users/role/${role}`);
-    return response.data.data.map(normalizeUser);
-  },
-
-
-
-
-  //MUTATIONS:
 
   async createUser(payload) {
     const response = await api.post(endpoints.users.list, payload);
@@ -64,5 +54,10 @@ export const usersApi = {
       isActive: payload.isActive === true,
     });
     return normalizeUser(response.data.data);
+  },
+
+  async getUsersByRole(role) {
+    const response = await api.get(`/users/role/${role}`);
+    return response.data.data.map(normalizeUser);
   },
 };

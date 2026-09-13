@@ -1,6 +1,6 @@
 import { Alert, Button, CircularProgress, Typography } from "@mui/material";
 import { Add as AddIcon } from "@mui/icons-material";
-import CardStat from "../shared/components/CardStat";
+import CardStat from "../../components/common/CardStat";
 import HteTable from "./components/HteTable";
 import HteModal from "./components/HteModal";
 import { useHteModalState } from "./hooks/useHteModalState";
@@ -72,7 +72,7 @@ export default function HteManagementLayout() {
   const supervisorMap = Object.fromEntries(
     allUsers.map((u) => [
       u.id,
-      [u.first_name, u.middle_name, u.last_name, u.suffix].filter(Boolean).join(" "),
+      [u.last_name, u.first_name].filter(Boolean).join(", "),
     ]),
   );
 
@@ -173,7 +173,7 @@ export default function HteManagementLayout() {
               onSupervisorChange={updateHteSupervisor.mutateAsync}
               onStatusChange={updateStatus.mutateAsync}
               onBulkStatusChange={bulkUpdateStatus.mutateAsync}
-              onHteClick={(selectedHte) => modalState.open("edit", selectedHte)}
+              onHteClick={(selectedHte) => modalState.open("view", selectedHte)}
             />
           )}
         </div>

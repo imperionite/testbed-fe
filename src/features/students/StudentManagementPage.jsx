@@ -6,7 +6,7 @@ import {
   Button,
 } from "@mui/material";
 import { Add as AddIcon } from "@mui/icons-material";
-import CardStat from "../shared/components/CardStat";
+import CardStat from "../../components/common/CardStat";
 import StudentTable from "./components/StudentTable";
 import StudentModal from "./components/StudentModal";
 import useAuth from "../../hooks/useAuth";

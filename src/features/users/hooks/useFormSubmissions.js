@@ -7,7 +7,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
  * Isolates validation integration (Zod), payload filtering (RBAC), and API interactions.
  *
  * @param {Object} params - Hook parameters
- * @param {string} params.resourceName - Name of the resource (e.g, 'user', 'attendance', etc.)
  * @param {string} params.mode - Current modal/form mode ('create' | 'edit' | 'view')
  * @param {Object|null} params.entity - The active entity being viewed/edited, null for create mode
  * @param {Object} params.schema - Zod validation schema for the current mode
@@ -22,7 +21,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
  * @returns {Object} Form registration methods, submit handler, saving state, and error message
  */
 export function useFormSubmission({
-  resourceName = "item",
   mode,
   entity,
   schema,
@@ -73,7 +71,8 @@ export function useFormSubmission({
 
   /**
    * Submission workflow handler.
-   * Validates values, strips hidden or read-only fields based on current permissions, handles async status, and catches API response rejections.
+   * Validates values, strips hidden or read-only fields based on current permissions,
+   * handles async status, and catches API response rejections.
    */
   const handleSubmit = useCallback(
     async (formData) => {
@@ -100,6 +99,9 @@ export function useFormSubmission({
       for (const field of fieldConfig) {
         const rule = getRule(field);
 
+        // Property 1: "Any field marked as hidden for a given role and mode must never appear
+        // in the visible fields list and must never be included in the form submission payload."
+        // Furthermore, readonly fields are typically excluded from edits unless in create mode.
         if (rule !== "hidden") {
           // Exclude readonly fields in EDIT mode to prevent tampering with un-editable state (e.g. username)
           if (mode === "edit" && rule === "readonly") {
@@ -136,7 +138,7 @@ export function useFormSubmission({
         const serverMsg =
           submitError?.response?.data?.message ||
           submitError?.message ||
-          `An error occurred while saving the ${resourceName}.`;
+          "An error occurred while saving the user.";
         setError(serverMsg);
       } finally {
         setIsSaving(false);

@@ -1,4 +1,33 @@
-import { ROLES, MODES, FIELD_RULES, ROLE_OPTIONS} from '../../shared/constants/constants'
+export const ROLES = {
+  ADMIN: "administrator",
+  INTERNSHIP_COORDINATOR: "internship_coordinator",
+  FACULTY_ADVISER: "faculty_adviser",
+  HTE_SUPERVISOR: "hte_supervisor",
+  STUDENT: "student",
+};
+
+export const MODES = {
+  CREATE: "create",
+  EDIT: "edit",
+  VIEW: "view",
+};
+
+export const FIELD_RULES = {
+  HIDDEN: "hidden",
+  READONLY: "readonly",
+  EDITABLE: "editable",
+  REQUIRED: "required",
+};
+
+// Imported into files (user management related) requiring role constants
+export const ROLE_OPTIONS = [
+  { value: ROLES.ADMIN, label: "Administrator" },
+  { value: ROLES.INTERNSHIP_COORDINATOR, label: "Internship Coordinator" },
+  { value: ROLES.FACULTY_ADVISER, label: "Faculty Adviser" },
+  { value: ROLES.HTE_SUPERVISOR, label: "HTE Supervisor" },
+  { value: ROLES.STUDENT, label: "Student" },
+];
+
 // ─────────────────────────────────────────────────────────────────────────────
 // FIELD CONFIG
 //
@@ -106,7 +135,7 @@ export const userFormConfig = [
   {
     name: "isActive",
     label: "Account Status",
-    type: "status_account",
+    type: "status",
     rbac: {
       [ROLES.ADMIN]: {
         [MODES.CREATE]: FIELD_RULES.HIDDEN,
