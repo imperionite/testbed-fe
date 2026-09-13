@@ -1,9 +1,8 @@
 import { useState, useCallback } from 'react';
 
 /**
- * Hook for managing the modal dialog lifecycle and state transitions.
- * Handles opening, closing, mode changes ('create', 'edit', 'view'), and managing
- * the active selected entity, aligning with Property 7 (Modal State Lifecycle).
+ * Generalized hook for managing the modal dialog lifecycle and state transitions.
+ * Handles opening, closing, mode changes ('create', 'edit', 'view')
  * 
  * @param {Object} [initialState] - Optional initial state overrides
  * @returns {Object} Modal state variables and interactive setters
@@ -25,10 +24,7 @@ export function useModalState(initialState = {}) {
     setIsOpen(true);
   }, []);
 
-  /**
-   * Closes the modal and completely resets the state to prevent leaking stale data 
-   * on subsequent opens, adhering to the modal state consistency contract (Property 7).
-   */
+  // On close
   const close = useCallback(() => {
     setIsOpen(false);
     setSelectedEntityState(null);

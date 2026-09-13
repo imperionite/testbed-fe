@@ -2,6 +2,10 @@ import React from "react";
 import { Chip } from "@mui/material";
 
 /**
+ * Generic badge component
+ */
+
+/**
  * @typedef {Object} BadgeProps
  * @property {string} value - Value to display in the badge
  * @property {Object.<string, string>} colorMap - Map of values to colors
@@ -9,9 +13,6 @@ import { Chip } from "@mui/material";
  * @property {'filled' | 'outlined'} [variant] - Badge variant style
  */
 
-/**
- * Generic badge component for displaying role and status chips
- */
 export function Badge({
   value,
   colorMap,

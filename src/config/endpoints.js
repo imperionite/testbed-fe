@@ -15,7 +15,6 @@ const endpoints = {
     details: (id) => `/users/${id}`,
     role: (id) => `/users/${id}/role`,
     status: (id) => `/users/${id}/status`,
-    roleStudents: "/users/role/student",
   },
 
   students: {

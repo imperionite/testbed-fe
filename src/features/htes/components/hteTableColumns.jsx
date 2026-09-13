@@ -33,7 +33,7 @@ export function createHteTableColumns({ canEdit, supervisorMap = {} }) {
     {
       accessorKey: "company_name",
       header: "Company Name",
-      size: 260,
+      size: 200,
       enableColumnFilter: true,
       enableEditing: false,
     },
@@ -61,7 +61,7 @@ export function createHteTableColumns({ canEdit, supervisorMap = {} }) {
     {
       accessorKey: "contact_number",
       header: "Contact Number",
-      size: 160,
+      size: 200,
       enableColumnFilter: true,
       enableEditing: false,
     },
@@ -80,7 +80,7 @@ export function createHteTableColumns({ canEdit, supervisorMap = {} }) {
     {
       accessorKey: "is_active",
       header: "Status",
-      size: 120,
+      size: 150,
       filterVariant: "select",
       filterSelectOptions: [
         { value: "true", label: "Active" },
@@ -105,7 +105,7 @@ export function createHteTableColumns({ canEdit, supervisorMap = {} }) {
     {
       accessorKey: "created_at",
       header: "Created",
-      size: 130,
+      size: 160,
       enableColumnFilter: false,
       enableEditing: false,
       Cell: ({ cell }) => formatCellDate(cell.getValue()),
