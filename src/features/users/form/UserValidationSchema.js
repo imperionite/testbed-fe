@@ -1,6 +1,5 @@
-// userValidationSchema.js
 import { z } from "zod";
-import {MODES} from "./formConfig"
+import { MODES } from "../../shared/constants/constants";
 
 const roleSchema = [
   "administrator",
@@ -67,6 +66,7 @@ const createUserValidationSchema = z.object({
       (value) => value.length >= 8,
       "Password must be at least 8 characters",
     )
+    
     .refine(
       (value) => /[A-Z]/.test(value),
       "Password must contain at least one uppercase letter",
@@ -82,10 +82,6 @@ const createUserValidationSchema = z.object({
 });
 
 const editUserValidationSchema = z.object({
-  email: requiredString("Email").refine(
-    (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value),
-    "Must be a valid email",
-  ),
   firstName: requiredString("First name", 50),
   middleName: optionalNullableString(
     50,

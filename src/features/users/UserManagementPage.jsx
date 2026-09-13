@@ -1,14 +1,15 @@
 import React from "react";
-import { Alert, Button, CircularProgress, Typography } from "@mui/material";
+import { Button, Typography } from "@mui/material";
 import { Add as AddIcon } from "@mui/icons-material";
 
-// Reusable custom layout and stats components
-import CardStat from "../../components/common/CardStat";
+// Reusable layout and components
+import CardStat from "../shared/components/CardStat";
+import GuardTableContent from "../shared/components/GuardTableContent";
 
 // Refactored features components and hooks
 import UsersTable from "./components/UsersTable";
 import UserModal from "./components/UserModal";
-import { useModalState } from "./hooks/useModalState";
+import { useModalState } from "../shared/hooks/useModalState";
 import { useUsers } from "./hooks/useUsers";
 import { useUserMutations } from "./hooks/useUserMutations";
 import { getUserManagementPermissions } from "./userPermissions";
@@ -107,7 +108,7 @@ export default function UserManagementPage() {
             title="Students"
             value={
               userData.filter(
-                (u) => u.isActive === true && u.role === "student"
+                (u) => u.isActive === true && u.role === "student",
               ).length
             }
           />
@@ -115,7 +116,7 @@ export default function UserManagementPage() {
             title="Administrators"
             value={
               userData.filter(
-                (u) => u.isActive === true && u.role === "administrator"
+                (u) => u.isActive === true && u.role === "administrator",
               ).length
             }
           />
@@ -123,7 +124,7 @@ export default function UserManagementPage() {
             title="HTE Supervisors"
             value={
               userData.filter(
-                (u) => u.isActive === true && u.role === "hte_supervisor"
+                (u) => u.isActive === true && u.role === "hte_supervisor",
               ).length
             }
           />
@@ -131,7 +132,7 @@ export default function UserManagementPage() {
             title="Faculty Advisers"
             value={
               userData.filter(
-                (u) => u.isActive === true && u.role === "faculty_adviser"
+                (u) => u.isActive === true && u.role === "faculty_adviser",
               ).length
             }
           />
@@ -140,7 +141,7 @@ export default function UserManagementPage() {
             value={
               userData.filter(
                 (u) =>
-                  u.isActive === true && u.role === "internship_coordinator"
+                  u.isActive === true && u.role === "internship_coordinator",
               ).length
             }
           />
@@ -158,50 +159,20 @@ export default function UserManagementPage() {
 
         {/* Data Grid Table Container */}
         <div style={styles.tableContainer}>
-          {!permissions.canView ? (
-            <Alert severity="error">
-              You do not have permission to view users.
-            </Alert>
-          ) : isLoading ? (
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                padding: "32px",
-              }}
-            >
-              <CircularProgress size={28} />
-            </div>
-          ) : isError ? (
-            <Alert
-              severity="error"
-              action={
-                <Button color="inherit" size="small" onClick={refetch}>
-                  Retry
-                </Button>
-              }
-            >
-              {error?.response?.data?.message ||
-                "Unable to load users. Please try again."}
-            </Alert>
-          ) : userData.length === 0 ? (
-            <Alert
-              severity="info"
-              action={
-                permissions.canCreate ? (
-                  <Button
-                    color="inherit"
-                    size="small"
-                    onClick={() => modalState.open("create")}
-                  >
-                    Add user
-                  </Button>
-                ) : undefined
-              }
-            >
-              No users found.
-            </Alert>
-          ) : (
+          <GuardTableContent
+            canView={permissions.canView}
+            isLoading={isLoading}
+            isError={isError}
+            error={error}
+            isEmpty={userData.length === 0}
+            resourceName="users"
+            onRetry={refetch}
+            onAdd={
+              permissions.canCreate
+                ? () => modalState.open("create")
+                : undefined
+            }
+          >
             <UsersTable
               users={userData}
               permissions={permissions}
@@ -213,7 +184,7 @@ export default function UserManagementPage() {
                 modalState.open("edit", selectedUser)
               }
             />
-          )}
+          </GuardTableContent>
         </div>
       </div>
 
@@ -227,12 +198,14 @@ export default function UserManagementPage() {
           mode={modalState.mode}
           user={modalState.selectedEntity}
           permissions={permissions}
+          mutations={{
+            createUser,
+            updateUser,
+            updateRole,
+            updateStatus,
+          }}
           onClose={modalState.close}
           onSuccess={notify.success}
-          onCreate={createUser.mutateAsync}
-          onUpdate={updateUser.mutateAsync}
-          onRoleChange={updateRole.mutateAsync}
-          onStatusChange={updateStatus.mutateAsync}
         />
       )}
     </div>

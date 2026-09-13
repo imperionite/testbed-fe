@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { MODES } from "./formConfig";
+import { MODES } from "../../shared/constants/constants";
 
 const requiredString = (fieldName, maxLength) =>
   z.preprocess(
