@@ -11,7 +11,7 @@ import {
   Select,
 } from "@mui/material";
 
-import { ROLE_OPTIONS } from "../form/formConfig";
+import { ROLE_OPTIONS } from "../../shared/constants/constants";
 
 /**
  * @typedef {Object} RoleChooserDialogProps

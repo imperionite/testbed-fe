@@ -1,4 +1,4 @@
-import { Badge } from "./shared/Badge.jsx";
+import { Badge } from "../../shared/components/Badge";
 
 function BadgeRole({ value }) {
   return (
