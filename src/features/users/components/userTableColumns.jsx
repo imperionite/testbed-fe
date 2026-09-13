@@ -1,8 +1,8 @@
 import { MenuItem } from "@mui/material";
-import BadgeRole from "../components/BadgeRole";
-import BadgeStatus from "../components/BadgeStatus";
-import { ROLE_OPTIONS } from "../../shared/constants/constants";
-import { formatUserDate } from "../../shared/fieldFormatters";
+import BadgeRole from "./BadgeRole";
+import BadgeStatus from "./BadgeStatus";
+import { ROLE_OPTIONS } from "../form/formConfig";
+import { formatUserDate } from "../form/fieldFormatters";
 
 //-----------------
 // HELPERS
@@ -21,7 +21,7 @@ export function createUserTableColumns({ canEdit }) {
     {
       accessorKey: "email",
       header: "Email",
-      size: 200,
+      size: 220,
       enableColumnFilter: true,
       enableEditing: false,
     },
@@ -39,7 +39,7 @@ export function createUserTableColumns({ canEdit }) {
     {
       id: "firstName",
       header: "First Name",
-      size: 150,
+      size: 200,
       accessorFn: (row) => row.firstName || defaultCallEmptyStateValue,
       enableColumnFilter: true,
       enableEditing: false,
@@ -47,7 +47,7 @@ export function createUserTableColumns({ canEdit }) {
     {
       id: "lastName",
       header: "Last Name",
-      size: 150,
+      size: 180,
       accessorFn: (row) => row.lastName || defaultCallEmptyStateValue,
       enableColumnFilter: true,
       enableEditing: false,
@@ -55,7 +55,7 @@ export function createUserTableColumns({ canEdit }) {
     {
       id: "middleName",
       header: "Middle Name",
-      size: 150,
+      size: 180,
       accessorFn: (row) => row.middleName || defaultCallEmptyStateValue,
       enableColumnFilter: true,
       enableEditing: false,
@@ -71,7 +71,7 @@ export function createUserTableColumns({ canEdit }) {
     {
       accessorKey: "role",
       header: "Role",
-      size: 150,
+      size: 190,
       filterVariant: "select",
       filterSelectOptions: ROLE_OPTIONS,
       Cell: ({ cell }) => <BadgeRole value={formatRole(cell.getValue())} /> || defaultCallEmptyStateValue,
@@ -87,7 +87,7 @@ export function createUserTableColumns({ canEdit }) {
     },
     {
       accessorKey: "isActive",
-      header: "Account Status",
+      header: "Status",
       size: 120,
       filterVariant: "select",
       filterSelectOptions: [
@@ -117,7 +117,7 @@ export function createUserTableColumns({ canEdit }) {
       size: 130,
       enableColumnFilter: true,
       enableEditing: false,
-      sortingFn: "datetime", // Ensures chronological sorting
+      sortingFn: "datetime", // Ensures chronological sorting instead of alphabetical
     },
   ];
 }

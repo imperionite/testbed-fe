@@ -3,19 +3,29 @@ import {
   MaterialReactTable,
   useMaterialReactTable,
 } from "@glebcha/material-react-table";
-import { CircularProgress, IconButton, Tooltip } from "@mui/material";
+import {
+  CircularProgress,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Button,
+  IconButton,
+  Tooltip,
+} from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
 import EditIcon from "@mui/icons-material/Edit";
 
+// Import our configuration registries and custom hooks
 import { userTableConfig } from "../config/tableConfig.js";
-import { useUserTableState } from "../hooks/useUserTableState.js";
+import { useTableState } from "../hooks/useTableState.js";
 import { useTableActions } from "../hooks/useTableActions.jsx";
-import { createUserTableColumns } from "../config/userTableColumns.jsx";
+import { createUserTableColumns } from "./userTableColumns.jsx";
 
-import BulkActionToolbar from "../../shared/components/BulkActionToolbar.jsx";
+// Import decomposed components
+import BulkActionToolbar from "./shared/BulkActionToolbar.jsx";
 import RoleChooserDialog from "./RoleChooserDialog.jsx";
-import ActionConfirmDialog from "../../shared/components/ActionConfirmDialog.jsx";
-import { bulkActionsConfig } from "../config/bulkActionsConfig.js";
 
 /**
  * @typedef {Object} UsersTableProps
@@ -43,14 +53,15 @@ export function UsersTable({
   onBulkRoleChange,
   onBulkStatusChange,
 }) {
-  const tableState = useUserTableState();
+  // 1. Manage UI states (selection, confirmation, and roleChooser dialogs)
+  const tableState = useTableState();
   const defaultColumns = useMemo(
     () => createUserTableColumns({ canEdit: permissions.canEdit }),
     [permissions.canEdit],
   );
   const tableColumns = columns ?? defaultColumns;
 
-  // Table actions
+  // 2. Manage business actions and coordinate mutations
   const tableActions = useTableActions({
     permissions,
     onRoleChange,
@@ -62,7 +73,7 @@ export function UsersTable({
     clearSelection: () => tableState.setRowSelection({}),
   });
 
-  // Core table
+  // 3. Setup core table structure combining static config and runtime states
   const table = useMaterialReactTable({
     ...userTableConfig,
 
@@ -74,20 +85,20 @@ export function UsersTable({
     enableEditing: permissions.canEdit,
     enableRowActions: permissions.canEdit,
 
+    // Runtime selection and column states
     state: {
       rowSelection: tableState.rowSelection,
       columnVisibility: {
-        ...tableState.columnVisibility,
-        // Hide row actions while rows are selected so the bulk toolbar takes priority.
+        // Hide row actions if some rows are selected (prioritizing the Bulk Toolbar)
         "mrt-row-actions": tableState.selectedRowCount === 0,
       },
     },
 
+    // Handlers wired cleanly to our custom hooks
     onRowSelectionChange: tableState.setRowSelection,
-    onColumnVisibilityChange: tableState.setColumnVisibility,
     onEditingRowSave: tableActions.handleInlineEdit,
 
-    // Open the external form from the row action icon.
+    // Open the external form only from the row action icon.
     renderRowActions: ({ row, table: rowActionsTable }) => (
       <Tooltip title="Edit user">
         <IconButton
@@ -114,51 +125,75 @@ export function UsersTable({
         ),
     },
 
-    // Render the bulk actions toolbar
-    renderBottomToolbarCustomActions: () => {
-      const selectedRows = table.getSelectedRowModel().rows;
-
-      const actionHandlers = {
-        "change-role": () => tableActions.handleBulkRoleChange(selectedRows),
-        activate: () => tableActions.handleBulkActivate(selectedRows),
-        deactivate: () => tableActions.handleBulkDeactivate(selectedRows),
-      };
-
-      // integrate bulk actions config
-      const availableActions = bulkActionsConfig
-        .filter((action) => action.hasPermission(permissions))
-        .map((action) => ({
-          key: action.key,
-          label: action.label,
-          variant: action.key === "change-role" ? "contained" : "outlined",
-          onClick: actionHandlers[action.key],
-        }));
-
-      return (
-        <BulkActionToolbar
-          selectedCount={tableState.selectedRowCount}
-          actions={availableActions}
-          isPending={tableActions.isPending}
-          pendingAction={tableActions.pendingAction}
-        />
-      );
-    },
+    // Render the bulk actions toolbar at the bottom of the table
+    renderBottomToolbarCustomActions: () => (
+      <BulkActionToolbar
+        selectedCount={tableState.selectedRowCount}
+        actions={[
+          {
+            key: "change-role",
+            label: "Change Role",
+            variant: "contained",
+            onClick: () =>
+              tableActions.handleBulkRoleChange(
+                table.getSelectedRowModel().rows
+              ),
+          },
+          {
+            key: "activate",
+            label: "Activate",
+            onClick: () =>
+              tableActions.handleBulkActivate(table.getSelectedRowModel().rows),
+          },
+          {
+            key: "deactivate",
+            label: "Deactivate",
+            onClick: () =>
+              tableActions.handleBulkDeactivate(
+                table.getSelectedRowModel().rows
+              ),
+          },
+        ]}
+        isPending={tableActions.isPending}
+        pendingAction={tableActions.pendingAction}
+      />
+    ),
   });
 
   return (
     <>
-      {/* Main Grid Rendering */}
+      {/* 1. Main Grid Rendering */}
       <MaterialReactTable table={table} />
 
-      {/* Generic Action Confirmation Dialog */}
-      <ActionConfirmDialog
+      {/* 2. Generic Action Confirmation Dialog */}
+      <Dialog
         open={Boolean(tableState.confirmation)}
-        message={tableState.confirmation?.message}
-        onConfirm={() => tableState.closeConfirmation(true)}
-        onCancel={() => tableState.closeConfirmation(false)}
-      ></ActionConfirmDialog>
+        onClose={() => tableState.closeConfirmation(false)}
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogTitle>Confirm Action</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            {tableState.confirmation?.message}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => tableState.closeConfirmation(false)}>
+            Cancel
+          </Button>
+          <Button
+            onClick={() => tableState.closeConfirmation(true)}
+            variant="contained"
+            color="primary"
+            autoFocus
+          >
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
 
-      {/* Bulk Role Selection Chooser */}
+      {/* 3. Bulk Role Selection Chooser */}
       <RoleChooserDialog
         open={tableState.roleChooser?.open}
         value={tableState.roleChooser?.value}

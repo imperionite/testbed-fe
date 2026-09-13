@@ -8,7 +8,7 @@ import CheckIcon from "@mui/icons-material/Check";
 
 import { createHteTableColumns } from "./hteTableColumns";
 import notify from "../../../utils/toast";
-import ActionConfirmDialog from "../../shared/components/ActionConfirmDialog";
+import ActionConfirmDialog from "../../../components/common/ActionConfirmDialog";
 
 export default function HtesTable({
   htes,

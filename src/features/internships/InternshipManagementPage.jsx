@@ -4,7 +4,7 @@ import { useMaterialReactTable } from "@glebcha/material-react-table";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { attendanceApi } from "../../api/attendance";
-import CardStat from "../shared/components/CardStat";
+import CardStat from "../../components/common/CardStat";
 import InternshipTable from "./components/InternshipTable";
 import InternshipModal from "./components/InternshipModal";
 import { BadgeStatus } from "./components/BadgeStatus";

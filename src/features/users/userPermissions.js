@@ -1,15 +1,15 @@
 import {
+	FIELD_RULES,
+	MODES,
+	ROLES,
 	userFormConfig,
-} from "./form/userFormConfig";
-import { MODES, ROLES } from "../shared/constants/constants";
-import { FIELD_RULES } from "../shared/constants/constants";
+} from "./form/formConfig";
 
 export function getUserManagementPermissions(role) {
 	const isAdmin = role === ROLES.ADMIN;
-	const isCoordinator = role === ROLES.INTERNSHIP_COORDINATOR;
 
 	return {
-		canView: isAdmin || isCoordinator,
+		canView: isAdmin,
 		canCreate: isAdmin,
 		canEdit: isAdmin,
 		canChangeRole: isAdmin,

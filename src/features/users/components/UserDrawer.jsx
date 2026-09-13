@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
+  Drawer,
+  Typography,
   Button,
   Alert,
   IconButton,
   Box,
+  Divider,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 
@@ -18,25 +17,20 @@ import { UserForm } from './UserForm';
 import notify from '../../../utils/toast';
 
 /**
- * @typedef {Object} UserModalProps
- * @property {boolean} open - Whether the modal is open
- * @property {'view' | 'edit' | 'create'} mode - Current modal mode
+ * @typedef {Object} UserDrawerProps
+ * @property {boolean} open - Whether the drawer is open
+ * @property {'view' | 'edit' | 'create'} mode - Current mode
  * @property {Object | null} user - User being viewed/edited, null for create mode
  * @property {Object} permissions - Current user's permissions
- * @property {() => void} onClose - Handler for closing the modal
+ * @property {() => void} onClose - Handler for closing the drawer
  * @property {(data: Object) => Promise<void>} onCreate - Handler for creating a user
  * @property {(params: { id: string; payload: Object }) => Promise<void>} onUpdate - Handler for updating a user
  * @property {(params: { id: string; role: string }) => Promise<void>} onRoleChange - Handler for changing user role
  * @property {(params: { id: string; isActive: boolean }) => Promise<void>} onStatusChange - Handler for changing user status
- * @property {(mode: 'view' | 'edit' | 'create') => void} [onModeChange] - Optional handler to change modal mode externally
+ * @property {(mode: 'view' | 'edit' | 'create') => void} [onModeChange] - Optional handler to change mode externally
  */
 
-/**
- * UserModal component that orchestrates user details editing, creation, and viewing
- * inside a focused Dialog interface. It manages state transitions and submits validated
- * payloads securely.
- */
-export function UserModal({
+export function UserDrawer({
   open,
   mode,
   user,
@@ -48,7 +42,6 @@ export function UserModal({
   onStatusChange,
   onModeChange,
 }) {
-  // Support both local transition and parent-state driven mode changes
   const [localMode, setLocalMode] = useState(mode);
 
   const handleModeChange = (newMode) => {
@@ -58,7 +51,6 @@ export function UserModal({
     }
   };
 
-  // Determine active form interaction role
   const activeRole = permissions?.canEdit ? ROLES.ADMIN : ROLES.STUDENT;
 
   const formSubmission = useFormSubmission({
@@ -74,21 +66,17 @@ export function UserModal({
       if (localMode === 'create') {
         await onCreate(filteredPayload);
       } else {
-        // Sequentially execute mutations for partial updates based on what's changed/configured
         const userId = user?.id;
         if (!userId) {
           throw new Error('User ID is missing for the update operation.');
         }
 
-        // 1. Submit core user updates; the API normalizes form field names.
         await onUpdate({ id: userId, payload: filteredPayload });
 
-        // 2. Perform role change mutation if edited
         if (filteredPayload.role && filteredPayload.role !== user.role) {
           await onRoleChange({ id: userId, role: filteredPayload.role });
         }
 
-        // 3. Perform status change mutation if edited.
         const updatedActive = filteredPayload.isActive;
         const originalActive = user.isActive;
 
@@ -104,35 +92,44 @@ export function UserModal({
   });
 
   return (
-    <Dialog
+    <Drawer
+      anchor="right"
       open={open}
       onClose={formSubmission.isSaving ? undefined : onClose}
-      maxWidth="sm"
-      fullWidth
-      aria-labelledby="user-modal-title"
+      PaperProps={{
+        sx: {
+          width: { xs: '100%', sm: 450 },
+          display: 'flex',
+          flexDirection: 'column',
+        },
+      }}
     >
-      <DialogTitle id="user-modal-title">
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span>
-            {localMode === 'create' ? 'Create User' : localMode === 'edit' ? 'Edit User' : 'View User'}
-          </span>
-          <IconButton
-            aria-label="close"
-            onClick={onClose}
-            disabled={formSubmission.isSaving}
-            sx={{
-              position: 'absolute',
-              right: 8,
-              top: 8,
-              color: (theme) => theme.palette.grey[500],
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </Box>
-      </DialogTitle>
+      {/* Header */}
+      <Box
+        sx={{
+          p: 2,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
+        <Typography variant="h6" component="h2">
+          {localMode === 'create' ? 'Create User' : localMode === 'edit' ? 'Edit User' : 'View User'}
+        </Typography>
+        <IconButton
+          aria-label="close"
+          onClick={onClose}
+          disabled={formSubmission.isSaving}
+          sx={{ color: (theme) => theme.palette.grey[500] }}
+        >
+          <CloseIcon />
+        </IconButton>
+      </Box>
 
-      <DialogContent dividers sx={{ pb: 3 }}>
+      <Divider />
+
+      {/* Form Body (Scrollable) */}
+      <Box sx={{ flexGrow: 1, overflowY: 'auto', p: 3 }}>
         {formSubmission.error && (
           <Alert severity="error" sx={{ mb: 2.5, whiteSpace: 'pre-wrap' }}>
             {formSubmission.error}
@@ -145,9 +142,19 @@ export function UserModal({
           control={formSubmission.formMethods.control}
           errors={formSubmission.formMethods.formState.errors}
         />
-      </DialogContent>
+      </Box>
 
-      <DialogActions sx={{ px: 3, py: 2 }}>
+      <Divider />
+
+      {/* Footer Actions */}
+      <Box
+        sx={{
+          p: 2,
+          display: 'flex',
+          justifyContent: 'flex-end',
+          gap: 1.5,
+        }}
+      >
         <Button
           onClick={onClose}
           disabled={formSubmission.isSaving}
@@ -176,9 +183,9 @@ export function UserModal({
             {formSubmission.isSaving ? 'Saving...' : 'Save'}
           </Button>
         )}
-      </DialogActions>
-    </Dialog>
+      </Box>
+    </Drawer>
   );
 }
 
-export default UserModal;
+export default UserDrawer;
