@@ -1,6 +1,6 @@
 export const MODES = {
-    CREATE: "CREATE",
-    EDIT: "EDIT",
-    VIEW: "VIEW",
-    VALIDATE: "VALIDATE",
-};
+  CREATE: 'CREATE',
+  EDIT: 'EDIT',
+  VIEW: 'VIEW',
+  VALIDATE: 'VALIDATE',
+}
