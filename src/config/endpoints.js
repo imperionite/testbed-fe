@@ -55,6 +55,15 @@ documents: {
     reject: (id) => `/documents/${id}/reject`,
     delete: (id) => `/documents/${id}`,
   },
+
+  reports: {
+    internships: "/reports/internships",
+    summary: "/reports/internships/summary",
+  },
+
+  audit: {
+    list: "/audit",
+  },
 };
 
 export default Object.freeze(endpoints);
