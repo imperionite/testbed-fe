@@ -10,7 +10,7 @@ import {
   ClearOutlined,
   ArrowDownwardOutlined,
   DensityMediumOutlined,
-} from '@mui/icons-material';
+} from '@mui/icons-material'
 
 /**
  * Base configuration shared across all features (Users, HTEs, Students)
@@ -31,8 +31,8 @@ export const defaultTableConfig = {
   enableDensityToggle: true,
   enableStickyHeader: true,
   enableStickyFooter: true,
-  positionActionsColumn: "last",
-  positionGlobalFilter: "right",
+  positionActionsColumn: 'last',
+  positionGlobalFilter: 'right',
 
   icons: {
     ViewListIcon: ViewListOutlined,
@@ -50,25 +50,24 @@ export const defaultTableConfig = {
 
   initialState: {
     density: 'comfortable',
-    pagination: { pageIndex: 0, pageSize: 15 }, 
-    sorting: [{ id: "createdAt", desc: true }],
+    pagination: { pageIndex: 0, pageSize: 15 },
+    sorting: [{ id: 'createdAt', desc: true }],
     columnFiltersOpen: false,
     columnPinning: {
-      right: ["mrt-row-actions"],
+      right: ['mrt-row-actions'],
     },
   },
 
   // Action column sizing configurations
   displayColumnDefOptions: {
-    "mrt-row-actions": {
+    'mrt-row-actions': {
       size: 80,
       muiTableBodyCellProps: {
         sx: {
           minWidth: 70,
-          whiteSpace: "nowrap",
+          whiteSpace: 'nowrap',
         },
       },
     },
   },
-
-};
+}

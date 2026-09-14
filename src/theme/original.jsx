@@ -1,46 +1,46 @@
-import { createTheme } from "@mui/material/styles";
+import { createTheme } from '@mui/material/styles'
 
 export const originalTheme = createTheme({
   palette: {
     primary: {
-      main: "#526D82",
-      light: "#6D8699",
-      dark: "#27374D",
-      contrastText: "#fff",
+      main: '#526D82',
+      light: '#6D8699',
+      dark: '#27374D',
+      contrastText: '#fff',
     },
 
     secondary: {
-      main: "#9DB2BF",
-      light: "#DDE6ED",
-      dark: "#7B97A8",
+      main: '#9DB2BF',
+      light: '#DDE6ED',
+      dark: '#7B97A8',
     },
 
     background: {
-      default: "#F7F9FB",
-      paper: "#FFFFFF",
+      default: '#F7F9FB',
+      paper: '#FFFFFF',
     },
 
     text: {
-      primary: "#27374D",
-      secondary: "#526D82",
+      primary: '#27374D',
+      secondary: '#526D82',
     },
 
-    divider: "#DDE6ED",
+    divider: '#DDE6ED',
 
     success: {
-      main: "#2E7D32",
+      main: '#2E7D32',
     },
 
     warning: {
-      main: "#ED6C02",
+      main: '#ED6C02',
     },
 
     error: {
-      main: "#D32F2F",
+      main: '#D32F2F',
     },
 
     info: {
-      main: "#0288D1",
+      main: '#0288D1',
     },
   },
 
@@ -57,7 +57,7 @@ export const originalTheme = createTheme({
       styleOverrides: {
         root: {
           borderRadius: 12,
-          boxShadow: "0 2px 8px rgba(39,55,77,0.08)",
+          boxShadow: '0 2px 8px rgba(39,55,77,0.08)',
         },
       },
     },
@@ -69,7 +69,7 @@ export const originalTheme = createTheme({
 
       styleOverrides: {
         root: {
-          textTransform: "none",
+          textTransform: 'none',
           borderRadius: 8,
         },
       },
@@ -78,9 +78,9 @@ export const originalTheme = createTheme({
     MuiPaper: {
       styleOverrides: {
         root: {
-          backgroundImage: "none",
+          backgroundImage: 'none',
         },
       },
     },
   },
-});
+})

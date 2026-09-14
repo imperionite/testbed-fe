@@ -1,30 +1,30 @@
-import { createContext, useContext, useState, useEffect, useMemo } from "react";
-import { ThemeProvider } from "@mui/material/styles";
-import CssBaseline from "@mui/material/CssBaseline";
-import { createAppTheme } from "../theme/experiment";
+import { createContext, useState, useEffect, useMemo } from 'react'
+import { ThemeProvider } from '@mui/material/styles'
+import CssBaseline from '@mui/material/CssBaseline'
+import { createAppTheme } from '../theme/experiment'
 
-const ThemeContext = createContext();
+const ThemeContext = createContext()
 
-export const useThemeContext = () => useContext(ThemeContext);
+// export const useThemeContext = () => useContext(ThemeContext);
 
 export const ThemeContextProvider = ({ children }) => {
-  const [mode, setMode] = useState(() => localStorage.getItem("themeMode") || "system");
+  const [mode, setMode] = useState(() => localStorage.getItem('themeMode') || 'system')
 
   const systemMode = useMemo(() => {
-    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-  }, []);
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+  }, [])
 
-  const activeMode = mode === "system" ? systemMode : mode;
+  const activeMode = mode === 'system' ? systemMode : mode
 
-  const theme = useMemo(() => createAppTheme(activeMode), [activeMode]);
+  const theme = useMemo(() => createAppTheme(activeMode), [activeMode])
 
   useEffect(() => {
-    localStorage.setItem("themeMode", mode);
-  }, [mode]);
+    localStorage.setItem('themeMode', mode)
+  }, [mode])
 
   const toggleTheme = (newMode) => {
-    setMode(newMode);
-  };
+    setMode(newMode)
+  }
 
   return (
     <ThemeContext.Provider value={{ mode, toggleTheme }}>
@@ -33,5 +33,5 @@ export const ThemeContextProvider = ({ children }) => {
         {children}
       </ThemeProvider>
     </ThemeContext.Provider>
-  );
-};
+  )
+}

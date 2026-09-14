@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react'
 import {
   Button,
   Dialog,
@@ -9,9 +9,9 @@ import {
   InputLabel,
   MenuItem,
   Select,
-} from "@mui/material";
+} from '@mui/material'
 
-import { ROLE_OPTIONS } from "../../shared/constants/constants";
+import { ROLE_OPTIONS } from '../../shared/constants/constants'
 
 /**
  * @typedef {Object} RoleChooserDialogProps
@@ -28,19 +28,14 @@ import { ROLE_OPTIONS } from "../../shared/constants/constants";
  */
 export function RoleChooserDialog({
   open,
-  value = "",
+  value = '',
   onChange,
   onConfirm,
   onCancel,
   isLoading = false,
 }) {
   return (
-    <Dialog
-      open={open}
-      onClose={isLoading ? undefined : onCancel}
-      maxWidth="xs"
-      fullWidth
-    >
+    <Dialog open={open} onClose={isLoading ? undefined : onCancel} maxWidth="xs" fullWidth>
       <DialogTitle>Choose a role</DialogTitle>
       <DialogContent>
         <FormControl fullWidth margin="dense">
@@ -56,20 +51,19 @@ export function RoleChooserDialog({
               <MenuItem key={role.value} value={role.value}>
                 {role.label}
               </MenuItem>
-            )) || (
+            )) ||
               // Fallback options based on user validation schema if formConfig is not fully populated
               [
-                { value: "administrator", label: "Administrator" },
-                { value: "internship_coordinator", label: "Coordinator" },
-                { value: "faculty_adviser", label: "Faculty Adviser" },
-                { value: "hte_supervisor", label: "HTE Supervisor" },
-                { value: "student", label: "Student" }
+                { value: 'administrator', label: 'Administrator' },
+                { value: 'internship_coordinator', label: 'Coordinator' },
+                { value: 'faculty_adviser', label: 'Faculty Adviser' },
+                { value: 'hte_supervisor', label: 'HTE Supervisor' },
+                { value: 'student', label: 'Student' },
               ].map((role) => (
                 <MenuItem key={role.value} value={role.value}>
                   {role.label}
                 </MenuItem>
-              ))
-            )}
+              ))}
           </Select>
         </FormControl>
       </DialogContent>
@@ -77,16 +71,12 @@ export function RoleChooserDialog({
         <Button onClick={onCancel} disabled={isLoading}>
           Cancel
         </Button>
-        <Button
-          onClick={onConfirm}
-          variant="contained"
-          disabled={!value || isLoading}
-        >
+        <Button onClick={onConfirm} variant="contained" disabled={!value || isLoading}>
           Continue
         </Button>
       </DialogActions>
     </Dialog>
-  );
+  )
 }
 
-export default RoleChooserDialog;
+export default RoleChooserDialog

@@ -1,6 +1,6 @@
-import React from "react";
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import React from 'react'
+import { useForm, Controller } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import {
   Chip,
   FormControl,
@@ -11,14 +11,11 @@ import {
   Stack,
   Switch,
   TextField,
-} from "@mui/material";
-import { hteFormConfig } from "../form/formConfig";
-import {
-  getHteFormPermissions,
-  getVisibleHteFields,
-} from "../htePermissions";
-import getValidationSchema from "../form/HteValidationSchema";
-import { formatAccountStatus, formatDate } from "../form/fieldFormatters";
+} from '@mui/material'
+import { hteFormConfig } from '../form/formConfig'
+import { getHteFormPermissions, getVisibleHteFields } from '../htePermissions'
+import getValidationSchema from '../form/HteValidationSchema'
+import { formatAccountStatus, formatDate } from '../form/fieldFormatters'
 
 export default function HteForm({
   role,
@@ -26,11 +23,11 @@ export default function HteForm({
   defaultValues = {},
   onSubmit,
   onInvalid,
-  formId = "hte-form",
+  formId = 'hte-form',
   supervisorOptions = [],
 }) {
-  const { getFieldRule } = getHteFormPermissions(role, mode);
-  const schema = getValidationSchema(mode);
+  const { getFieldRule } = getHteFormPermissions(role, mode)
+  const schema = getValidationSchema(mode)
 
   const {
     control,
@@ -39,21 +36,21 @@ export default function HteForm({
   } = useForm({
     resolver: zodResolver(schema),
     defaultValues,
-    mode: "onBlur",
-  });
+    mode: 'onBlur',
+  })
 
   const handleSubmitData = (data) => {
     const payload = hteFormConfig.reduce((acc, field) => {
-      if (getFieldRule(field) !== "hidden" && data[field.name] !== undefined) {
-        acc[field.name] = data[field.name];
+      if (getFieldRule(field) !== 'hidden' && data[field.name] !== undefined) {
+        acc[field.name] = data[field.name]
       }
-      return acc;
-    }, {});
+      return acc
+    }, {})
 
-    onSubmit?.(payload);
-  };
+    onSubmit?.(payload)
+  }
 
-  const visibleFields = getVisibleHteFields(role, mode);
+  const visibleFields = getVisibleHteFields(role, mode)
 
   return (
     <Stack
@@ -63,9 +60,9 @@ export default function HteForm({
       spacing={2}
     >
       {visibleFields.map((field) => {
-        const rule = getFieldRule(field);
-        const isDisabled = rule === "readonly";
-        const isRequired = rule === "required";
+        const rule = getFieldRule(field)
+        const isDisabled = rule === 'readonly'
+        const isRequired = rule === 'required'
 
         return (
           <Controller
@@ -73,12 +70,12 @@ export default function HteForm({
             name={field.name}
             control={control}
             render={({ field: rhfField }) => {
-              if (field.type === "supervisor-select") {
+              if (field.type === 'supervisor-select') {
                 if (isDisabled) {
-                  const match = supervisorOptions.find((u) => u.id === rhfField.value);
+                  const match = supervisorOptions.find((u) => u.id === rhfField.value)
                   const displayName = match
-                    ? [match.last_name, match.first_name].filter(Boolean).join(", ")
-                    : rhfField.value ?? "No Supervisor";
+                    ? [match.last_name, match.first_name].filter(Boolean).join(', ')
+                    : (rhfField.value ?? 'No Supervisor')
                   return (
                     <TextField
                       value={displayName}
@@ -87,38 +84,30 @@ export default function HteForm({
                       fullWidth
                       size="small"
                     />
-                  );
+                  )
                 }
                 return (
                   <FormControl fullWidth size="small" error={!!errors[field.name]}>
                     <InputLabel>{field.label}</InputLabel>
-                    <Select
-                      {...rhfField}
-                      value={rhfField.value ?? ""}
-                      label={field.label}
-                    >
+                    <Select {...rhfField} value={rhfField.value ?? ''} label={field.label}>
                       <MenuItem value="">
                         <em>None</em>
                       </MenuItem>
                       {supervisorOptions.map((u) => (
                         <MenuItem key={u.id} value={u.id}>
-                          {[u.last_name, u.first_name].filter(Boolean).join(", ")}
+                          {[u.last_name, u.first_name].filter(Boolean).join(', ')}
                         </MenuItem>
                       ))}
                     </Select>
                   </FormControl>
-                );
+                )
               }
 
-              if (field.type === "select") {
+              if (field.type === 'select') {
                 return (
                   <FormControl fullWidth size="small" error={!!errors[field.name]}>
                     <InputLabel>{field.label}</InputLabel>
-                    <Select
-                      {...rhfField}
-                      label={field.label}
-                      disabled={isDisabled}
-                    >
+                    <Select {...rhfField} label={field.label} disabled={isDisabled}>
                       {field.options.map((option) => (
                         <MenuItem key={option.value} value={option.value}>
                           {option.label}
@@ -126,20 +115,20 @@ export default function HteForm({
                       ))}
                     </Select>
                   </FormControl>
-                );
+                )
               }
 
-              if (field.type === "status" && isDisabled) {
+              if (field.type === 'status' && isDisabled) {
                 return (
                   <Chip
                     label={formatAccountStatus(rhfField.value)}
-                    color={rhfField.value === true ? "success" : "error"}
+                    color={rhfField.value === true ? 'success' : 'error'}
                     variant="filled"
                   />
-                );
+                )
               }
 
-              if (field.type === "status") {
+              if (field.type === 'status') {
                 return (
                   <FormControlLabel
                     control={
@@ -151,16 +140,14 @@ export default function HteForm({
                     }
                     label={formatAccountStatus(rhfField.value)}
                   />
-                );
+                )
               }
 
               return (
                 <TextField
                   {...rhfField}
                   value={
-                    field.format === "date"
-                      ? formatDate(rhfField.value)
-                      : rhfField.value ?? ""
+                    field.format === 'date' ? formatDate(rhfField.value) : (rhfField.value ?? '')
                   }
                   label={field.label}
                   type={field.type}
@@ -171,11 +158,11 @@ export default function HteForm({
                   fullWidth
                   size="small"
                 />
-              );
+              )
             }}
           />
-        );
+        )
       })}
     </Stack>
-  );
+  )
 }
