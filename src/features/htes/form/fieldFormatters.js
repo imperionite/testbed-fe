@@ -1,15 +1,15 @@
 export function formatDate(value) {
-  if (!value) return "-";
+  if (!value) return '-'
 
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "-";
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return '-'
 
   return new Intl.DateTimeFormat(undefined, {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(date);
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  }).format(date)
 }
 
 export function formatAccountStatus(value) {
-  return value === true ? "Active" : "Inactive";
+  return value === true ? 'Active' : 'Inactive'
 }

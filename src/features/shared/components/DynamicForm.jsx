@@ -1,12 +1,12 @@
-import React from 'react';
-import { Stack } from '@mui/material';
-import FormField from './FormFieldRenderer';
+import React from 'react'
+import { Stack } from '@mui/material'
+import FormField from './FormFieldRenderer'
 
-export function DynamicForm({ 
-  fields = [], 
-  getFieldRule, 
-  control, 
-  errors, 
+export function DynamicForm({
+  fields = [],
+  getFieldRule,
+  control,
+  errors,
   formatters,
   mode,
   supervisorOptions = [],
@@ -16,8 +16,8 @@ export function DynamicForm({
   return (
     <Stack component="form" spacing={2.5} sx={{ mt: 1 }}>
       {fields.map((field) => {
-        const rule = getFieldRule ? getFieldRule(field) : 'editable';
-        
+        const rule = getFieldRule ? getFieldRule(field) : 'editable'
+
         return (
           <FormField
             key={field.name}
@@ -31,10 +31,10 @@ export function DynamicForm({
             isSupervisorLoading={isSupervisorLoading}
             supervisorError={supervisorError}
           />
-        );
+        )
       })}
     </Stack>
-  );
+  )
 }
 
-export default DynamicForm;
+export default DynamicForm

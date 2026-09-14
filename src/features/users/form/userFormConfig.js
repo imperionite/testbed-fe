@@ -1,4 +1,4 @@
-import { ROLES, MODES, FIELD_RULES, ROLE_OPTIONS} from '../../shared/constants/constants'
+import { ROLES, MODES, FIELD_RULES, ROLE_OPTIONS } from '../../shared/constants/constants'
 // ─────────────────────────────────────────────────────────────────────────────
 // FIELD CONFIG
 //
@@ -6,9 +6,9 @@ import { ROLES, MODES, FIELD_RULES, ROLE_OPTIONS} from '../../shared/constants/c
 // ─────────────────────────────────────────────────────────────────────────────
 export const userFormConfig = [
   {
-    name: "id",
-    label: "ID",
-    type: "text",
+    name: 'id',
+    label: 'ID',
+    type: 'text',
     rbac: {
       [ROLES.ADMIN]: {
         [MODES.CREATE]: FIELD_RULES.HIDDEN,
@@ -18,10 +18,10 @@ export const userFormConfig = [
     },
   },
   {
-    name: "createdAt",
-    label: "Created At",
-    type: "text",
-    format: "date",
+    name: 'createdAt',
+    label: 'Created At',
+    type: 'text',
+    format: 'date',
     rbac: {
       [ROLES.ADMIN]: {
         [MODES.CREATE]: FIELD_RULES.HIDDEN,
@@ -31,9 +31,9 @@ export const userFormConfig = [
     },
   },
   {
-    name: "email",
-    label: "Email",
-    type: "email",
+    name: 'email',
+    label: 'Email',
+    type: 'email',
     rbac: {
       [ROLES.ADMIN]: {
         [MODES.CREATE]: FIELD_RULES.REQUIRED,
@@ -43,9 +43,9 @@ export const userFormConfig = [
     },
   },
   {
-    name: "lastName",
-    label: "Last Name",
-    type: "text",
+    name: 'lastName',
+    label: 'Last Name',
+    type: 'text',
     rbac: {
       [ROLES.ADMIN]: {
         [MODES.CREATE]: FIELD_RULES.REQUIRED,
@@ -55,9 +55,9 @@ export const userFormConfig = [
     },
   },
   {
-    name: "firstName",
-    label: "First Name",
-    type: "text",
+    name: 'firstName',
+    label: 'First Name',
+    type: 'text',
     rbac: {
       [ROLES.ADMIN]: {
         [MODES.CREATE]: FIELD_RULES.REQUIRED,
@@ -67,9 +67,9 @@ export const userFormConfig = [
     },
   },
   {
-    name: "middleName",
-    label: "Middle Name",
-    type: "text",
+    name: 'middleName',
+    label: 'Middle Name',
+    type: 'text',
     rbac: {
       [ROLES.ADMIN]: {
         [MODES.CREATE]: FIELD_RULES.EDITABLE,
@@ -79,9 +79,9 @@ export const userFormConfig = [
     },
   },
   {
-    name: "suffix",
-    label: "Suffix",
-    type: "text",
+    name: 'suffix',
+    label: 'Suffix',
+    type: 'text',
     rbac: {
       [ROLES.ADMIN]: {
         [MODES.CREATE]: FIELD_RULES.EDITABLE,
@@ -91,9 +91,9 @@ export const userFormConfig = [
     },
   },
   {
-    name: "role",
-    label: "Role",
-    type: "select",
+    name: 'role',
+    label: 'Role',
+    type: 'select',
     options: ROLE_OPTIONS,
     rbac: {
       [ROLES.ADMIN]: {
@@ -104,9 +104,9 @@ export const userFormConfig = [
     },
   },
   {
-    name: "isActive",
-    label: "Account Status",
-    type: "status_account",
+    name: 'isActive',
+    label: 'Account Status',
+    type: 'status_account',
     rbac: {
       [ROLES.ADMIN]: {
         [MODES.CREATE]: FIELD_RULES.HIDDEN,
@@ -116,9 +116,9 @@ export const userFormConfig = [
     },
   },
   {
-    name: "password",
-    label: "Password",
-    type: "text",
+    name: 'password',
+    label: 'Password',
+    type: 'text',
     rbac: {
       [ROLES.ADMIN]: {
         [MODES.CREATE]: FIELD_RULES.REQUIRED,
@@ -127,4 +127,4 @@ export const userFormConfig = [
       },
     },
   },
-];
+]

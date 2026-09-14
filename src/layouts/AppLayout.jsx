@@ -1,25 +1,25 @@
-import { Box } from "@mui/material";
-import { useState } from "react";
+import { Box } from '@mui/material'
+import { useState } from 'react'
 
-import { Outlet } from "react-router-dom";
+import { Outlet } from 'react-router-dom'
 
-import Sidebar from "../components/Sidebar";
-import AppHeader from "../components/AppHeader";
-import Footer from "../components/Footer";
+import Sidebar from '../components/Sidebar'
+import AppHeader from '../components/AppHeader'
+import Footer from '../components/Footer'
 
-import useAuth from "../hooks/useAuth";
-import PasswordChangeGuard from "../guards/PasswordChangeGuard";
+import useAuth from '../hooks/useAuth'
+import PasswordChangeGuard from '../guards/PasswordChangeGuard'
 
 export default function AppLayout() {
-  const { user } = useAuth();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user } = useAuth()
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   return (
     <Box
       sx={{
-        minHeight: "100vh",
-        display: "flex",
-        flexDirection: "column",
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
       }}
     >
       <AppHeader onMenuClick={() => setMobileMenuOpen(true)} />
@@ -27,9 +27,9 @@ export default function AppLayout() {
       <Box
         sx={{
           flex: 1,
-          display: "flex",
-          alignItems: "stretch",
-          flexDirection: "row",
+          display: 'flex',
+          alignItems: 'stretch',
+          flexDirection: 'row',
         }}
       >
         <Sidebar
@@ -54,5 +54,5 @@ export default function AppLayout() {
 
       <Footer />
     </Box>
-  );
+  )
 }

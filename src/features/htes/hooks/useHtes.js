@@ -1,11 +1,11 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery } from '@tanstack/react-query'
 
-import { htesApi } from "../../../api/htes";
+import { htesApi } from '../../../api/htes'
 
 export function useHtes(options = {}) {
   return useQuery({
-    queryKey: ["htes"],
+    queryKey: ['htes'],
     queryFn: htesApi.listHtes,
     ...options,
-  });
+  })
 }

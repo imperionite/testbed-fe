@@ -1,10 +1,7 @@
-import React from "react";
-import {
-  getVisibleUserFields,
-  getUserFormPermissions,
-} from "../userPermissions";
-import { formatUserDate, formatAccountStatus } from "../../shared/fieldFormatters";
-import DynamicForm from "../../shared/components/DynamicForm";
+import React from 'react'
+import { getVisibleUserFields, getUserFormPermissions } from '../userPermissions'
+import { formatUserDate, formatAccountStatus } from '../../shared/fieldFormatters'
+import DynamicForm from '../../shared/components/DynamicForm'
 
 /**
  * @typedef {Object} UserFormProps
@@ -20,10 +17,10 @@ import DynamicForm from "../../shared/components/DynamicForm";
  */
 export function UserForm({ role, mode, control, errors }) {
   // Get the list of fields that are visible for this role and mode
-  const visibleFields = getVisibleUserFields(role, mode);
+  const visibleFields = getVisibleUserFields(role, mode)
 
   // Get permission helper to determine field-level editability rules
-  const { getFieldRule } = getUserFormPermissions(role, mode);
+  const { getFieldRule } = getUserFormPermissions(role, mode)
 
   // Render form
   return (
@@ -35,7 +32,7 @@ export function UserForm({ role, mode, control, errors }) {
       formatters={{ date: formatUserDate, status: formatAccountStatus }}
       mode={mode}
     />
-  );
+  )
 }
 
-export default UserForm;
+export default UserForm
