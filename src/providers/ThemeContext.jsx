@@ -5,13 +5,18 @@ import { createAppTheme } from "../theme/experiment";
 
 const ThemeContext = createContext();
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useThemeContext = () => useContext(ThemeContext);
 
 export const ThemeContextProvider = ({ children }) => {
-  const [mode, setMode] = useState(() => localStorage.getItem("themeMode") || "system");
+  const [mode, setMode] = useState(
+    () => localStorage.getItem("themeMode") || "system",
+  );
 
   const systemMode = useMemo(() => {
-    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    return window.matchMedia("(prefers-color-scheme: dark)").matches
+      ? "dark"
+      : "light";
   }, []);
 
   const activeMode = mode === "system" ? systemMode : mode;
