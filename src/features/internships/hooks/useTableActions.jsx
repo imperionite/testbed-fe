@@ -1,6 +1,6 @@
-import { useState, useCallback, useMemo } from 'react'
-import notify from '../../../utils/toast'
-import { formatSentenceCase } from '../form/fieldFormatters'
+import { useState, useCallback, useMemo } from "react";
+import notify from "../../../utils/toast";
+import { formatSentenceCase } from "../form/fieldFormatters";
 
 /**
  * Hook for managing internship table action handlers (inline editing & bulk status updates).
@@ -26,10 +26,10 @@ export function useTableActions({
   clearSelection,
 }) {
   // Tracks active action ID ('bulk-status' or 'row-[id]')
-  const [pendingAction, setPendingAction] = useState(null)
+  const [pendingAction, setPendingAction] = useState(null);
 
   // Evaluates to true whenever any async mutation is in progress
-  const isPending = useMemo(() => pendingAction !== null, [pendingAction])
+  const isPending = useMemo(() => pendingAction !== null, [pendingAction]);
 
   /**
    * Action handler for inline table row editing.
@@ -37,55 +37,61 @@ export function useTableActions({
    */
   const handleInlineEdit = useCallback(
     async ({ exitEditingMode, row, values }) => {
-      if (!row || !values) return
+      if (!row || !values) return;
 
-      const facultyAdviserChanged = values.facultyAdviserId !== row.original.facultyAdviserId
-      const statusChanged = values.status !== row.original.status
+      const facultyAdviserChanged =
+        values.facultyAdviserId !== row.original.facultyAdviserId;
+      const statusChanged = values.status !== row.original.status;
 
       // Early return if no changes were made
       if (!facultyAdviserChanged && !statusChanged) {
-        exitEditingMode()
-        return
+        exitEditingMode();
+        return;
       }
 
       if (!permissions.canEdit) {
-        notify.error('You do not have permission to edit internships.')
-        return
+        notify.error("You do not have permission to edit internships.");
+        return;
       }
 
       const confirmed = askForConfirmation
-        ? await askForConfirmation('Are you sure you want to save these changes?')
-        : window.confirm('Are you sure you want to save these changes?')
+        ? await askForConfirmation("Are you sure you want to save these changes?")
+        : window.confirm("Are you sure you want to save these changes?");
 
-      if (!confirmed) return
+      if (!confirmed) return;
 
-      setPendingAction(`row-${row.original.id}`)
+      setPendingAction(`row-${row.original.id}`);
 
       try {
         if (facultyAdviserChanged && onFacultyAdviserChange) {
           await onFacultyAdviserChange({
             id: row.original.id,
             facultyAdviserId: values.facultyAdviserId,
-          })
+          });
         }
 
         if (statusChanged && onStatusChange) {
           await onStatusChange({
             id: row.original.id,
             status: values.status,
-          })
+          });
         }
 
-        exitEditingMode()
-        notify.success('Internship updated successfully.')
+        exitEditingMode();
+        notify.success("Internship updated successfully.");
       } catch (error) {
-        notify.error(error?.message || 'Failed to update internship.')
+        notify.error(error?.message || "Failed to update internship.");
       } finally {
-        setPendingAction(null)
+        setPendingAction(null);
       }
     },
-    [permissions.canEdit, onFacultyAdviserChange, onStatusChange, askForConfirmation],
-  )
+    [
+      permissions.canEdit,
+      onFacultyAdviserChange,
+      onStatusChange,
+      askForConfirmation,
+    ]
+  );
 
   /**
    * Action handler for bulk internship status updates.
@@ -97,55 +103,55 @@ export function useTableActions({
    */
   const handleBulkStatusChange = useCallback(
     async (selectedRows, targetStatus) => {
-      if (!selectedRows || selectedRows.length === 0) return
+      if (!selectedRows || selectedRows.length === 0) return;
 
-      const canBulk = permissions.canBulkEdit ?? permissions.canEdit
+      const canBulk = permissions.canBulkEdit ?? permissions.canEdit;
       if (!canBulk) {
-        notify.error('You do not have permission to bulk edit internship status.')
-        return
+        notify.error("You do not have permission to bulk edit internship status.");
+        return;
       }
 
-      let nextStatus = targetStatus
+      let nextStatus = targetStatus;
 
       // Prompt for status if not supplied directly
       if (!nextStatus && askForStatus) {
-        nextStatus = await askForStatus()
+        nextStatus = await askForStatus();
       }
 
-      if (!nextStatus) return
+      if (!nextStatus) return;
 
-      const formattedStatus = formatSentenceCase(nextStatus)
+      const formattedStatus = formatSentenceCase(nextStatus);
 
       const confirmed = askForConfirmation
         ? await askForConfirmation(
-            `Are you sure you want to set the status of ${selectedRows.length} selected internship(s) to "${formattedStatus}"?`,
+            `Are you sure you want to set the status of ${selectedRows.length} selected internship(s) to "${formattedStatus}"?`
           )
         : window.confirm(
-            `Are you sure you want to set the status of ${selectedRows.length} selected internship(s) to "${formattedStatus}"?`,
-          )
+            `Are you sure you want to set the status of ${selectedRows.length} selected internship(s) to "${formattedStatus}"?`
+          );
 
-      if (!confirmed) return
+      if (!confirmed) return;
 
-      setPendingAction('bulk-status')
+      setPendingAction("bulk-status");
 
-      const ids = selectedRows.map((row) => row.original.id)
+      const ids = selectedRows.map((row) => row.original.id);
 
       try {
         if (onBulkStatusChange) {
-          await onBulkStatusChange({ ids, status: nextStatus })
+          await onBulkStatusChange({ ids, status: nextStatus });
         }
 
         notify.success(
-          `Successfully updated status to "${formattedStatus}" for ${selectedRows.length} record(s).`,
-        )
+          `Successfully updated status to "${formattedStatus}" for ${selectedRows.length} record(s).`
+        );
 
         if (clearSelection) {
-          clearSelection()
+          clearSelection();
         }
       } catch (error) {
-        notify.error(error?.message || 'Failed to bulk update internship statuses.')
+        notify.error(error?.message || "Failed to bulk update internship statuses.");
       } finally {
-        setPendingAction(null)
+        setPendingAction(null);
       }
     },
     [
@@ -155,15 +161,15 @@ export function useTableActions({
       askForConfirmation,
       onBulkStatusChange,
       clearSelection,
-    ],
-  )
+    ]
+  );
 
   return {
     pendingAction,
     isPending,
     handleInlineEdit,
     handleBulkStatusChange,
-  }
+  };
 }
 
-export default useTableActions
+export default useTableActions;

@@ -1,51 +1,51 @@
 const endpoints = {
   auth: {
-    login: '/auth/login',
-    refresh: '/auth/refresh',
-    logout: '/auth/logout',
-    me: '/auth/me',
-    changePassword: '/auth/change-password',
-    forgotPassword: '/auth/forgot-password',
+    login: "/auth/login",
+    refresh: "/auth/refresh",
+    logout: "/auth/logout",
+    me: "/auth/me",
+    changePassword: "/auth/change-password",
+    forgotPassword: "/auth/forgot-password",
 
-    completePasswordReset: '/auth/reset-password/complete',
+    completePasswordReset: "/auth/reset-password/complete",
   },
 
   users: {
-    list: '/users',
+    list: "/users",
     details: (id) => `/users/${id}`,
     role: (id) => `/users/${id}/role`,
     status: (id) => `/users/${id}/status`,
   },
 
   students: {
-    list: '/students',
-    me: '/students/me',
+    list: "/students",
+    me: "/students/me",
     details: (id) => `/students/${id}`,
   },
 
   htes: {
-    list: '/htes',
+    list: "/htes",
     details: (id) => `/htes/${id}`,
     status: (id) => `/htes/${id}/status`,
     supervisor: (id) => `/htes/${id}/supervisor`,
   },
 
   internships: {
-    list: '/internships',
+    list: "/internships",
     details: (id) => `/internships/${id}`,
     status: (id) => `/internships/${id}/status`,
     adviser: (id) => `/internships/${id}/adviser`,
-    me: '/internships/me',
+    me: "/internships/me",
   },
 
   attendance: {
-    list: '/attendance',
-    me: '/attendance/me',
+    list: "/attendance",
+    me: "/attendance/me",
     details: (id) => `/attendance/${id}`,
     internship: (id) => `/attendance/internship/${id}`,
     renderedHours: (id) => `/attendance/internship/${id}/rendered-hours`,
     validation: (id) => `/attendance/${id}/validation`,
   },
-}
+};
 
-export default Object.freeze(endpoints)
+export default Object.freeze(endpoints);

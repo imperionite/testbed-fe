@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState } from "react";
 
 import {
   Alert,
@@ -11,50 +11,50 @@ import {
   Stack,
   TextField,
   Typography,
-} from '@mui/material'
+} from "@mui/material";
 
-import { Visibility, VisibilityOff } from '@mui/icons-material'
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
-import { useForm } from 'react-hook-form'
+import { useForm } from "react-hook-form";
 
-import { z } from 'zod'
+import { z } from "zod";
 
-import { zodResolver } from '@hookform/resolvers/zod'
+import { zodResolver } from "@hookform/resolvers/zod";
 
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from "react-router-dom";
 
-import { supabase } from '../lib/supabase'
+import { supabase } from "../lib/supabase";
 
-import { useCompletePasswordReset } from '../hooks/useAuth'
+import { useCompletePasswordReset } from "../hooks/useAuth";
 
-import notify from '../utils/toast'
+import notify from "../utils/toast";
 
 const schema = z
   .object({
-    newPassword: z.string().min(8, 'Password must be at least 8 characters.'),
+    newPassword: z.string().min(8, "Password must be at least 8 characters."),
 
-    confirmPassword: z.string().min(1, 'Please confirm your password.'),
+    confirmPassword: z.string().min(1, "Please confirm your password."),
   })
   .refine((data) => data.newPassword === data.confirmPassword, {
-    path: ['confirmPassword'],
-    message: 'Passwords do not match.',
-  })
+    path: ["confirmPassword"],
+    message: "Passwords do not match.",
+  });
 
 export default function ResetPasswordPage() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-  const completePasswordReset = useCompletePasswordReset()
+  const completePasswordReset = useCompletePasswordReset();
 
-  const [sessionReady, setSessionReady] = useState(false)
+  const [sessionReady, setSessionReady] = useState(false);
 
-  const [invalidLink, setInvalidLink] = useState(false)
+  const [invalidLink, setInvalidLink] = useState(false);
 
-  const [completed, setCompleted] = useState(false)
+  const [completed, setCompleted] = useState(false);
 
   const [showPassword, setShowPassword] = useState({
     new: false,
     confirm: false,
-  })
+  });
 
   /**
    * Establish Supabase recovery session
@@ -62,47 +62,47 @@ export default function ResetPasswordPage() {
   useEffect(() => {
     async function initializeRecovery() {
       try {
-        const hash = window.location.hash.substring(1)
+        const hash = window.location.hash.substring(1);
 
-        const params = new URLSearchParams(hash)
+        const params = new URLSearchParams(hash);
 
-        const accessToken = params.get('access_token')
+        const accessToken = params.get("access_token");
 
-        const refreshToken = params.get('refresh_token')
+        const refreshToken = params.get("refresh_token");
 
-        const type = params.get('type')
+        const type = params.get("type");
 
-        if (!accessToken || !refreshToken || type !== 'recovery') {
-          setInvalidLink(true)
-          return
+        if (!accessToken || !refreshToken || type !== "recovery") {
+          setInvalidLink(true);
+          return;
         }
 
         const { error } = await supabase.auth.setSession({
           access_token: accessToken,
 
           refresh_token: refreshToken,
-        })
+        });
 
         if (error) {
-          throw error
+          throw error;
         }
 
         /**
          * Remove tokens from URL
          * after successful session creation
          */
-        window.history.replaceState(null, '', window.location.pathname)
+        window.history.replaceState(null, "", window.location.pathname);
 
-        setSessionReady(true)
+        setSessionReady(true);
       } catch (error) {
-        console.error('Recovery session error:', error)
+        console.error("Recovery session error:", error);
 
-        setInvalidLink(true)
+        setInvalidLink(true);
       }
     }
 
-    initializeRecovery()
-  }, [])
+    initializeRecovery();
+  }, []);
 
   const {
     register,
@@ -114,11 +114,11 @@ export default function ResetPasswordPage() {
     resolver: zodResolver(schema),
 
     defaultValues: {
-      newPassword: '',
+      newPassword: "",
 
-      confirmPassword: '',
+      confirmPassword: "",
     },
-  })
+  });
 
   async function onSubmit(values) {
     try {
@@ -128,20 +128,20 @@ export default function ResetPasswordPage() {
        */
       const { error } = await supabase.auth.updateUser({
         password: values.newPassword,
-      })
+      });
 
       if (error) {
-        throw error
+        throw error;
       }
 
       /**
        * Retrieve current user
        * from recovery session
        */
-      const { data } = await supabase.auth.getUser()
+      const { data } = await supabase.auth.getUser();
 
       if (!data.user) {
-        throw new Error('Unable to identify user.')
+        throw new Error("Unable to identify user.");
       }
 
       /**
@@ -151,17 +151,17 @@ export default function ResetPasswordPage() {
        * Backend only updates:
        * must_change_password=false
        */
-      await completePasswordReset.mutateAsync(data.user.id)
+      await completePasswordReset.mutateAsync(data.user.id);
 
-      notify.success('Password reset successfully.')
+      notify.success("Password reset successfully.");
 
-      setCompleted(true)
+      setCompleted(true);
 
-      await supabase.auth.signOut()
+      await supabase.auth.signOut();
     } catch (error) {
-      console.error('PASSWORD RESET ERROR:', error)
+      console.error("PASSWORD RESET ERROR:", error);
 
-      notify.error(error?.message ?? 'Unable to reset password.')
+      notify.error(error?.message ?? "Unable to reset password.");
     }
   }
 
@@ -175,7 +175,7 @@ export default function ResetPasswordPage() {
       >
         <Alert severity="error">Invalid or expired password reset link.</Alert>
       </Container>
-    )
+    );
   }
 
   if (!sessionReady) {
@@ -188,18 +188,18 @@ export default function ResetPasswordPage() {
       >
         <Alert severity="info">Preparing password reset...</Alert>
       </Container>
-    )
+    );
   }
 
   return (
     <Container
       maxWidth="sm"
       sx={{
-        display: 'flex',
+        display: "flex",
 
-        justifyContent: 'center',
+        justifyContent: "center",
 
-        alignItems: 'center',
+        alignItems: "center",
 
         py: 6,
       }}
@@ -207,7 +207,7 @@ export default function ResetPasswordPage() {
       <Paper
         elevation={3}
         sx={{
-          width: '100%',
+          width: "100%",
 
           p: 5,
         }}
@@ -217,7 +217,7 @@ export default function ResetPasswordPage() {
             <>
               <Box
                 sx={{
-                  textAlign: 'center',
+                  textAlign: "center",
                 }}
               >
                 <Typography variant="h5" fontWeight={600}>
@@ -233,10 +233,10 @@ export default function ResetPasswordPage() {
                 <Stack spacing={2.5}>
                   <TextField
                     label="New Password"
-                    type={showPassword.new ? 'text' : 'password'}
+                    type={showPassword.new ? "text" : "password"}
                     fullWidth
                     autoComplete="new-password"
-                    {...register('newPassword')}
+                    {...register("newPassword")}
                     error={!!errors.newPassword}
                     helperText={errors.newPassword?.message}
                     slotProps={{
@@ -252,7 +252,11 @@ export default function ResetPasswordPage() {
                                 }))
                               }
                             >
-                              {showPassword.new ? <VisibilityOff /> : <Visibility />}
+                              {showPassword.new ? (
+                                <VisibilityOff />
+                              ) : (
+                                <Visibility />
+                              )}
                             </IconButton>
                           </InputAdornment>
                         ),
@@ -262,10 +266,10 @@ export default function ResetPasswordPage() {
 
                   <TextField
                     label="Confirm Password"
-                    type={showPassword.confirm ? 'text' : 'password'}
+                    type={showPassword.confirm ? "text" : "password"}
                     fullWidth
                     autoComplete="new-password"
-                    {...register('confirmPassword')}
+                    {...register("confirmPassword")}
                     error={!!errors.confirmPassword}
                     helperText={errors.confirmPassword?.message}
                     slotProps={{
@@ -281,7 +285,11 @@ export default function ResetPasswordPage() {
                                 }))
                               }
                             >
-                              {showPassword.confirm ? <VisibilityOff /> : <Visibility />}
+                              {showPassword.confirm ? (
+                                <VisibilityOff />
+                              ) : (
+                                <Visibility />
+                              )}
                             </IconButton>
                           </InputAdornment>
                         ),
@@ -304,7 +312,7 @@ export default function ResetPasswordPage() {
             <>
               <Alert severity="success">Password reset successfully.</Alert>
 
-              <Button variant="contained" onClick={() => navigate('/')}>
+              <Button variant="contained" onClick={() => navigate("/")}>
                 Back to Sign In
               </Button>
             </>
@@ -312,5 +320,5 @@ export default function ResetPasswordPage() {
         </Stack>
       </Paper>
     </Container>
-  )
+  );
 }

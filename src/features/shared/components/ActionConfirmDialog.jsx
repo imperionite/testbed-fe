@@ -1,4 +1,10 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material'
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+} from "@mui/material";
 
 // REUSABLE ACTION CONFIRM DIALOG
 // Props it accepts:
@@ -15,26 +21,36 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/
 
 export default function ActionConfirmDialog({
   open,
-  title = 'Confirm Action',
+  title = "Confirm Action",
   message,
-  confirmLabel = 'Confirm',
-  cancelLabel = 'Cancel',
+  confirmLabel = "Confirm",
+  cancelLabel = "Cancel",
   onConfirm,
   onCancel,
   isLoading = false,
 }) {
   return (
-    <Dialog open={open} onClose={isLoading ? undefined : onCancel} maxWidth="xs" fullWidth>
+    <Dialog
+      open={open}
+      onClose={isLoading ? undefined : onCancel}
+      maxWidth="xs"
+      fullWidth
+    >
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>{message}</DialogContent>
       <DialogActions>
         <Button onClick={onCancel} disabled={isLoading}>
           {cancelLabel}
         </Button>
-        <Button onClick={onConfirm} variant="contained" color="primary" disabled={isLoading}>
-          {isLoading ? 'Saving...' : confirmLabel}
+        <Button
+          onClick={onConfirm}
+          variant="contained"
+          color="primary"
+          disabled={isLoading}
+        >
+          {isLoading ? "Saving..." : confirmLabel}
         </Button>
       </DialogActions>
     </Dialog>
-  )
+  );
 }

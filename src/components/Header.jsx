@@ -1,6 +1,6 @@
-import { AppBar, Toolbar, Box } from '@mui/material'
-import { Link } from 'react-router-dom'
-import logo from '../assets/logo.webp'
+import { AppBar, Toolbar, Box } from "@mui/material";
+import { Link } from "react-router-dom";
+import logo from "../assets/logo.webp";
 
 export default function Header() {
   return (
@@ -10,8 +10,8 @@ export default function Header() {
       elevation={0}
       sx={{
         borderBottom: 1,
-        borderColor: 'divider',
-        bgcolor: 'background.default',
+        borderColor: "divider",
+        bgcolor: "background.default",
       }}
     >
       <Toolbar sx={{ minHeight: 72 }}>
@@ -19,8 +19,8 @@ export default function Header() {
           component={Link}
           to="/"
           sx={{
-            display: 'flex',
-            alignItems: 'center',
+            display: "flex",
+            alignItems: "center",
           }}
         >
           <Box
@@ -29,11 +29,11 @@ export default function Header() {
             alt="SBIMS"
             sx={{
               height: 50,
-              width: 'auto',
+              width: "auto"
             }}
           />
         </Box>
       </Toolbar>
     </AppBar>
-  )
+  );
 }

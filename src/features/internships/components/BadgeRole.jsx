@@ -1,4 +1,4 @@
-import { Chip } from '@mui/material'
+import { Chip } from "@mui/material";
 
 function BadgeRole({ value }) {
   return (
@@ -8,11 +8,11 @@ function BadgeRole({ value }) {
       color="default"
       variant="outlined"
       sx={{
-        color: 'text.primary',
-        borderColor: 'divider',
+        color: "text.primary",
+        borderColor: "divider",
       }}
     />
-  )
+  );
 }
 
-export default BadgeRole
+export default BadgeRole;

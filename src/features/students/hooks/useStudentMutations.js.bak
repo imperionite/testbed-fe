@@ -5,12 +5,8 @@ import notify from "../../../utils/toast";
 export function useStudentMutations() {
   const queryClient = useQueryClient();
 
-  const invalidate = () => {
-    
+  const invalidate = () =>
     queryClient.invalidateQueries({ queryKey: ["students"] });
-    // Invalidate internships to sync status changes
-    queryClient.invalidateQueries({ queryKey: ["internships"] });
-  };
 
   const onCreate = useMutation({
     mutationFn: (payload) => studentApi.createStudent(payload),

@@ -19,5 +19,5 @@ export const bulkActionsConfig = [
     requiredInput: null,
     mutationType: 'updateStatus',
     hasPermission: (permissions) => permissions.canBulkEdit && permissions.canChangeStatus,
-  },
-]
+  }
+];

@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { useState, useEffect, useCallback } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 /**
  * Hook for managing form validation, lifecycle, and submission logic.
@@ -32,42 +32,42 @@ export function useFormSubmission({
   onSubmit,
   onSuccess,
 }) {
-  const [isSaving, setIsSaving] = useState(false)
-  const [error, setError] = useState(null)
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState(null);
 
   // Initialize react-hook-form with Zod resolver if schema is provided
   const formMethods = useForm({
     resolver: schema ? zodResolver(schema) : undefined,
     defaultValues: entity ? { ...entity } : defaultValues || {},
-    mode: 'onChange',
-  })
-  const { reset } = formMethods
+    mode: "onChange",
+  });
+  const { reset } = formMethods;
 
   // Helper to determine the RBAC rule of a field ('hidden', 'readonly', 'required', 'editable')
   const getRule = useCallback(
     (field) => {
       if (getFieldRule) {
-        return getFieldRule(field, role, mode)
+        return getFieldRule(field, role, mode);
       }
       if (field.rbac && role) {
-        const roleRules = field.rbac[role]
-        return roleRules ? roleRules[mode] : 'editable'
+        const roleRules = field.rbac[role];
+        return roleRules ? roleRules[mode] : "editable";
       }
-      return 'editable'
+      return "editable";
     },
     [getFieldRule, role, mode],
-  )
+  );
 
   // Synchronize form states when the active entity or mode changes
   useEffect(() => {
     if (entity) {
       // Pre-fill fields with active entity values in edit/view modes
-      reset({ ...entity })
+      reset({ ...entity });
     } else {
       // Revert to default blank state for create mode
-      reset(defaultValues || {})
+      reset(defaultValues || {});
     }
-  }, [entity, mode, defaultValues, reset])
+  }, [entity, mode, defaultValues, reset]);
 
   /**
    * Submission workflow handler.
@@ -78,74 +78,74 @@ export function useFormSubmission({
     async (formData) => {
       // 1. Guard against unauthorized submissions
       if (permissions && permissions.canSubmit === false) {
-        setError('You do not have permission to submit this form.')
-        return
+        setError("You do not have permission to submit this form.");
+        return;
       }
 
       // 2. Extra safety Zod client-side validation
       if (schema) {
-        const validationResult = schema.safeParse(formData)
+        const validationResult = schema.safeParse(formData);
         if (!validationResult.success) {
           const errorMsg = validationResult.error.errors
-            .map((err) => `${err.path.join('.')}: ${err.message}`)
-            .join(', ')
-          setError(`Validation failed: ${errorMsg}`)
-          return
+            .map((err) => `${err.path.join(".")}: ${err.message}`)
+            .join(", ");
+          setError(`Validation failed: ${errorMsg}`);
+          return;
         }
       }
 
       // 3. Filter payload - strip hidden and readonly fields from submission payload
-      const payload = {}
+      const payload = {};
       for (const field of fieldConfig) {
-        const rule = getRule(field)
+        const rule = getRule(field);
 
         // Property 1: "Any field marked as hidden for a given role and mode must never appear
         // in the visible fields list and must never be included in the form submission payload."
         // Furthermore, readonly fields are typically excluded from edits unless in create mode.
-        if (rule !== 'hidden') {
+        if (rule !== "hidden") {
           // Exclude readonly fields in EDIT mode to prevent tampering with un-editable state (e.g. username)
-          if (mode === 'edit' && rule === 'readonly') {
-            continue
+          if (mode === "edit" && rule === "readonly") {
+            continue;
           }
 
           if (formData[field.name] !== undefined) {
-            payload[field.name] = formData[field.name]
+            payload[field.name] = formData[field.name];
           }
         }
       }
 
       // If all configured fields were stripped, abort
       if (Object.keys(payload).length === 0 && fieldConfig.length > 0) {
-        setError('No modifiable form fields were submitted.')
-        return
+        setError("No modifiable form fields were submitted.");
+        return;
       }
 
-      setIsSaving(true)
-      setError(null)
+      setIsSaving(true);
+      setError(null);
 
       try {
         // 4. Delegate mutation to parent API container
-        await onSubmit(payload)
+        await onSubmit(payload);
 
         // 5. Trigger post-submission success callbacks (like closing modal and notifying)
         if (onSuccess) {
-          await onSuccess(payload)
+          await onSuccess(payload);
         }
       } catch (submitError) {
-        console.error('Form submission failed:', submitError)
+        console.error("Form submission failed:", submitError);
 
         // Extract detailed server validation errors if present
         const serverMsg =
           submitError?.response?.data?.message ||
           submitError?.message ||
-          'An error occurred while saving the user.'
-        setError(serverMsg)
+          "An error occurred while saving the user.";
+        setError(serverMsg);
       } finally {
-        setIsSaving(false)
+        setIsSaving(false);
       }
     },
     [permissions, schema, fieldConfig, getRule, mode, onSubmit, onSuccess],
-  )
+  );
 
   return {
     formMethods,
@@ -153,7 +153,7 @@ export function useFormSubmission({
     error,
     setError,
     onSubmit: handleSubmit,
-  }
+  };
 }
 
-export default useFormSubmission
+export default useFormSubmission;

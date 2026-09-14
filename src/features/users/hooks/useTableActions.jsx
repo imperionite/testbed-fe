@@ -1,6 +1,6 @@
-import { useState, useCallback, useMemo } from 'react'
-import notify from '../../../utils/toast'
-import { formatSentenceCase } from '../../shared/fieldFormatters'
+import { useState, useCallback, useMemo } from "react";
+import notify from "../../../utils/toast";
+import { formatSentenceCase } from "../../shared/fieldFormatters";
 
 /**
  * Hook for managing table action handlers (inline editing & bulk operations).
@@ -29,10 +29,10 @@ export function useTableActions({
   clearSelection,
 }) {
   // Tracks active action ('bulk-role', 'bulk-activate', 'bulk-deactivate', or 'row-[id]')
-  const [pendingAction, setPendingAction] = useState(null)
+  const [pendingAction, setPendingAction] = useState(null);
 
   // Helper to determine if any async action is actively mutating
-  const isPending = useMemo(() => pendingAction !== null, [pendingAction])
+  const isPending = useMemo(() => pendingAction !== null, [pendingAction]);
 
   /**
    * Action handler for inline table row editing.
@@ -41,57 +41,59 @@ export function useTableActions({
    */
   const handleInlineEdit = useCallback(
     async ({ exitEditingMode, row, values }) => {
-      if (!row || !values) return
+      if (!row || !values) return;
 
       // Detect changes
-      const roleChanged = values.role !== row.original.role
+      const roleChanged = values.role !== row.original.role;
 
-      const originalActive = row.original.isActive
-      const newActive = values.isActive
+      const originalActive = row.original.isActive;
+      const newActive = values.isActive;
 
-      const statusChanged = newActive !== originalActive
+      const statusChanged = newActive !== originalActive;
 
       // Early return if no actual changes were made
       if (!roleChanged && !statusChanged) {
-        exitEditingMode()
-        return
+        exitEditingMode();
+        return;
       }
 
       // Double-check permissions
       if (!permissions.canEdit) {
-        notify.error('You do not have permission to edit users.')
-        return
+        notify.error("You do not have permission to edit users.");
+        return;
       }
 
       // Get user confirmation
       const confirmed = askForConfirmation
-        ? await askForConfirmation('Are you sure you want to save these changes?')
-        : window.confirm('Are you sure you want to save these changes?')
+        ? await askForConfirmation(
+            "Are you sure you want to save these changes?",
+          )
+        : window.confirm("Are you sure you want to save these changes?");
 
-      if (!confirmed) return
+      if (!confirmed) return;
 
-      setPendingAction(`row-${row.original.id}`)
+      setPendingAction(`row-${row.original.id}`);
 
       try {
         // Execute mutations sequentially
         if (roleChanged) {
-          await onRoleChange({ id: row.original.id, role: values.role })
+          await onRoleChange({ id: row.original.id, role: values.role });
         }
 
         if (statusChanged) {
-          await onStatusChange({ id: row.original.id, isActive: newActive })
+          await onStatusChange({ id: row.original.id, isActive: newActive });
         }
 
-        exitEditingMode()
-        notify.success('User updated successfully')
+        exitEditingMode();
+        notify.success("User updated successfully");
       } catch (error) {
-        notify.error(error.message || 'Failed to update user')
+        notify.error(error.message || "Failed to update user");
       } finally {
-        setPendingAction(null)
+        setPendingAction(null);
       }
     },
     [permissions.canEdit, onRoleChange, onStatusChange, askForConfirmation],
-  )
+  );
 
   /**
    * Action handler for bulk role changes.
@@ -99,55 +101,55 @@ export function useTableActions({
    */
   const handleBulkRoleChange = useCallback(
     async (selectedRows) => {
-      if (!selectedRows || selectedRows.length === 0) return
+      if (!selectedRows || selectedRows.length === 0) return;
 
       if (!permissions.canBulkEdit || !permissions.canChangeRole) {
-        notify.error('You do not have permission to bulk edit roles.')
-        return
+        notify.error("You do not have permission to bulk edit roles.");
+        return;
       }
 
       // 1. Get role selection from dialog
       if (!askForRole) {
-        console.warn('useTableActions: askForRole is not provided.')
-        return
+        console.warn("useTableActions: askForRole is not provided.");
+        return;
       }
-      const selectedRole = await askForRole()
-      if (!selectedRole) return // User cancelled
+      const selectedRole = await askForRole();
+      if (!selectedRole) return; // User cancelled
 
       // 2. Confirm the action
-      const formattedRole = formatSentenceCase(selectedRole)
+      const formattedRole = formatSentenceCase(selectedRole);
 
       const confirmed = askForConfirmation
         ? await askForConfirmation(
             <>
-              Are you sure you want to change the role of {selectedRows.length} selected user(s) to{' '}
-              <b>{formattedRole}</b>?
+              Are you sure you want to change the role of {selectedRows.length}{" "}
+              selected user(s) to <b>{formattedRole}</b>?
             </>,
           )
         : window.confirm(
             `Are you sure you want to change the role of ${selectedRows.length} selected user(s) to "${formattedRole}"?`,
-          )
+          );
 
-      if (!confirmed) return
+      if (!confirmed) return;
 
-      setPendingAction('bulk-role')
+      setPendingAction("bulk-role");
 
       // Extract user IDs
-      const ids = selectedRows.map((row) => row.original.id)
+      const ids = selectedRows.map((row) => row.original.id);
 
       try {
-        await onBulkRoleChange({ ids, role: selectedRole })
+        await onBulkRoleChange({ ids, role: selectedRole });
         notify.success(
           `Successfully updated role to ${selectedRole} for ${selectedRows.length} user(s).`,
-        )
+        );
 
         if (clearSelection) {
-          clearSelection()
+          clearSelection();
         }
       } catch (error) {
-        notify.error(error.message || 'Failed to bulk update roles.')
+        notify.error(error.message || "Failed to bulk update roles.");
       } finally {
-        setPendingAction(null)
+        setPendingAction(null);
       }
     },
     [
@@ -158,18 +160,18 @@ export function useTableActions({
       onBulkRoleChange,
       clearSelection,
     ],
-  )
+  );
 
   /**
    * Action handler for bulk activation status updates.
    */
   const handleBulkActivate = useCallback(
     async (selectedRows) => {
-      if (!selectedRows || selectedRows.length === 0) return
+      if (!selectedRows || selectedRows.length === 0) return;
 
       if (!permissions.canBulkEdit || !permissions.canChangeStatus) {
-        notify.error('You do not have permission to bulk edit status.')
-        return
+        notify.error("You do not have permission to bulk edit status.");
+        return;
       }
 
       const confirmed = askForConfirmation
@@ -178,25 +180,27 @@ export function useTableActions({
           )
         : window.confirm(
             `Are you sure you want to activate ${selectedRows.length} selected user(s)?`,
-          )
+          );
 
-      if (!confirmed) return
+      if (!confirmed) return;
 
-      setPendingAction('bulk-activate')
+      setPendingAction("bulk-activate");
 
-      const ids = selectedRows.map((row) => row.original.id)
+      const ids = selectedRows.map((row) => row.original.id);
 
       try {
-        await onBulkStatusChange({ ids, isActive: true })
-        notify.success(`Successfully activated ${selectedRows.length} user(s).`)
+        await onBulkStatusChange({ ids, isActive: true });
+        notify.success(
+          `Successfully activated ${selectedRows.length} user(s).`,
+        );
 
         if (clearSelection) {
-          clearSelection()
+          clearSelection();
         }
       } catch (error) {
-        notify.error(error.message || 'Failed to bulk activate users.')
+        notify.error(error.message || "Failed to bulk activate users.");
       } finally {
-        setPendingAction(null)
+        setPendingAction(null);
       }
     },
     [
@@ -206,18 +210,18 @@ export function useTableActions({
       onBulkStatusChange,
       clearSelection,
     ],
-  )
+  );
 
   /**
    * Action handler for bulk deactivation status updates.
    */
   const handleBulkDeactivate = useCallback(
     async (selectedRows) => {
-      if (!selectedRows || selectedRows.length === 0) return
+      if (!selectedRows || selectedRows.length === 0) return;
 
       if (!permissions.canBulkEdit || !permissions.canChangeStatus) {
-        notify.error('You do not have permission to bulk edit status.')
-        return
+        notify.error("You do not have permission to bulk edit status.");
+        return;
       }
 
       const confirmed = askForConfirmation
@@ -226,25 +230,27 @@ export function useTableActions({
           )
         : window.confirm(
             `Are you sure you want to deactivate ${selectedRows.length} selected user(s)?`,
-          )
+          );
 
-      if (!confirmed) return
+      if (!confirmed) return;
 
-      setPendingAction('bulk-deactivate')
+      setPendingAction("bulk-deactivate");
 
-      const ids = selectedRows.map((row) => row.original.id)
+      const ids = selectedRows.map((row) => row.original.id);
 
       try {
-        await onBulkStatusChange({ ids, isActive: false })
-        notify.success(`Successfully deactivated ${selectedRows.length} user(s).`)
+        await onBulkStatusChange({ ids, isActive: false });
+        notify.success(
+          `Successfully deactivated ${selectedRows.length} user(s).`,
+        );
 
         if (clearSelection) {
-          clearSelection()
+          clearSelection();
         }
       } catch (error) {
-        notify.error(error.message || 'Failed to bulk deactivate users.')
+        notify.error(error.message || "Failed to bulk deactivate users.");
       } finally {
-        setPendingAction(null)
+        setPendingAction(null);
       }
     },
     [
@@ -254,7 +260,7 @@ export function useTableActions({
       onBulkStatusChange,
       clearSelection,
     ],
-  )
+  );
 
   return {
     pendingAction,
@@ -263,7 +269,7 @@ export function useTableActions({
     handleBulkRoleChange,
     handleBulkActivate,
     handleBulkDeactivate,
-  }
+  };
 }
 
-export default useTableActions
+export default useTableActions;

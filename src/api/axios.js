@@ -1,70 +1,70 @@
-import axios from 'axios'
+import axios from "axios";
 
-import { env, endpoints } from '../config'
-import { authStorage } from '../auth'
+import { env, endpoints } from "../config";
+import { authStorage } from "../auth";
 
 const api = axios.create({
   baseURL: env.API_URL,
 
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
-})
+});
 
 const refreshClient = axios.create({
   baseURL: env.API_URL,
 
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
-})
+});
 
-let isRefreshing = false
+let isRefreshing = false;
 
-let refreshQueue = []
+let refreshQueue = [];
 
 function processQueue(error, token = null) {
   refreshQueue.forEach((promise) => {
     if (error) {
-      promise.reject(error)
+      promise.reject(error);
     } else {
-      promise.resolve(token)
+      promise.resolve(token);
     }
-  })
+  });
 
-  refreshQueue = []
+  refreshQueue = [];
 }
 
 api.interceptors.request.use((config) => {
-  const token = authStorage.getAccessToken()
+  const token = authStorage.getAccessToken();
 
   if (token) {
-    config.headers.Authorization = `Bearer ${token}`
+    config.headers.Authorization = `Bearer ${token}`;
   }
 
-  return config
-})
+  return config;
+});
 
 api.interceptors.response.use(
   (response) => response,
 
   async (error) => {
-    const originalRequest = error.config
+    const originalRequest = error.config;
 
     if (!originalRequest) {
-      return Promise.reject(error)
+      return Promise.reject(error);
     }
 
     if (error.response?.status !== 401 || originalRequest?._retry) {
-      return Promise.reject(error)
+      return Promise.reject(error);
     }
 
-    const refreshToken = authStorage.getRefreshToken()
+    const refreshToken = authStorage.getRefreshToken();
 
     if (!refreshToken) {
-      authStorage.clearSession()
+      authStorage.clearSession();
 
-      return Promise.reject(error)
+      return Promise.reject(error);
     }
 
     if (isRefreshing) {
@@ -72,45 +72,45 @@ api.interceptors.response.use(
         refreshQueue.push({
           resolve,
           reject,
-        })
+        });
       }).then((token) => {
-        originalRequest.headers.Authorization = `Bearer ${token}`
+        originalRequest.headers.Authorization = `Bearer ${token}`;
 
-        return api(originalRequest)
-      })
+        return api(originalRequest);
+      });
     }
 
-    originalRequest._retry = true
+    originalRequest._retry = true;
 
-    isRefreshing = true
+    isRefreshing = true;
 
     try {
       const response = await refreshClient.post(endpoints.auth.refresh, {
         refreshToken,
-      })
+      });
 
-      const { accessToken, refreshToken: newRefreshToken } = response.data.data
+      const { accessToken, refreshToken: newRefreshToken } = response.data.data;
 
       authStorage.setTokens({
         accessToken,
         refreshToken: newRefreshToken,
-      })
+      });
 
-      processQueue(null, accessToken)
+      processQueue(null, accessToken);
 
-      originalRequest.headers.Authorization = `Bearer ${accessToken}`
+      originalRequest.headers.Authorization = `Bearer ${accessToken}`;
 
-      return api(originalRequest)
+      return api(originalRequest);
     } catch (refreshError) {
-      processQueue(refreshError, null)
+      processQueue(refreshError, null);
 
-      authStorage.clearSession()
+      authStorage.clearSession();
 
-      return Promise.reject(refreshError)
+      return Promise.reject(refreshError);
     } finally {
-      isRefreshing = false
+      isRefreshing = false;
     }
   },
-)
+);
 
-export default api
+export default api;

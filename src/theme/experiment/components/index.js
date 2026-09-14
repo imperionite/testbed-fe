@@ -1,8 +1,8 @@
-import { MuiButton } from './button'
-import { MuiCard } from './card'
-import { MuiTextField } from './textField'
-import { MuiDialog } from './dialog'
-import { MuiPaper } from './paper'
+import { MuiButton } from "./button";
+import { MuiCard } from "./card";
+import { MuiTextField } from "./textField";
+import { MuiDialog } from "./dialog";
+import { MuiPaper } from "./paper";
 
 export const components = {
   MuiButton,
@@ -11,4 +11,4 @@ export const components = {
   MuiTextField,
   MuiDialog,
   MuiPaper,
-}
+};

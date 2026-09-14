@@ -1,25 +1,25 @@
-import { IconButton, Menu, MenuItem, Divider, Typography } from '@mui/material'
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
-import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined'
-import { useState } from 'react'
-import { useThemeContext } from '../providers/ThemeContext'
+import { IconButton, Menu, MenuItem, Divider, Typography } from "@mui/material";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
+import { useState } from "react";
+import { useThemeContext } from "../providers/ThemeContext";
 
 export function HeaderDropdownMenu({ onLogout, isLoading }) {
-  const [anchorEl, setAnchorEl] = useState(null)
-  const { mode, toggleTheme } = useThemeContext()
+  const [anchorEl, setAnchorEl] = useState(null);
+  const { mode, toggleTheme } = useThemeContext();
 
   const handleOpen = (event) => {
-    setAnchorEl(event.currentTarget)
-  }
+    setAnchorEl(event.currentTarget);
+  };
 
   const handleClose = () => {
-    setAnchorEl(null)
-  }
+    setAnchorEl(null);
+  };
 
   const handleLogout = () => {
-    handleClose()
-    onLogout()
-  }
+    handleClose();
+    onLogout();
+  };
 
   return (
     <>
@@ -36,22 +36,26 @@ export function HeaderDropdownMenu({ onLogout, isLoading }) {
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
         onClose={handleClose}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        transformOrigin={{ vertical: "top", horizontal: "right" }}
         slotProps={{
           paper: {
             sx: {
-              marginTop: '14px',
-              minWidth: '160px',
+              marginTop: "14px",
+              minWidth: "160px",
             },
           },
         }}
       >
-        <Typography variant="overline" sx={{ px: 2, display: 'block', color: 'text.secondary' }}>
+        <Typography variant="overline" sx={{ px: 2, display: "block", color: "text.secondary" }}>
           Theme
         </Typography>
-        {['light', 'dark', 'system'].map((m) => (
-          <MenuItem key={m} onClick={() => toggleTheme(m)} selected={mode === m}>
+        {["light", "dark", "system"].map((m) => (
+          <MenuItem 
+            key={m} 
+            onClick={() => toggleTheme(m)} 
+            selected={mode === m}
+          >
             {m.charAt(0).toUpperCase() + m.slice(1)}
           </MenuItem>
         ))}
@@ -62,5 +66,5 @@ export function HeaderDropdownMenu({ onLogout, isLoading }) {
         </MenuItem>
       </Menu>
     </>
-  )
+  );
 }

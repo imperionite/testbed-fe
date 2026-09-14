@@ -1,5 +1,5 @@
-import { createAppTheme } from './experiment'
+import { createAppTheme } from "./experiment";
 
-const theme = createAppTheme('light')
+const theme = createAppTheme("light");
 
-export default theme
+export default theme;

@@ -89,21 +89,21 @@ Keep the criteria in a reusable array:
 
 ```js
 const evaluationCriteria = [
-  { key: 'criterion_1', label: 'Knowledge of Assigned Tasks' },
-  { key: 'criterion_2', label: 'Quality of Work' },
-  { key: 'criterion_3', label: 'Productivity' },
-  { key: 'criterion_4', label: 'Problem-Solving' },
-  { key: 'criterion_5', label: 'Communication' },
-  { key: 'criterion_6', label: 'Teamwork' },
-  { key: 'criterion_7', label: 'Professionalism' },
-  { key: 'criterion_8', label: 'Adaptability' },
-]
+  { key: "criterion_1", label: "Knowledge of Assigned Tasks" },
+  { key: "criterion_2", label: "Quality of Work" },
+  { key: "criterion_3", label: "Productivity" },
+  { key: "criterion_4", label: "Problem-Solving" },
+  { key: "criterion_5", label: "Communication" },
+  { key: "criterion_6", label: "Teamwork" },
+  { key: "criterion_7", label: "Professionalism" },
+  { key: "criterion_8", label: "Adaptability" },
+];
 ```
 
 Store the selected ratings in React state:
 
 ```js
-const [responses, setResponses] = useState({})
+const [responses, setResponses] = useState({});
 ```
 
 Example state:

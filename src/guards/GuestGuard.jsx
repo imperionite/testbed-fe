@@ -1,17 +1,17 @@
-import { Navigate, Outlet } from 'react-router-dom'
+import { Navigate, Outlet } from "react-router-dom";
 
-import useAuth from '../hooks/useAuth'
+import useAuth from "../hooks/useAuth";
 
 export default function GuestGuard() {
-  const { user, isLoading } = useAuth()
+  const { user, isLoading } = useAuth();
 
   if (isLoading) {
-    return null
+    return null;
   }
 
   if (user) {
-    return <Navigate to="/dashboard" replace />
+    return <Navigate to="/dashboard" replace />;
   }
 
-  return <Outlet />
+  return <Outlet />;
 }

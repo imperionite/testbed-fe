@@ -1,54 +1,54 @@
-import { Alert, Button, CircularProgress, Typography } from '@mui/material'
-import { Add as AddIcon } from '@mui/icons-material'
-import CardStat from '../shared/components/CardStat'
-import HteTable from './components/HteTable'
-import HteModal from './components/HteModal'
-import { useHteModalState } from './hooks/useHteModalState'
-import useAuth from '../../hooks/useAuth'
-import { useHtes } from './hooks/useHtes'
-import { useHteMutations } from './hooks/useHteMutations'
-import { getHteManagementPermissions } from './htePermissions'
-import { useUsers } from '../users/hooks/useUsers'
-import notify from '../../utils/toast'
+import { Alert, Button, CircularProgress, Typography } from "@mui/material";
+import { Add as AddIcon } from "@mui/icons-material";
+import CardStat from "../shared/components/CardStat";
+import HteTable from "./components/HteTable";
+import HteModal from "./components/HteModal";
+import { useHteModalState } from "./hooks/useHteModalState";
+import useAuth from "../../hooks/useAuth";
+import { useHtes } from "./hooks/useHtes";
+import { useHteMutations } from "./hooks/useHteMutations";
+import { getHteManagementPermissions } from "./htePermissions";
+import { useUsers } from "../users/hooks/useUsers";
+import notify from "../../utils/toast";
 
 // ============================================
 // STYLES
 // ============================================
 const styles = {
   container: {
-    minHeight: '100vh',
+    minHeight: "100vh",
   },
   headerSection: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-    gap: '16px',
-    marginBottom: '20px',
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    flexWrap: "wrap",
+    gap: "16px",
+    marginBottom: "20px",
   },
   cardsSection: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-    gap: '16px',
-    width: '100%',
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+    gap: "16px",
+    width: "100%",
   },
   mainSection: {
-    paddingTop: '10px',
+    paddingTop: "10px",
   },
   tableHeader: {
-    marginBottom: '16px',
+    marginBottom: "16px",
   },
   tableContainer: {
-    width: '100%',
+    width: "100%",
   },
-}
+};
 
 // ============================================
 // MAIN COMPONENT
 // ============================================
 export default function HteManagementLayout() {
-  const { user } = useAuth()
-  const permissions = getHteManagementPermissions(user?.role)
+  const { user } = useAuth();
+  const permissions = getHteManagementPermissions(user?.role);
 
   const {
     data: hteData = [],
@@ -58,27 +58,32 @@ export default function HteManagementLayout() {
     refetch,
   } = useHtes({
     enabled: permissions.canView,
-  })
+  });
 
   // Supervisor Mapping Block
   const { data: allUsers = [] } = useUsers({
     enabled: permissions.canView,
-  })
+  });
 
   const supervisorOptions = allUsers.filter(
-    (u) => u.role === 'hte_supervisor' && u.is_active === true,
-  )
+    (u) => u.role === "hte_supervisor" && u.is_active === true,
+  );
 
   const supervisorMap = Object.fromEntries(
     allUsers.map((u) => [
       u.id,
-      [u.first_name, u.middle_name, u.last_name, u.suffix].filter(Boolean).join(' '),
+      [u.first_name, u.middle_name, u.last_name, u.suffix].filter(Boolean).join(" "),
     ]),
-  )
+  );
 
-  const modalState = useHteModalState()
-  const { createHte, updateHte, updateHteSupervisor, updateStatus, bulkUpdateStatus } =
-    useHteMutations()
+  const modalState = useHteModalState();
+  const {
+    createHte,
+    updateHte,
+    updateHteSupervisor,
+    updateStatus,
+    bulkUpdateStatus,
+  } = useHteMutations();
 
   return (
     <div style={styles.container}>
@@ -87,12 +92,12 @@ export default function HteManagementLayout() {
         {/* Header: Title + Action Button */}
         <div style={styles.headerSection}>
           <Typography variant="h5" fontWeight={600}>
-            Host Training Establishments (HTE)
+          Host Training Establishments (HTE)
           </Typography>
           <Button
             startIcon={<AddIcon />}
             variant="contained"
-            onClick={() => modalState.open('create')}
+            onClick={() => modalState.open("create")}
             disabled={!permissions.canCreate}
           >
             Register HTE
@@ -112,18 +117,21 @@ export default function HteManagementLayout() {
       {/* ==================== MAIN SECTION ==================== */}
       <div style={styles.mainSection}>
         {/* Table Header */}
-        <div style={styles.tableHeader}></div>
+        <div style={styles.tableHeader}>
+        </div>
 
         {/* Data Table */}
         <div style={styles.tableContainer}>
           {!permissions.canView ? (
-            <Alert severity="error">You do not have permission to view HTEs.</Alert>
+            <Alert severity="error">
+              You do not have permission to view HTEs.
+            </Alert>
           ) : isLoading ? (
             <div
               style={{
-                display: 'flex',
-                justifyContent: 'center',
-                padding: '32px',
+                display: "flex",
+                justifyContent: "center",
+                padding: "32px",
               }}
             >
               <CircularProgress size={28} />
@@ -137,14 +145,19 @@ export default function HteManagementLayout() {
                 </Button>
               }
             >
-              {error?.response?.data?.message || 'Unable to load HTEs. Please try again.'}
+              {error?.response?.data?.message ||
+                "Unable to load HTEs. Please try again."}
             </Alert>
           ) : hteData.length === 0 ? (
             <Alert
               severity="info"
               action={
                 permissions.canCreate ? (
-                  <Button color="inherit" size="small" onClick={() => modalState.open('create')}>
+                  <Button
+                    color="inherit"
+                    size="small"
+                    onClick={() => modalState.open("create")}
+                  >
                     Register HTE
                   </Button>
                 ) : undefined
@@ -160,7 +173,7 @@ export default function HteManagementLayout() {
               onSupervisorChange={updateHteSupervisor.mutateAsync}
               onStatusChange={updateStatus.mutateAsync}
               onBulkStatusChange={bulkUpdateStatus.mutateAsync}
-              onHteClick={(selectedHte) => modalState.open('edit', selectedHte)}
+              onHteClick={(selectedHte) => modalState.open("edit", selectedHte)}
             />
           )}
         </div>
@@ -168,7 +181,7 @@ export default function HteManagementLayout() {
 
       {permissions.canView && (
         <HteModal
-          key={`${modalState.mode}-${modalState.selectedHte?.id ?? 'new'}-${modalState.isOpen}`}
+          key={`${modalState.mode}-${modalState.selectedHte?.id ?? "new"}-${modalState.isOpen}`}
           open={modalState.isOpen}
           mode={modalState.mode}
           hte={modalState.selectedHte}
@@ -184,5 +197,5 @@ export default function HteManagementLayout() {
         />
       )}
     </div>
-  )
+  );
 }

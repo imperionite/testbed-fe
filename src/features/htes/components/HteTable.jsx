@@ -1,11 +1,14 @@
-import { useMemo, useState } from 'react'
-import { MaterialReactTable, useMaterialReactTable } from '@glebcha/material-react-table'
-import { Box, Button, CircularProgress } from '@mui/material'
-import CheckIcon from '@mui/icons-material/Check'
+import { useMemo, useState } from "react";
+import {
+  MaterialReactTable,
+  useMaterialReactTable,
+} from "@glebcha/material-react-table";
+import { Box, Button, CircularProgress } from "@mui/material";
+import CheckIcon from "@mui/icons-material/Check";
 
-import { createHteTableColumns } from './hteTableColumns'
-import notify from '../../../utils/toast'
-import ActionConfirmDialog from '../../shared/components/ActionConfirmDialog'
+import { createHteTableColumns } from "./hteTableColumns";
+import notify from "../../../utils/toast";
+import ActionConfirmDialog from "../../shared/components/ActionConfirmDialog";
 
 export default function HtesTable({
   htes,
@@ -15,19 +18,19 @@ export default function HtesTable({
   onBulkStatusChange,
   onHteClick,
 }) {
-  const [rowSelection, setRowSelection] = useState({})
-  const [confirmation, setConfirmation] = useState(null)
-  const [pendingAction, setPendingAction] = useState(null)
+  const [rowSelection, setRowSelection] = useState({});
+  const [confirmation, setConfirmation] = useState(null);
+  const [pendingAction, setPendingAction] = useState(null);
 
   const askForConfirmation = (message) =>
     new Promise((resolve) => {
-      setConfirmation({ message, resolve })
-    })
+      setConfirmation({ message, resolve });
+    });
 
   const closeConfirmation = (confirmed) => {
-    confirmation?.resolve(confirmed)
-    setConfirmation(null)
-  }
+    confirmation?.resolve(confirmed);
+    setConfirmation(null);
+  };
 
   const columns = useMemo(
     () =>
@@ -36,9 +39,9 @@ export default function HtesTable({
         supervisorMap,
       }),
     [permissions.canEdit, supervisorMap],
-  )
+  );
 
-  const selectedRowCount = Object.keys(rowSelection).length
+  const selectedRowCount = Object.keys(rowSelection).length;
 
   const table = useMaterialReactTable({
     columns,
@@ -56,15 +59,15 @@ export default function HtesTable({
     enableStickyHeader: true,
     enableStickyFooter: true,
     enableEditing: permissions.canEdit,
-    editDisplayMode: 'row',
-    positionActionsColumn: 'last',
-    positionGlobalFilter: 'right',
+    editDisplayMode: "row",
+    positionActionsColumn: "last",
+    positionGlobalFilter: "right",
     initialState: {
       columnFiltersOpen: false,
       pagination: { pageIndex: 0, pageSize: 5 },
-      sorting: [{ id: 'created_at', desc: true }],
+      sorting: [{ id: "created_at", desc: true }],
       columnPinning: {
-        right: ['mrt-row-actions'],
+      right: ["mrt-row-actions"],
       },
     },
     icons: {
@@ -72,16 +75,19 @@ export default function HtesTable({
         pendingAction ? (
           <CircularProgress size={18} color="inherit" />
         ) : (
-          <CheckIcon {...props} sx={{ ...props.sx, color: 'success.main' }} />
+          <CheckIcon
+            {...props}
+            sx={{ ...props.sx, color: "success.main" }}
+          />
         ),
     },
     displayColumnDefOptions: {
-      'mrt-row-actions': {
+      "mrt-row-actions": {
         size: 104,
         muiTableBodyCellProps: {
           sx: {
             minWidth: 104,
-            whiteSpace: 'nowrap',
+            whiteSpace: "nowrap",
           },
         },
       },
@@ -89,56 +95,59 @@ export default function HtesTable({
     state: {
       rowSelection,
       columnVisibility: {
-        'mrt-row-actions': selectedRowCount === 0,
+        "mrt-row-actions": selectedRowCount === 0,
       },
     },
     onRowSelectionChange: setRowSelection,
     onEditingRowSave: permissions.canEdit
       ? async ({ exitEditingMode, row, values }) => {
-          const statusChanged = String(values.is_active) !== String(row.original.is_active)
+          const statusChanged =
+            String(values.is_active) !== String(row.original.is_active);
 
           if (!statusChanged) {
-            exitEditingMode()
-            return
+            exitEditingMode();
+            return;
           }
 
-          if (!(await askForConfirmation('Are you sure you want to save these changes?'))) {
-            return
+          if (!(await askForConfirmation("Are you sure you want to save these changes?"))) {
+            return;
           }
 
           try {
-            setPendingAction(`row-${row.original.id}`)
+            setPendingAction(`row-${row.original.id}`);
             if (statusChanged) {
               await onStatusChange({
                 id: row.original.id,
-                isActive: values.is_active === true || values.is_active === 'true',
-              })
+                isActive: values.is_active === true || values.is_active === "true",
+              });
             }
-            exitEditingMode()
-            notify.success('HTE updated successfully.')
+            exitEditingMode();
+            notify.success("HTE updated successfully.");
           } catch (error) {
-            console.error('Failed to update HTE:', error)
-            notify.error(error.response?.data?.message || 'Failed to update HTE.')
+            console.error("Failed to update HTE:", error);
+            notify.error(
+              error.response?.data?.message || "Failed to update HTE.",
+            );
           } finally {
-            setPendingAction(null)
+            setPendingAction(null);
           }
         }
       : undefined,
     muiTableContainerProps: {
       sx: {
         maxHeight: 600,
-        maxWidth: '100%',
-        overflowX: 'auto',
+        maxWidth: "100%",
+        overflowX: "auto",
       },
     },
     muiTableProps: {
       sx: {
-        tableLayout: 'fixed',
+        tableLayout: "fixed",
       },
     },
     muiTableHeadCellProps: {
       sx: {
-        position: 'sticky',
+        position: "sticky",
         top: 0,
         zIndex: 2,
       },
@@ -146,83 +155,85 @@ export default function HtesTable({
     muiTableBodyRowProps: ({ row }) => ({
       onClick: (event) => {
         if (
-          event.target.closest('button') ||
-          event.target.closest('input') ||
+          event.target.closest("button") ||
+          event.target.closest("input") ||
           event.target.closest('[role="checkbox"]')
         ) {
-          return
+          return;
         }
 
-        onHteClick?.(row.original)
+        onHteClick?.(row.original);
       },
       sx: {
-        cursor: onHteClick ? 'pointer' : 'default',
+        cursor: onHteClick ? "pointer" : "default",
       },
     }),
     renderBottomToolbarCustomActions: ({ table: currentTable }) =>
       permissions.canBulkEdit ? (
-        <Box sx={{ display: 'flex', gap: 1 }}>
+        <Box sx={{ display: "flex", gap: 1 }}>
           <Button
             size="small"
             variant="outlined"
             disabled={!currentTable.getSelectedRowModel().rows.length}
             onClick={async () => {
-              if (
-                !(await askForConfirmation('Are you sure you want to activate the selected HTEs?'))
-              ) {
-                return
+              if (!(await askForConfirmation("Are you sure you want to activate the selected HTEs?"))) {
+                return;
               }
 
-              const ids = currentTable.getSelectedRowModel().rows.map((row) => row.original.id)
+              const ids = currentTable
+                .getSelectedRowModel()
+                .rows.map((row) => row.original.id);
 
-              setPendingAction('bulk-activate')
+              setPendingAction("bulk-activate");
               try {
-                await onBulkStatusChange({ ids, isActive: true })
-                notify.success('HTEs activated successfully.')
+                await onBulkStatusChange({ ids, isActive: true });
+                notify.success("HTEs activated successfully.");
               } catch (error) {
-                console.error('Failed to activate HTE:', error)
-                notify.error(error.response?.data?.message || 'Failed to activate HTE.')
+                console.error("Failed to activate HTE:", error);
+                notify.error(
+                  error.response?.data?.message || "Failed to activate HTE.",
+                );
               } finally {
-                setPendingAction(null)
+                setPendingAction(null);
               }
             }}
-            startIcon={pendingAction === 'bulk-activate' ? <CircularProgress size={16} /> : null}
+            startIcon={pendingAction === "bulk-activate" ? <CircularProgress size={16} /> : null}
           >
-            {pendingAction === 'bulk-activate' ? 'Activating...' : 'Activate'}
+            {pendingAction === "bulk-activate" ? "Activating..." : "Activate"}
           </Button>
           <Button
             size="small"
             variant="outlined"
             disabled={!currentTable.getSelectedRowModel().rows.length}
             onClick={async () => {
-              if (
-                !(await askForConfirmation(
-                  'Are you sure you want to deactivate the selected HTEs?',
-                ))
-              ) {
-                return
+              if (!(await askForConfirmation("Are you sure you want to deactivate the selected HTEs?"))) {
+                return;
               }
 
-              const ids = currentTable.getSelectedRowModel().rows.map((row) => row.original.id)
+              const ids = currentTable
+                .getSelectedRowModel()
+                .rows.map((row) => row.original.id);
 
-              setPendingAction('bulk-deactivate')
+              setPendingAction("bulk-deactivate");
               try {
-                await onBulkStatusChange({ ids, isActive: false })
-                notify.success('HTEs deactivated successfully.')
+                await onBulkStatusChange({ ids, isActive: false });
+                notify.success("HTEs deactivated successfully.");
               } catch (error) {
-                console.error('Failed to deactivate HTEs:', error)
-                notify.error(error.response?.data?.message || 'Failed to deactivate HTEs.')
+                console.error("Failed to deactivate HTEs:", error);
+                notify.error(
+                  error.response?.data?.message || "Failed to deactivate HTEs.",
+                );
               } finally {
-                setPendingAction(null)
+                setPendingAction(null);
               }
             }}
-            startIcon={pendingAction === 'bulk-deactivate' ? <CircularProgress size={16} /> : null}
+            startIcon={pendingAction === "bulk-deactivate" ? <CircularProgress size={16} /> : null}
           >
-            {pendingAction === 'bulk-deactivate' ? 'Deactivating...' : 'Deactivate'}
+            {pendingAction === "bulk-deactivate" ? "Deactivating..." : "Deactivate"}
           </Button>
         </Box>
       ) : null,
-  })
+  });
 
   return (
     <>
@@ -234,5 +245,5 @@ export default function HtesTable({
         onCancel={() => closeConfirmation(false)}
       />
     </>
-  )
+  );
 }

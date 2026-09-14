@@ -1,17 +1,17 @@
 export const formatStudentName = (firstName, middleName, lastName) => {
-  const middleInitial = middleName ? `${middleName.charAt(0).toUpperCase()}.` : ''
-  return `${firstName} ${middleInitial ? middleInitial + ' ' : ''}${lastName}`
-}
+  const middleInitial = middleName ? `${middleName.charAt(0).toUpperCase()}.` : "";
+  return `${firstName} ${middleInitial ? middleInitial + " " : ""}${lastName}`;
+};
 
 export const mapStudentData = (student, userRecord = {}) => {
-  const profiles = student.profiles || {}
-  const meta = userRecord.user_metadata || {}
+  const profiles = student.profiles || {};
+  const meta = userRecord.user_metadata || {};
 
   return {
     ...student,
     userId: student.id,
     internship_status: student.currentInternship?.status || student.internship_status || 'pending',
-    email: profiles.email || student.email || userRecord.email || meta.email || '',
+    email: profiles.email || student.email || userRecord.email || meta.email || "",
     firstName:
       profiles.first_name ||
       student.firstName ||
@@ -20,7 +20,7 @@ export const mapStudentData = (student, userRecord = {}) => {
       userRecord.first_name ||
       meta.firstName ||
       meta.first_name ||
-      '',
+      "",
     middleName:
       profiles.middle_name ||
       student.middleName ||
@@ -29,7 +29,7 @@ export const mapStudentData = (student, userRecord = {}) => {
       userRecord.middle_name ||
       meta.middleName ||
       meta.middle_name ||
-      '',
+      "",
     lastName:
       profiles.last_name ||
       student.lastName ||
@@ -38,6 +38,6 @@ export const mapStudentData = (student, userRecord = {}) => {
       userRecord.last_name ||
       meta.lastName ||
       meta.last_name ||
-      '',
-  }
-}
+      "",
+  };
+};

@@ -1,5 +1,5 @@
-import React from 'react'
-import { Controller } from 'react-hook-form'
+import React from "react";
+import { Controller } from "react-hook-form";
 import {
   TextField,
   Select,
@@ -10,9 +10,12 @@ import {
   FormLabel,
   Switch,
   // CircularProgress,
-} from '@mui/material'
+} from "@mui/material";
 
-import { formatUserDate, formatAccountStatus } from '../fieldFormatters'
+import {
+  formatUserDate,
+  formatAccountStatus,
+} from "../fieldFormatters";
 
 /**
  * Generic form field renderer
@@ -36,16 +39,7 @@ import { formatUserDate, formatAccountStatus } from '../fieldFormatters'
  * @param {Object} props.supervisorError - Error state for supervisor data
  * @returns {React.ReactNode} Rendered field component
  */
-export function FormField({
-  field,
-  control,
-  error,
-  isDisabled,
-  isRequired,
-  supervisorOptions = [],
-  isSupervisorLoading = false,
-  supervisorError = null,
-}) {
+export function FormField({ field, control, error, isDisabled, isRequired, supervisorOptions = [], isSupervisorLoading = false, supervisorError = null }) {
   return (
     <Controller
       name={field.name}
@@ -53,27 +47,35 @@ export function FormField({
       render={({ field: rhfField }) => {
         // Handle date formatting for display
         const displayValue =
-          field.format === 'date' ? formatUserDate(rhfField.value) : rhfField.value
+          field.format === "date"
+            ? formatUserDate(rhfField.value)
+            : rhfField.value;
 
         // Supervisor select field type
-        if (field.type === 'supervisor-select') {
+        if (field.type === "supervisor-select") {
           if (isDisabled) {
-            const match = supervisorOptions?.find((u) => u.id === rhfField.value)
+            const match = supervisorOptions?.find((u) => u.id === rhfField.value);
             const displayName = match
-              ? [match.last_name, match.first_name].filter(Boolean).join(', ')
-              : (rhfField.value ?? 'No Supervisor')
+              ? [match.last_name, match.first_name].filter(Boolean).join(", ")
+              : rhfField.value ?? "No Supervisor";
             return (
-              <TextField value={displayName} label={field.label} disabled fullWidth size="small" />
-            )
+              <TextField
+                value={displayName}
+                label={field.label}
+                disabled
+                fullWidth
+                size="small"
+              />
+            );
           }
-
+          
           if (isSupervisorLoading) {
             return (
               <FormControl fullWidth size="small" error={!!error}>
                 <InputLabel>{field.label}</InputLabel>
                 <Select
                   {...rhfField}
-                  value={rhfField.value ?? ''}
+                  value={rhfField.value ?? ""}
                   label={field.label}
                   disabled={isDisabled}
                 >
@@ -82,16 +84,16 @@ export function FormField({
                   </MenuItem>
                 </Select>
               </FormControl>
-            )
+            );
           }
-
+          
           if (supervisorError) {
             return (
               <FormControl fullWidth size="small" error={!!error}>
                 <InputLabel>{field.label}</InputLabel>
                 <Select
                   {...rhfField}
-                  value={rhfField.value ?? ''}
+                  value={rhfField.value ?? ""}
                   label={field.label}
                   disabled={isDisabled}
                 >
@@ -100,7 +102,7 @@ export function FormField({
                   </MenuItem>
                 </Select>
               </FormControl>
-            )
+            );
           }
 
           return (
@@ -108,7 +110,7 @@ export function FormField({
               <InputLabel>{field.label}</InputLabel>
               <Select
                 {...rhfField}
-                value={rhfField.value ?? ''}
+                value={rhfField.value ?? ""}
                 label={field.label}
                 disabled={isDisabled}
                 required={isRequired}
@@ -118,22 +120,22 @@ export function FormField({
                 </MenuItem>
                 {supervisorOptions?.map((u) => (
                   <MenuItem key={u.id} value={u.id}>
-                    {[u.last_name, u.first_name].filter(Boolean).join(', ')}
+                    {[u.last_name, u.first_name].filter(Boolean).join(", ")}
                   </MenuItem>
                 ))}
               </Select>
             </FormControl>
-          )
+          );
         }
 
         switch (field.type) {
-          case 'select':
+          case "select":
             return (
               <FormControl fullWidth size="small" error={!!error}>
                 <InputLabel shrink>{field.label}</InputLabel>
                 <Select
                   {...rhfField}
-                  value={rhfField.value ?? ''}
+                  value={rhfField.value ?? ""}
                   label={field.label}
                   disabled={isDisabled}
                   required={isRequired}
@@ -145,13 +147,16 @@ export function FormField({
                   ))}
                 </Select>
               </FormControl>
-            )
+            );
 
-          case 'status_account':
+          case "status_account":
             return (
               <FormControl component="fieldset">
-                <FormLabel component="legend" sx={{ fontSize: '0.75rem', mb: 0, ml: 0.9 }}>
-                  {field.label || 'Account Status'}
+                <FormLabel
+                  component="legend"
+                  sx={{ fontSize: "0.75rem", mb: 0, ml: 0.9 }}
+                >
+                  {field.label || "Account Status"}
                 </FormLabel>
 
                 <FormControlLabel
@@ -159,22 +164,24 @@ export function FormField({
                   control={
                     <Switch
                       checked={rhfField.value === true}
-                      onChange={(event) => rhfField.onChange(event.target.checked)}
+                      onChange={(event) =>
+                        rhfField.onChange(event.target.checked)
+                      }
                       disabled={isDisabled}
                     />
                   }
                   label={formatAccountStatus(rhfField.value)}
                 />
               </FormControl>
-            )
+            );
 
-          case 'email':
-          case 'text':
-          case 'password':
+          case "email":
+          case "text":
+          case "password":
             return (
               <TextField
                 {...rhfField}
-                value={displayValue ?? ''}
+                value={displayValue ?? ""}
                 label={field.label}
                 type={field.type}
                 disabled={isDisabled}
@@ -185,14 +192,14 @@ export function FormField({
                 size="small"
                 slotProps={{ inputLabel: { shrink: true } }}
               />
-            )
+            );
 
-          case 'date':
-          case 'datetime':
+          case "date":
+          case "datetime":
             return (
               <TextField
                 {...rhfField}
-                value={displayValue ?? ''}
+                value={displayValue ?? ""}
                 label={field.label}
                 type="text"
                 disabled={isDisabled}
@@ -203,13 +210,13 @@ export function FormField({
                 size="small"
                 slotProps={{ inputLabel: { shrink: true } }}
               />
-            )
+            );
 
           default:
             return (
               <TextField
                 {...rhfField}
-                value={displayValue ?? ''}
+                value={displayValue ?? ""}
                 label={field.label}
                 type="text"
                 disabled={isDisabled}
@@ -220,11 +227,11 @@ export function FormField({
                 size="small"
                 slotProps={{ inputLabel: { shrink: true } }}
               />
-            )
+            );
         }
       }}
     />
-  )
+  );
 }
 
-export default FormField
+export default FormField;

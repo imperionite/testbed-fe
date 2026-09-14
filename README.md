@@ -166,15 +166,3 @@ Preview production build:
 ```bash
 npm run preview
 ```
-
----
-
-## Development Principles
-
-### API Separation
-
-API calls are separated from UI components.
-
-```
-Components → Hooks → API Layer → Backend
-```
