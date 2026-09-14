@@ -1,5 +1,4 @@
-import React from "react";
-import { Box, Button, CircularProgress } from "@mui/material";
+import { Box, Button, CircularProgress } from '@mui/material'
 
 /**
  * @typedef {Object} BulkAction
@@ -23,35 +22,26 @@ import { Box, Button, CircularProgress } from "@mui/material";
  * Generic bulk action toolbar component
  * Displays action buttons at all times.
  */
-export function BulkActionToolbar({
-  selectedCount,
-  actions,
-  isPending,
-  pendingAction,
-}) {
+export function BulkActionToolbar({ selectedCount, actions, isPending, pendingAction }) {
   return (
-    <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+    <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
       {actions.map((action) => (
         <Button
           key={action.key}
           size="small"
-          variant={action.variant || "outlined"}
-          color={action.color || "primary"}
+          variant={action.variant || 'outlined'}
+          color={action.color || 'primary'}
           disabled={action.disabled || selectedCount === 0 || isPending}
           onClick={action.onClick}
           startIcon={
-            pendingAction === action.key ? (
-              <CircularProgress size={16} color="inherit" />
-            ) : null
+            pendingAction === action.key ? <CircularProgress size={16} color="inherit" /> : null
           }
         >
-          {pendingAction === action.key
-            ? `${action.label}...`
-            : action.label}
+          {pendingAction === action.key ? `${action.label}...` : action.label}
         </Button>
       ))}
     </Box>
-  );
+  )
 }
 
-export default BulkActionToolbar;
+export default BulkActionToolbar

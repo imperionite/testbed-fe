@@ -1,24 +1,24 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route } from 'react-router-dom'
 
-import PublicLayout from "../layouts/PublicLayout";
-import LoginPage from "../pages/LoginPage";
-import About from "../pages/About";
-import PrivacyPolicy from "../pages/PrivacyPolicy";
-import TermsConditions from "../pages/TermsConditions";
-import ForgotPasswordPage from "../pages/ForgotPasswordPage";
-import ResetPasswordPage from "../pages/ResetPasswordPage";
-import StudentsRoute from "../features/students/StudentsRoute";
-import StudentProfilePage from "../features/students/StudentProfilePage";
-import InternshipManagementPage from "../features/internships/InternshipManagementPage";
+import PublicLayout from '../layouts/PublicLayout'
+import LoginPage from '../pages/LoginPage'
+import About from '../pages/About'
+import PrivacyPolicy from '../pages/PrivacyPolicy'
+import TermsConditions from '../pages/TermsConditions'
+import ForgotPasswordPage from '../pages/ForgotPasswordPage'
+import ResetPasswordPage from '../pages/ResetPasswordPage'
+import StudentsRoute from '../features/students/StudentsRoute'
+import StudentProfilePage from '../features/students/StudentProfilePage'
+import InternshipManagementPage from '../features/internships/InternshipManagementPage'
 
-import Dashboard from "../pages/Dashboard";
-import UserManagementPage from "../features/users/UserManagementPage";
-import HteManagementPage from "../features/htes/HTEManagementPage";
-import AppLayout from "../layouts/AppLayout";
-import AuthGuard from "../guards/AuthGuard";
-import GuestGuard from "../guards/GuestGuard";
+import Dashboard from '../pages/Dashboard'
+import UserManagementPage from '../features/users/UserManagementPage'
+import HteManagementPage from '../features/htes/HTEManagementPage'
+import AppLayout from '../layouts/AppLayout'
+import AuthGuard from '../guards/AuthGuard'
+import GuestGuard from '../guards/GuestGuard'
 
-import NotFound from "../pages/NotFound";
+import NotFound from '../pages/NotFound'
 
 export default function AppRouter() {
   return (
@@ -52,5 +52,5 @@ export default function AppRouter() {
 
       <Route path="*" element={<NotFound />} />
     </Routes>
-  );
+  )
 }

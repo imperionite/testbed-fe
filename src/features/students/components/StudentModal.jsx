@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from 'react'
 import {
   Dialog,
   DialogTitle,
@@ -8,11 +8,11 @@ import {
   CircularProgress,
   Alert,
   IconButton,
-} from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
-import StudentForm from "./StudentForm";
-import { MODES } from "../form/formConfig";
-import useAuth from "../../../hooks/useAuth";
+} from '@mui/material'
+import CloseIcon from '@mui/icons-material/Close'
+import StudentForm from './StudentForm'
+import { MODES } from '../form/formConfig'
+import useAuth from '../../../hooks/useAuth'
 
 export default function StudentModal({
   open,
@@ -27,59 +27,55 @@ export default function StudentModal({
   isStudent,
   availableUsers,
 }) {
-  const [mode, setMode] = useState(initialMode);
-  const [isSaving, setIsSaving] = useState(false);
-  const [error, setError] = useState(null);
-  const { user } = useAuth();
+  const [mode, setMode] = useState(initialMode)
+  const [isSaving, setIsSaving] = useState(false)
+  const [error, setError] = useState(null)
+  const { user } = useAuth()
 
-  const handleEditBtnPressed = () => setMode(MODES.EDIT);
+  const handleEditBtnPressed = () => setMode(MODES.EDIT)
   const handleCancelBtnPressed = () => {
-    setError(null);
-    setMode(MODES.VIEW);
-  };
+    setError(null)
+    setMode(MODES.VIEW)
+  }
 
   const getTitle = () => {
-    if (mode === MODES.CREATE) return "Add New Student";
-    if (mode === MODES.EDIT) return "Edit Student";
-    return "View Student Details";
-  };
+    if (mode === MODES.CREATE) return 'Add New Student'
+    if (mode === MODES.EDIT) return 'Edit Student'
+    return 'View Student Details'
+  }
 
   const handleSubmit = async (data) => {
-    setError(null);
+    setError(null)
     try {
       if (mode === MODES.CREATE) {
-        await onCreate?.(data);
-        onSuccess?.("Student created successfully!");
+        await onCreate?.(data)
+        onSuccess?.('Student created successfully!')
       } else if (mode === MODES.EDIT) {
-        const studentId = student?.id;
+        const studentId = student?.id
         if (!studentId) {
-          throw new Error("No student record selected for update.");
+          throw new Error('No student record selected for update.')
         }
-        
-        const payload = { ...data };
-        delete payload.userId;
-        await onUpdate?.({ id: studentId, payload, role: user?.role });
-        onSuccess?.("Student updated successfully!");
-      }
-      setIsSaving(false);
-      onClose();
-    } catch (submitError) {
-      setIsSaving(false);
-      console.error("Full Submit Error:", submitError);
-      setError(submitError.response?.data?.message || submitError.message || "Unable to save student.");
-    }
-  };
 
-  const canEdit = permissions?.canUpdate;
+        const payload = { ...data }
+        delete payload.userId
+        await onUpdate?.({ id: studentId, payload, role: user?.role })
+        onSuccess?.('Student updated successfully!')
+      }
+      setIsSaving(false)
+      onClose()
+    } catch (submitError) {
+      setIsSaving(false)
+      console.error('Full Submit Error:', submitError)
+      setError(
+        submitError.response?.data?.message || submitError.message || 'Unable to save student.',
+      )
+    }
+  }
+
+  const canEdit = permissions?.canUpdate
 
   return (
-    <Dialog
-      open={open}
-      onClose={onClose}
-      maxWidth="sm"
-      fullWidth
-      disablePortal={disablePortal}
-    >
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth disablePortal={disablePortal}>
       <DialogTitle>
         {getTitle()}
 
@@ -119,7 +115,10 @@ export default function StudentModal({
 
         {mode !== MODES.VIEW && (
           <>
-            <Button onClick={mode === MODES.CREATE ? onClose : handleCancelBtnPressed} disabled={isSaving}>
+            <Button
+              onClick={mode === MODES.CREATE ? onClose : handleCancelBtnPressed}
+              disabled={isSaving}
+            >
               Cancel
             </Button>
             <Button
@@ -130,11 +129,11 @@ export default function StudentModal({
               disabled={isSaving}
               startIcon={isSaving ? <CircularProgress size={20} /> : null}
             >
-              {mode === MODES.CREATE ? "Submit" : "Save"}
+              {mode === MODES.CREATE ? 'Submit' : 'Save'}
             </Button>
           </>
         )}
       </DialogActions>
     </Dialog>
-  );
+  )
 }

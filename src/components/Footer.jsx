@@ -1,5 +1,5 @@
-import { Box, Link, Typography } from "@mui/material";
-import { Link as RouterLink } from "react-router-dom";
+import { Box, Link, Typography } from '@mui/material'
+import { Link as RouterLink } from 'react-router-dom'
 
 export default function Footer() {
   return (
@@ -8,17 +8,17 @@ export default function Footer() {
       sx={{
         py: 3,
         px: 2,
-        textAlign: "center",
-        color: "text.secondary",
+        textAlign: 'center',
+        color: 'text.secondary',
         borderTop: 1,
-        borderColor: "divider",
+        borderColor: 'divider',
       }}
     >
       <Box
         sx={{
-          display: "flex",
-          justifyContent: "center",
-          flexWrap: "wrap",
+          display: 'flex',
+          justifyContent: 'center',
+          flexWrap: 'wrap',
           gap: 2,
           mb: 1.5,
         }}
@@ -54,13 +54,11 @@ export default function Footer() {
         </Link>
       </Box>
 
-      <Typography variant="body2">
-        © {new Date().getFullYear()} SBIMS
-      </Typography>
+      <Typography variant="body2">© {new Date().getFullYear()} SBIMS</Typography>
 
       <Typography variant="caption" display="block">
         Academic Project for Educational Purposes Only
       </Typography>
     </Box>
-  );
+  )
 }

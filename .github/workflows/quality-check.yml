@@ -1,0 +1,139 @@
+name: Quality Check
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Lint, Format, Test & Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: ESLint
+        id: eslint
+        continue-on-error: true
+        run: |
+          echo "Starting ESLint..."
+          START=$(date +%s)
+
+          npm run lint
+
+          END=$(date +%s)
+          echo "Duration: $((END - START)) seconds"
+
+      - name: Prettier
+        id: prettier
+        continue-on-error: true
+        run: |
+          echo "Starting Prettier..."
+          START=$(date +%s)
+
+          npm run format:check
+
+          END=$(date +%s)
+          echo "Duration: $((END - START)) seconds"
+
+      - name: Knip
+        id: knip
+        continue-on-error: true
+        run: |
+          echo "Starting Knip..."
+          START=$(date +%s)
+
+          npm run knip
+
+          END=$(date +%s)
+          echo "Duration: $((END - START)) seconds"
+
+      - name: Tests
+        id: tests
+        continue-on-error: true
+        run: |
+          echo "Starting tests..."
+          START=$(date +%s)
+
+          npm test
+
+          END=$(date +%s)
+          echo "Duration: $((END - START)) seconds"
+
+      - name: Build
+        id: build
+        continue-on-error: true
+        run: |
+          echo "Starting production build..."
+          START=$(date +%s)
+
+          npm run build
+
+          END=$(date +%s)
+          echo "Duration: $((END - START)) seconds"
+
+      - name: Quality Check Summary
+        if: always()
+        run: |
+          echo ""
+          echo "=========================================="
+          echo "        QUALITY CHECK SUMMARY"
+          echo "=========================================="
+
+          echo ""
+          echo "ESLint:   ${{ steps.eslint.outcome }}"
+          echo "Prettier: ${{ steps.prettier.outcome }}"
+          echo "Knip:     ${{ steps.knip.outcome }}"
+          echo "Tests:    ${{ steps.tests.outcome }}"
+          echo "Build:    ${{ steps.build.outcome }}"
+
+          echo ""
+          echo "=========================================="
+          echo "        CI/CD TRACEABILITY"
+          echo "=========================================="
+
+          echo "Repository: ${{ github.repository }}"
+          echo "Workflow: ${{ github.workflow }}"
+          echo "Workflow Run ID: ${{ github.run_id }}"
+          echo "Run Number: ${{ github.run_number }}"
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Commit SHA: ${{ github.sha }}"
+          echo "Actor: ${{ github.actor }}"
+          echo "Event: ${{ github.event_name }}"
+
+          echo ""
+          echo "Run URL:"
+          echo "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+          echo ""
+          echo "Triggered via workflow_dispatch"
+
+      - name: Fail if quality checks failed
+        if: always()
+        run: |
+          if [[ \
+            "${{ steps.eslint.outcome }}" != "success" || \
+            "${{ steps.prettier.outcome }}" != "success" || \
+            "${{ steps.knip.outcome }}" != "success" || \
+            "${{ steps.tests.outcome }}" != "success" || \
+            "${{ steps.build.outcome }}" != "success"
+          ]]; then
+            echo ""
+            echo "❌ Quality checks failed."
+            exit 1
+          fi
+
+          echo ""
+          echo "✅ All quality checks passed."

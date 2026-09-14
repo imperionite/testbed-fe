@@ -1,5 +1,4 @@
-import React from "react";
-import { Chip } from "@mui/material";
+import { Chip } from '@mui/material'
 
 /**
  * Generic badge component
@@ -13,21 +12,15 @@ import { Chip } from "@mui/material";
  * @property {'filled' | 'outlined'} [variant] - Badge variant style
  */
 
-export function Badge({
-  value,
-  colorMap,
-  labelMap,
-  variant = "filled",
-  ...rest
-}) {
+export function Badge({ value, colorMap, labelMap, variant = 'filled', ...rest }) {
   if (value === undefined || value === null) {
-    return <Chip {...rest} label="-" variant={variant} color="default" />;
+    return <Chip {...rest} label="-" variant={variant} color="default" />
   }
 
-  const label = labelMap?.[value] ?? value;
-  const color = colorMap?.[value] ?? "default";
+  const label = labelMap?.[value] ?? value
+  const color = colorMap?.[value] ?? 'default'
 
-  return <Chip {...rest} label={label} variant={variant} color={color} />;
+  return <Chip {...rest} label={label} variant={variant} color={color} />
 }
 
-export default Badge;
+export default Badge

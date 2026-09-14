@@ -1,11 +1,11 @@
-import useAuth from "../hooks/useAuth";
-import ChangePasswordModal from "../components/ChangePasswordModal";
+import useAuth from '../hooks/useAuth'
+import ChangePasswordModal from '../components/ChangePasswordModal'
 
 export default function PasswordChangeGuard({ children }) {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading } = useAuth()
 
   if (isLoading) {
-    return null;
+    return null
   }
 
   return (
@@ -14,5 +14,5 @@ export default function PasswordChangeGuard({ children }) {
 
       <ChangePasswordModal open={user?.mustChangePassword === true} />
     </>
-  );
+  )
 }

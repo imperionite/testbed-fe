@@ -1,21 +1,18 @@
-import React, { useMemo } from "react";
-import {
-  MaterialReactTable,
-  useMaterialReactTable,
-} from "@glebcha/material-react-table";
-import { CircularProgress, IconButton, Tooltip } from "@mui/material";
-import CheckIcon from "@mui/icons-material/Check";
-import EditIcon from "@mui/icons-material/Edit";
+import { useMemo } from 'react'
+import { MaterialReactTable, useMaterialReactTable } from '@glebcha/material-react-table'
+import { CircularProgress, IconButton, Tooltip } from '@mui/material'
+import CheckIcon from '@mui/icons-material/Check'
+import EditIcon from '@mui/icons-material/Edit'
 
-import { userTableConfig } from "../config/tableConfig.js";
-import { useUserTableState } from "../hooks/useUserTableState.js";
-import { useTableActions } from "../hooks/useTableActions.jsx";
-import { createUserTableColumns } from "../config/userTableColumns.jsx";
+import { userTableConfig } from '../config/tableConfig.js'
+import { useUserTableState } from '../hooks/useUserTableState.js'
+import { useTableActions } from '../hooks/useTableActions.jsx'
+import { createUserTableColumns } from '../config/userTableColumns.jsx'
 
-import BulkActionToolbar from "../../shared/components/BulkActionToolbar.jsx";
-import RoleChooserDialog from "./RoleChooserDialog.jsx";
-import ActionConfirmDialog from "../../shared/components/ActionConfirmDialog.jsx";
-import { bulkActionsConfig } from "../config/bulkActionsConfig.js";
+import BulkActionToolbar from '../../shared/components/BulkActionToolbar.jsx'
+import RoleChooserDialog from './RoleChooserDialog.jsx'
+import ActionConfirmDialog from '../../shared/components/ActionConfirmDialog.jsx'
+import { bulkActionsConfig } from '../config/bulkActionsConfig.js'
 
 /**
  * @typedef {Object} UsersTableProps
@@ -43,12 +40,12 @@ export function UsersTable({
   onBulkRoleChange,
   onBulkStatusChange,
 }) {
-  const tableState = useUserTableState();
+  const tableState = useUserTableState()
   const defaultColumns = useMemo(
     () => createUserTableColumns({ canEdit: permissions.canEdit }),
     [permissions.canEdit],
-  );
-  const tableColumns = columns ?? defaultColumns;
+  )
+  const tableColumns = columns ?? defaultColumns
 
   // Table actions
   const tableActions = useTableActions({
@@ -60,7 +57,7 @@ export function UsersTable({
     askForConfirmation: tableState.askForConfirmation,
     askForRole: tableState.askForRole,
     clearSelection: () => tableState.setRowSelection({}),
-  });
+  })
 
   // Core table
   const table = useMaterialReactTable({
@@ -79,7 +76,7 @@ export function UsersTable({
       columnVisibility: {
         ...tableState.columnVisibility,
         // Hide row actions while rows are selected so the bulk toolbar takes priority.
-        "mrt-row-actions": tableState.selectedRowCount === 0,
+        'mrt-row-actions': tableState.selectedRowCount === 0,
       },
     },
 
@@ -93,9 +90,9 @@ export function UsersTable({
         <IconButton
           aria-label={`Edit ${row.original.email}`}
           onClick={(event) => {
-            event.stopPropagation();
-            rowActionsTable.setEditingRow(null);
-            onEditRow?.(row.original);
+            event.stopPropagation()
+            rowActionsTable.setEditingRow(null)
+            onEditRow?.(row.original)
           }}
           size="small"
         >
@@ -107,22 +104,22 @@ export function UsersTable({
     // Custom inline saving loader
     icons: {
       SaveIcon: (props) =>
-        tableActions.pendingAction?.startsWith("row-") ? (
+        tableActions.pendingAction?.startsWith('row-') ? (
           <CircularProgress size={18} color="inherit" />
         ) : (
-          <CheckIcon {...props} sx={{ ...props.sx, color: "success.main" }} />
+          <CheckIcon {...props} sx={{ ...props.sx, color: 'success.main' }} />
         ),
     },
 
     // Render the bulk actions toolbar
     renderBottomToolbarCustomActions: () => {
-      const selectedRows = table.getSelectedRowModel().rows;
+      const selectedRows = table.getSelectedRowModel().rows
 
       const actionHandlers = {
-        "change-role": () => tableActions.handleBulkRoleChange(selectedRows),
+        'change-role': () => tableActions.handleBulkRoleChange(selectedRows),
         activate: () => tableActions.handleBulkActivate(selectedRows),
         deactivate: () => tableActions.handleBulkDeactivate(selectedRows),
-      };
+      }
 
       // integrate bulk actions config
       const availableActions = bulkActionsConfig
@@ -130,9 +127,9 @@ export function UsersTable({
         .map((action) => ({
           key: action.key,
           label: action.label,
-          variant: action.key === "change-role" ? "contained" : "outlined",
+          variant: action.key === 'change-role' ? 'contained' : 'outlined',
           onClick: actionHandlers[action.key],
-        }));
+        }))
 
       return (
         <BulkActionToolbar
@@ -141,9 +138,9 @@ export function UsersTable({
           isPending={tableActions.isPending}
           pendingAction={tableActions.pendingAction}
         />
-      );
+      )
     },
-  });
+  })
 
   return (
     <>
@@ -163,14 +160,12 @@ export function UsersTable({
         open={tableState.roleChooser?.open}
         value={tableState.roleChooser?.value}
         onChange={(value) => tableState.roleChooser.setValue(value)}
-        onConfirm={() =>
-          tableState.closeRoleChooser(tableState.roleChooser.value)
-        }
+        onConfirm={() => tableState.closeRoleChooser(tableState.roleChooser.value)}
         onCancel={() => tableState.closeRoleChooser(null)}
-        isLoading={tableActions.pendingAction === "bulk-role"}
+        isLoading={tableActions.pendingAction === 'bulk-role'}
       />
     </>
-  );
+  )
 }
 
-export default UsersTable;
+export default UsersTable

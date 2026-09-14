@@ -1,77 +1,77 @@
-import { palette } from "./rawColors";
+import { palette } from './rawColors'
 
 const createPalette = (mode) => {
-  const colors = palette[mode];
+  const colors = palette[mode]
 
   return {
-  mode,
+    mode,
 
-  primary: {
-    main: colors.foreground,
-    contrastText: colors.primaryForeground,
-    hover: colors.primaryHover
-  },
+    primary: {
+      main: colors.foreground,
+      contrastText: colors.primaryForeground,
+      hover: colors.primaryHover,
+    },
 
-  secondary: {
-    main: colors.secondary,
-    contrastText: colors.secondaryForeground,
-  },
+    secondary: {
+      main: colors.secondary,
+      contrastText: colors.secondaryForeground,
+    },
 
-  // error: {
-  //   main: colors.destructive,
-  //   contrastText: colors.destructiveForeground,
-  // },
+    // error: {
+    //   main: colors.destructive,
+    //   contrastText: colors.destructiveForeground,
+    // },
 
-  // success: {
-  //   main: colors.primary,
-  //   contrastText: colors.primaryForeground,
-  // },
+    // success: {
+    //   main: colors.primary,
+    //   contrastText: colors.primaryForeground,
+    // },
 
-  background: {
-    default: colors.background,
-    paper: colors.card,
-    accent: colors.backgroundAccent
-  },
+    background: {
+      default: colors.background,
+      paper: colors.card,
+      accent: colors.backgroundAccent,
+    },
 
-  text: {
-    primary: colors.foreground,
-    secondary: colors.mutedForeground,
-  },
+    text: {
+      primary: colors.foreground,
+      secondary: colors.mutedForeground,
+    },
 
-  divider: colors.border,
+    divider: colors.border,
 
-  // Semantic/custom colors
-  muted: {
-    main: colors.muted,
-    contrastText: colors.mutedForeground,
-  },
+    // Semantic/custom colors
+    muted: {
+      main: colors.muted,
+      contrastText: colors.mutedForeground,
+    },
 
-  accent: {
-    main: colors.accent,
-    contrastText: colors.accentForeground,
-  },
+    accent: {
+      main: colors.accent,
+      contrastText: colors.accentForeground,
+    },
 
-  card: {
-    main: colors.card,
-    contrastText: colors.cardForeground,
-  },
+    card: {
+      main: colors.card,
+      contrastText: colors.cardForeground,
+    },
 
-  popover: {
-    main: colors.popover,
-    contrastText: colors.popoverForeground,
-  },
+    popover: {
+      main: colors.popover,
+      contrastText: colors.popoverForeground,
+    },
 
-  input: colors.input,
-  ring: colors.ring,
+    input: colors.input,
+    ring: colors.ring,
 
-  chart: {
-    1: colors.chart1,
-    2: colors.chart2,
-    3: colors.chart3,
-    4: colors.chart4,
-    5: colors.chart5,
-  },
-  };
-};
+    chart: {
+      1: colors.chart1,
+      2: colors.chart2,
+      3: colors.chart3,
+      4: colors.chart4,
+      5: colors.chart5,
+    },
+  }
+}
 
-export default createPalette;
+export default createPalette

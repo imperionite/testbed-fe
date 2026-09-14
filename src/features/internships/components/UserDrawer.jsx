@@ -1,20 +1,12 @@
-import React, { useState } from 'react';
-import {
-  Drawer,
-  Typography,
-  Button,
-  Alert,
-  IconButton,
-  Box,
-  Divider,
-} from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
+import { useState } from 'react'
+import { Drawer, Typography, Button, Alert, IconButton, Box, Divider } from '@mui/material'
+import CloseIcon from '@mui/icons-material/Close'
 
-import { useFormSubmission } from '../hooks/useFormSubmissions';
-import { getValidationSchema } from '../form/UserValidationSchema';
-import { userFormConfig, ROLES } from '../form/formConfig';
-import { UserForm } from './UserForm';
-import notify from '../../../utils/toast';
+import { useFormSubmission } from '../hooks/useFormSubmissions'
+import { getValidationSchema } from '../form/UserValidationSchema'
+import { userFormConfig, ROLES } from '../form/formConfig'
+import { UserForm } from './UserForm'
+import notify from '../../../utils/toast'
 
 /**
  * @typedef {Object} UserDrawerProps
@@ -42,16 +34,16 @@ export function UserDrawer({
   onStatusChange,
   onModeChange,
 }) {
-  const [localMode, setLocalMode] = useState(mode);
+  const [localMode, setLocalMode] = useState(mode)
 
   const handleModeChange = (newMode) => {
-    setLocalMode(newMode);
+    setLocalMode(newMode)
     if (onModeChange) {
-      onModeChange(newMode);
+      onModeChange(newMode)
     }
-  };
+  }
 
-  const activeRole = permissions?.canEdit ? ROLES.ADMIN : ROLES.STUDENT;
+  const activeRole = permissions?.canEdit ? ROLES.ADMIN : ROLES.STUDENT
 
   const formSubmission = useFormSubmission({
     mode: localMode,
@@ -64,32 +56,34 @@ export function UserDrawer({
     },
     onSubmit: async (filteredPayload) => {
       if (localMode === 'create') {
-        await onCreate(filteredPayload);
+        await onCreate(filteredPayload)
       } else {
-        const userId = user?.id;
+        const userId = user?.id
         if (!userId) {
-          throw new Error('User ID is missing for the update operation.');
+          throw new Error('User ID is missing for the update operation.')
         }
 
-        await onUpdate({ id: userId, payload: filteredPayload });
+        await onUpdate({ id: userId, payload: filteredPayload })
 
         if (filteredPayload.role && filteredPayload.role !== user.role) {
-          await onRoleChange({ id: userId, role: filteredPayload.role });
+          await onRoleChange({ id: userId, role: filteredPayload.role })
         }
 
-        const updatedActive = filteredPayload.isActive;
-        const originalActive = user.isActive;
+        const updatedActive = filteredPayload.isActive
+        const originalActive = user.isActive
 
         if (updatedActive !== undefined && updatedActive !== originalActive) {
-          await onStatusChange({ id: userId, isActive: updatedActive });
+          await onStatusChange({ id: userId, isActive: updatedActive })
         }
       }
     },
     onSuccess: () => {
-      notify.success(localMode === 'create' ? 'User created successfully' : 'User updated successfully');
-      onClose();
+      notify.success(
+        localMode === 'create' ? 'User created successfully' : 'User updated successfully',
+      )
+      onClose()
     },
-  });
+  })
 
   return (
     <Drawer
@@ -114,7 +108,11 @@ export function UserDrawer({
         }}
       >
         <Typography variant="h6" component="h2">
-          {localMode === 'create' ? 'Create User' : localMode === 'edit' ? 'Edit User' : 'View User'}
+          {localMode === 'create'
+            ? 'Create User'
+            : localMode === 'edit'
+              ? 'Edit User'
+              : 'View User'}
         </Typography>
         <IconButton
           aria-label="close"
@@ -155,20 +153,12 @@ export function UserDrawer({
           gap: 1.5,
         }}
       >
-        <Button
-          onClick={onClose}
-          disabled={formSubmission.isSaving}
-          color="inherit"
-        >
+        <Button onClick={onClose} disabled={formSubmission.isSaving} color="inherit">
           {localMode === 'view' ? 'Close' : 'Cancel'}
         </Button>
 
         {localMode === 'view' && permissions?.canEdit && (
-          <Button
-            onClick={() => handleModeChange('edit')}
-            variant="contained"
-            color="primary"
-          >
+          <Button onClick={() => handleModeChange('edit')} variant="contained" color="primary">
             Edit
           </Button>
         )}
@@ -185,7 +175,7 @@ export function UserDrawer({
         )}
       </Box>
     </Drawer>
-  );
+  )
 }
 
-export default UserDrawer;
+export default UserDrawer

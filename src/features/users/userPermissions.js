@@ -1,59 +1,55 @@
-import {
-	userFormConfig,
-} from "./form/userFormConfig";
-import { MODES, ROLES } from "../shared/constants/constants";
-import { FIELD_RULES } from "../shared/constants/constants";
+import { userFormConfig } from './form/userFormConfig'
+import { MODES, ROLES } from '../shared/constants/constants'
+import { FIELD_RULES } from '../shared/constants/constants'
 
 export function getUserManagementPermissions(role) {
-	const isAdmin = role === ROLES.ADMIN;
-	const isCoordinator = role === ROLES.INTERNSHIP_COORDINATOR;
+  const isAdmin = role === ROLES.ADMIN
+  const isCoordinator = role === ROLES.INTERNSHIP_COORDINATOR
 
-	return {
-		canView: isAdmin || isCoordinator,
-		canCreate: isAdmin,
-		canEdit: isAdmin,
-		canChangeRole: isAdmin,
-		canChangeStatus: isAdmin,
-		canBulkEdit: isAdmin,
-		canSelectRows: isAdmin,
-	};
+  return {
+    canView: isAdmin || isCoordinator,
+    canCreate: isAdmin,
+    canEdit: isAdmin,
+    canChangeRole: isAdmin,
+    canChangeStatus: isAdmin,
+    canBulkEdit: isAdmin,
+    canSelectRows: isAdmin,
+  }
 }
 
 export function getFieldRule(field, role, mode) {
-	if (!field || !field.rbac) {
-		return FIELD_RULES.HIDDEN;
-	}
+  if (!field || !field.rbac) {
+    return FIELD_RULES.HIDDEN
+  }
 
-	// Look up the { create, edit, view } object for this role.
-	const modeRulesForRole = field.rbac[role];
-	if (modeRulesForRole === undefined) {
-		return FIELD_RULES.HIDDEN;
-	}
+  // Look up the { create, edit, view } object for this role.
+  const modeRulesForRole = field.rbac[role]
+  if (modeRulesForRole === undefined) {
+    return FIELD_RULES.HIDDEN
+  }
 
-	// Pick the single rule value for this mode {"required", "hidden", "readonly"}
-	const fieldRuleForMode = modeRulesForRole[mode];
-	if (fieldRuleForMode === undefined) {
-		return FIELD_RULES.HIDDEN;
-	}
+  // Pick the single rule value for this mode {"required", "hidden", "readonly"}
+  const fieldRuleForMode = modeRulesForRole[mode]
+  if (fieldRuleForMode === undefined) {
+    return FIELD_RULES.HIDDEN
+  }
 
-	return fieldRuleForMode;
+  return fieldRuleForMode
 }
 
 export function canDoOperation(role, mode) {
-	return role === ROLES.ADMIN && (mode === MODES.CREATE || mode === MODES.EDIT);
+  return role === ROLES.ADMIN && (mode === MODES.CREATE || mode === MODES.EDIT)
 }
 
 export function getUserFormPermissions(role, mode) {
-	return {
-		getFieldRule: (field) => getFieldRule(field, role, mode),
-		canSubmit: canDoOperation(role, mode),
-	};
+  return {
+    getFieldRule: (field) => getFieldRule(field, role, mode),
+    canSubmit: canDoOperation(role, mode),
+  }
 }
 
 export function getVisibleUserFields(role, mode) {
-	return userFormConfig.filter(
-		(field) => getFieldRule(field, role, mode) !== FIELD_RULES.HIDDEN,
-	);
+  return userFormConfig.filter((field) => getFieldRule(field, role, mode) !== FIELD_RULES.HIDDEN)
 }
 
-export const userPermissions = getUserFormPermissions;
+export const userPermissions = getUserFormPermissions

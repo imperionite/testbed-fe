@@ -1,12 +1,11 @@
-import React from "react";
-import FormDialog from "../../shared/components/FormDialog";
-import { UserForm } from "./UserForm";
-import { useFormSubmission } from "../../shared/hooks/useFormSubmissions";
-import { getValidationSchema } from "../form/UserValidationSchema";
-import { userFormConfig } from "../form/userFormConfig";
-import { ROLES } from "../../shared/constants/constants";
-import { executeUserSave } from "../form/userFormActionsOrchestrator";
-import notify from "../../../utils/toast";
+import FormDialog from '../../shared/components/FormDialog'
+import { UserForm } from './UserForm'
+import { useFormSubmission } from '../../shared/hooks/useFormSubmissions'
+import { getValidationSchema } from '../form/UserValidationSchema'
+import { userFormConfig } from '../form/userFormConfig'
+import { ROLES } from '../../shared/constants/constants'
+import { executeUserSave } from '../form/userFormActionsOrchestrator'
+import notify from '../../../utils/toast'
 
 export function UserModal({
   open,
@@ -17,7 +16,7 @@ export function UserModal({
   onClose,
   onModeChange,
 }) {
-  const activeRole = permissions?.canEdit ? ROLES.ADMIN : ROLES.STUDENT;
+  const activeRole = permissions?.canEdit ? ROLES.ADMIN : ROLES.STUDENT
 
   const formSubmission = useFormSubmission({
     mode,
@@ -26,7 +25,7 @@ export function UserModal({
     fieldConfig: userFormConfig,
     role: activeRole,
     permissions: {
-      canSubmit: mode === "create" ? permissions?.canCreate : permissions?.canEdit,
+      canSubmit: mode === 'create' ? permissions?.canCreate : permissions?.canEdit,
     },
     onSubmit: async (filteredPayload) => {
       await executeUserSave({
@@ -34,18 +33,15 @@ export function UserModal({
         user,
         filteredPayload,
         mutations,
-      });
+      })
     },
     onSuccess: () => {
-      notify.success(
-        mode === "create" ? "User created successfully" : "User updated successfully"
-      );
-      onClose();
+      notify.success(mode === 'create' ? 'User created successfully' : 'User updated successfully')
+      onClose()
     },
-  });
+  })
 
-  const modalTitle =
-    mode === "create" ? "Create User" : mode === "edit" ? "Edit User" : "View User";
+  const modalTitle = mode === 'create' ? 'Create User' : mode === 'edit' ? 'Edit User' : 'View User'
 
   return (
     <FormDialog
@@ -56,7 +52,7 @@ export function UserModal({
       isSaving={formSubmission.isSaving}
       error={formSubmission.error}
       canEdit={permissions?.canEdit}
-      onEdit={() => onModeChange?.("edit")}
+      onEdit={() => onModeChange?.('edit')}
       onSave={formSubmission.formMethods.handleSubmit(formSubmission.onSubmit)}
     >
       <UserForm
@@ -66,7 +62,7 @@ export function UserModal({
         errors={formSubmission.formMethods.formState.errors}
       />
     </FormDialog>
-  );
+  )
 }
 
-export default UserModal;
+export default UserModal
