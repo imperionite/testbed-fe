@@ -4,7 +4,8 @@ import {
   getFieldRule,
   getUserManagementPermissions,
 } from '../src/features/users/userPermissions'
-import { FIELD_RULES, MODES, ROLES, userFormConfig } from '../src/features/users/form/formConfig'
+import { userFormConfig } from '../src/features/users/form/userFormConfig'
+import { FIELD_RULES, MODES, ROLES } from '../src/features/shared/constants/constants'
 import getValidationSchema from '../src/features/users/form/UserValidationSchema'
 
 describe('user permissions', () => {
