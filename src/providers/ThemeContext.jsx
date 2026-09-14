@@ -1,11 +1,12 @@
-import { createContext, useState, useEffect, useMemo } from 'react'
+import { createContext, useContext, useState, useEffect, useMemo } from 'react'
 import { ThemeProvider } from '@mui/material/styles'
 import CssBaseline from '@mui/material/CssBaseline'
 import { createAppTheme } from '../theme/experiment'
 
 const ThemeContext = createContext()
 
-// export const useThemeContext = () => useContext(ThemeContext);
+// eslint-disable-next-line react-refresh/only-export-components
+export const useThemeContext = () => useContext(ThemeContext)
 
 export const ThemeContextProvider = ({ children }) => {
   const [mode, setMode] = useState(() => localStorage.getItem('themeMode') || 'system')
