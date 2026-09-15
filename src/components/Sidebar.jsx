@@ -57,7 +57,15 @@ const menuItems = [
     icon: <WorkOutlineOutlinedIcon />,
     roles: ['administrator', 'internship_coordinator', 'faculty_adviser'],
   },
-]
+  
+  {
+    label: "Evaluations",
+    path: "/evaluations",
+    icon: <SchoolOutlinedIcon />,
+    roles: ["hte_supervisor", "internship_coordinator", "student"],
+  }
+];
+
 
 export default function Sidebar({ role, mobileOpen, onMobileClose }) {
   const allowedItems = menuItems.filter((item) => item.roles.includes(role))

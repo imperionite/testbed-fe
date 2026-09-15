@@ -30,6 +30,14 @@ const endpoints = {
     supervisor: (id) => `/htes/${id}/supervisor`,
   },
 
+  evaluations: {
+    create: "/evaluations",
+    my_list: "/evaluations/me",
+    by_intern:  (id) => `/evaluations/internship/${id}`,
+    details: (id) => `/evaluations/${id}`,
+    submit: (id) => `/evaluations/${id}/submit`,
+  },
+
   internships: {
     list: '/internships',
     details: (id) => `/internships/${id}`,

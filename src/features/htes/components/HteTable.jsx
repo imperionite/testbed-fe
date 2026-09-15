@@ -48,7 +48,7 @@ export default function HtesTable({
     enableGlobalFilter: true,
     enablePagination: true,
     enableRowSelection: permissions.canSelectRows,
-    enableHiding: false,
+    enableHiding: true,
     enableClickToCopy: true,
     enableColumnActions: false,
     enableColumnPinning: true,
@@ -93,6 +93,7 @@ export default function HtesTable({
       },
     },
     onRowSelectionChange: setRowSelection,
+    onColumnVisibilityChange: setColumnVisibility,
     onEditingRowSave: permissions.canEdit
       ? async ({ exitEditingMode, row, values }) => {
           const statusChanged = String(values.is_active) !== String(row.original.is_active)
