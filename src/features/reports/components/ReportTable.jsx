@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import { useMemo } from 'react'
 import { MaterialReactTable, useMaterialReactTable } from '@glebcha/material-react-table'
 
 export default function ReportTable({ data = [] }) {

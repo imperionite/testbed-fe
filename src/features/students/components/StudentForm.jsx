@@ -1,4 +1,4 @@
-import { useEffect} from 'react'
+import { useEffect } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { TextField, Stack, MenuItem } from '@mui/material'
@@ -149,11 +149,7 @@ export default function StudentForm({
             )}
           />
         ) : (
-          <TextField
-            label="User ID"
-            {...register('userId')}
-            disabled={true} 
-          />
+          <TextField label="User ID" {...register('userId')} disabled={true} />
         )}
         {!isCreate && (
           <>

@@ -19,16 +19,19 @@ export default function InternshipForm({ mode, internships = [], internship, onC
   const { data: users = [] } = useUsers()
   const facultyAdvisers = users.filter((u) => u.role === 'faculty_adviser')
 
-  const { updateInternship, updateStatus, assignAdviser } =
-    useInternshipMutations()
+  const { updateInternship, updateStatus, assignAdviser } = useInternshipMutations()
 
   const isViewOrEdit = mode !== MODES.CREATE
 
-  const studentsWithInternships = useMemo(() => new Set(
-    internships
-      .filter((i) => i.status === 'active' || i.status === 'pending')
-      .map((i) => i.student_id),
-  ), [internships])
+  const studentsWithInternships = useMemo(
+    () =>
+      new Set(
+        internships
+          .filter((i) => i.status === 'active' || i.status === 'pending')
+          .map((i) => i.student_id),
+      ),
+    [internships],
+  )
 
   const availableStudents = useMemo(() => {
     if (mode !== MODES.CREATE) return students
