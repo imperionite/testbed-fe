@@ -47,23 +47,23 @@ const endpoints = {
     validation: (id) => `/attendance/${id}/validation`,
   },
 
-documents: {
+  documents: {
     listByInternship: (internshipId) => `/documents/internship/${internshipId}`,
     details: (id) => `/documents/${id}`,
-    upload: "/documents",
+    upload: '/documents',
     approve: (id) => `/documents/${id}/approve`,
     reject: (id) => `/documents/${id}/reject`,
     delete: (id) => `/documents/${id}`,
   },
 
   reports: {
-    internships: "/reports/internships",
-    summary: "/reports/internships/summary",
+    internships: '/reports/internships',
+    summary: '/reports/internships/summary',
   },
 
   audit: {
-    list: "/audit",
+    list: '/audit',
   },
-};
+}
 
-export default Object.freeze(endpoints);
+export default Object.freeze(endpoints)

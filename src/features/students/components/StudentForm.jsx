@@ -149,11 +149,7 @@ export default function StudentForm({
             )}
           />
         ) : (
-          <TextField
-            label="User ID"
-            {...register('userId')}
-            disabled={true} // ID cannot change in EDIT/VIEW
-          />
+          <TextField label="User ID" {...register('userId')} disabled={true} />
         )}
         {!isCreate && (
           <>
