@@ -1,4 +1,4 @@
-import { Box, Paper, Typography, Grid } from '@mui/material'
+import { Paper, Typography, Grid } from '@mui/material'
 
 export default function ReportSummaryCards({ summary }) {
   if (!summary) return null
