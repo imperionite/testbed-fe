@@ -1,10 +1,9 @@
-import React from 'react'
+import {useEffect} from 'react'
 import { Box, TextField, MenuItem, Button, Stack } from '@mui/material'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import getValidationSchema from '../validation/InternshipValidationSchema'
 import { useUsers } from '../../users/hooks/useUsers'
-import { MODES } from '../form/formConfig'
 
 export default function InternshipAdviserForm({ internship, mode, onSubmit, onCancel }) {
   const { data: users = [], isLoading } = useUsers()
@@ -28,7 +27,7 @@ export default function InternshipAdviserForm({ internship, mode, onSubmit, onCa
     onSubmit(data)
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     reset({ facultyAdviserId: internship?.faculty_adviser_id || '' })
   }, [internship, reset])
 

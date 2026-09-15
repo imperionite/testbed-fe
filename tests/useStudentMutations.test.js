@@ -2,7 +2,7 @@
  * @vitest-environment jsdom
  */
 import { renderHook } from '@testing-library/react'
-import React from 'react'
+import { createElement} from 'react'
 import { useStudentMutations } from '../src/features/students/hooks/useStudentMutations'
 import { vi, describe, it, expect, beforeEach } from 'vitest'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -30,7 +30,7 @@ const queryClient = new QueryClient({
 })
 
 const wrapper = ({ children }) =>
-  React.createElement(QueryClientProvider, { client: queryClient }, children)
+  createElement(QueryClientProvider, { client: queryClient }, children)
 
 describe('useStudentMutations', () => {
   beforeEach(() => {

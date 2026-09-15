@@ -1,4 +1,3 @@
-import React from 'react'
 import { Alert, Button, CircularProgress } from '@mui/material'
 
 // This component acts as an access gatekeeper for table content, checking permissions and handling various UI states before rendering the actual table data.

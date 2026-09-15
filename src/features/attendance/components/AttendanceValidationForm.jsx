@@ -1,9 +1,7 @@
-import React from 'react'
 import { Box, MenuItem, TextField, Button, Stack } from '@mui/material'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import getValidationSchema from '../validation/AttendanceValidationSchema'
-import { MODES } from '../form/formConfig'
 
 export default function AttendanceValidationForm({ attendance, mode, onSubmit, onCancel }) {
   const {

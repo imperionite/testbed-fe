@@ -142,7 +142,7 @@ export function useFormSubmission({
         setIsSaving(false)
       }
     },
-    [permissions, schema, fieldConfig, getRule, mode, onSubmit, onSuccess],
+    [resourceName, permissions, schema, fieldConfig, getRule, mode, onSubmit, onSuccess],
   )
 
   return {

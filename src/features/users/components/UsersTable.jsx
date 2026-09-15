@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import { useMemo } from 'react'
 import { MaterialReactTable, useMaterialReactTable } from '@glebcha/material-react-table'
 import { CircularProgress, IconButton, Tooltip } from '@mui/material'
 import CheckIcon from '@mui/icons-material/Check'

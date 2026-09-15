@@ -1,9 +1,7 @@
-import React from 'react'
 import { Box, TextField, MenuItem, Button, Stack } from '@mui/material'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import getValidationSchema from '../validation/InternshipValidationSchema'
-import { MODES } from '../form/formConfig'
 
 export default function InternshipStatusForm({ internship, mode, onSubmit, onCancel }) {
   const currentStatus = internship?.status || 'pending'

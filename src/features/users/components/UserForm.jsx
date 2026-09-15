@@ -1,4 +1,3 @@
-import React from 'react'
 import { getVisibleUserFields, getUserFormPermissions } from '../userPermissions'
 import { formatUserDate, formatAccountStatus } from '../../shared/fieldFormatters'
 import DynamicForm from '../../shared/components/DynamicForm'

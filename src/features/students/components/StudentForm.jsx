@@ -1,4 +1,4 @@
-import React from 'react'
+import { useEffect} from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { TextField, Stack, MenuItem } from '@mui/material'
@@ -57,7 +57,7 @@ export default function StudentForm({
     },
   })
 
-  React.useEffect(() => {
+  useEffect(() => {
     reset({
       userId: defaultValues.userId || defaultValues.user_id || defaultValues.user?.id || '',
       email: defaultValues.email || defaultValues.user?.email || '',

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Box,
   Typography,
@@ -34,7 +34,7 @@ export default function StudentProfilePage() {
   })
 
   // Reset form when student data loads or isEditing toggles
-  React.useEffect(() => {
+  useEffect(() => {
     if (student) {
       reset({
         contactNumber: student.contact_number || '',

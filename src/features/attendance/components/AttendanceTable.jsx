@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import { useMemo } from 'react'
 import { useMaterialReactTable, MaterialReactTable } from '@glebcha/material-react-table'
 import { BadgeAttendanceStatus } from './BadgeAttendanceStatus'
 

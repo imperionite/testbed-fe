@@ -1,4 +1,3 @@
-import React from 'react'
 import FormDialog from '../../shared/components/FormDialog'
 import { UserForm } from './UserForm'
 import { useFormSubmission } from '../../shared/hooks/useFormSubmissions'

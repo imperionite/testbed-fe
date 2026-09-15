@@ -1,4 +1,3 @@
-import React from 'react'
 import { Modal, Box, Typography, Button } from '@mui/material'
 import { MODES } from '../form/formConfig'
 import InternshipStatusForm from './InternshipStatusForm'
