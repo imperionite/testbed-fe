@@ -1,12 +1,11 @@
-import React from "react";
-import { Box, Typography } from "@mui/material";
-import { AuditTable, useAuditLogs } from "../features/audit";
+import { Box, Typography } from '@mui/material'
+import { AuditTable, useAuditLogs } from '../features/audit'
 
 export default function AuditLogsPage() {
-  const { data: logsPage } = useAuditLogs();
-  
+  const { data: logsPage } = useAuditLogs()
+
   // Assuming the API returns an object with an 'items' array
-  const logs = logsPage?.items || [];
+  const logs = logsPage?.items || []
 
   return (
     <Box sx={{ p: 3 }}>
@@ -15,5 +14,5 @@ export default function AuditLogsPage() {
       </Typography>
       <AuditTable data={logs} />
     </Box>
-  );
+  )
 }

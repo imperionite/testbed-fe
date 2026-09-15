@@ -1,12 +1,8 @@
 import { Box, Paper, Stack, Typography } from '@mui/material'
 
-<<<<<<< HEAD
 import useAuth from '../hooks/useAuth'
-=======
-import useAuth from "../hooks/useAuth";
-import TimeTracker from "../features/attendance/components/TimeTracker";
-import { useStudents } from "../features/students/hooks/useStudents";
->>>>>>> 71f7016 ([FR-07] Backend alignment, refactor codes for Student's attendance and implementation of conditions.)
+import TimeTracker from '../features/attendance/components/TimeTracker'
+import { useStudents } from '../features/students/hooks/useStudents'
 
 const roleDashboard = {
   administrator: {
@@ -36,12 +32,8 @@ const roleDashboard = {
 }
 
 export default function Dashboard() {
-<<<<<<< HEAD
   const { user } = useAuth()
-=======
-  const { user } = useAuth();
-  const { data: studentProfile } = useStudents(user?.role);
->>>>>>> 71f7016 ([FR-07] Backend alignment, refactor codes for Student's attendance and implementation of conditions.)
+  const { data: studentProfile } = useStudents(user?.role)
 
   if (!user) {
     return null
@@ -52,12 +44,8 @@ export default function Dashboard() {
   return (
     <Box
       sx={{
-<<<<<<< HEAD
         width: '100%',
-=======
-        width: "100%",
-        position: 'relative'
->>>>>>> 71f7016 ([FR-07] Backend alignment, refactor codes for Student's attendance and implementation of conditions.)
+        position: 'relative',
       }}
     >
       {user.role === 'student' && studentProfile?.internship_id && (

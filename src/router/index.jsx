@@ -11,14 +11,14 @@ import StudentsRoute from '../features/students/StudentsRoute'
 import StudentProfilePage from '../features/students/StudentProfilePage'
 import InternshipManagementPage from '../features/internships/InternshipManagementPage'
 
-import Dashboard from "../pages/Dashboard";
-import ReportsPage from "../pages/ReportsPage";
-import AuditLogsPage from "../pages/AuditLogsPage";
-import UserManagementPage from "../features/users/UserManagementPage";
-import HteManagementPage from "../features/htes/HTEManagementPage";
-import AppLayout from "../layouts/AppLayout";
-import AuthGuard from "../guards/AuthGuard";
-import GuestGuard from "../guards/GuestGuard";
+import Dashboard from '../pages/Dashboard'
+import ReportsPage from '../pages/ReportsPage'
+import AuditLogsPage from '../pages/AuditLogsPage'
+import UserManagementPage from '../features/users/UserManagementPage'
+import HteManagementPage from '../features/htes/HTEManagementPage'
+import AppLayout from '../layouts/AppLayout'
+import AuthGuard from '../guards/AuthGuard'
+import GuestGuard from '../guards/GuestGuard'
 
 import NotFound from '../pages/NotFound'
 

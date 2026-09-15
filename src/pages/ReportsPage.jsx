@@ -1,10 +1,14 @@
-import React from "react";
-import { Box, Typography } from "@mui/material";
-import { ReportSummaryCards, ReportTable, useInternshipReport, useInternshipReportSummary } from "../features/reports";
+import { Box, Typography } from '@mui/material'
+import {
+  ReportSummaryCards,
+  ReportTable,
+  useInternshipReport,
+  useInternshipReportSummary,
+} from '../features/reports'
 
 export default function ReportsPage() {
-  const { data: summary } = useInternshipReportSummary();
-  const { data: detailedReport = [] } = useInternshipReport();
+  const { data: summary } = useInternshipReportSummary()
+  const { data: detailedReport = [] } = useInternshipReport()
 
   return (
     <Box sx={{ p: 3 }}>
@@ -14,5 +18,5 @@ export default function ReportsPage() {
       <ReportSummaryCards summary={summary} />
       <ReportTable data={detailedReport} />
     </Box>
-  );
+  )
 }

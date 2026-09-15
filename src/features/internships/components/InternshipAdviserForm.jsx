@@ -21,7 +21,7 @@ export default function InternshipAdviserForm({ internship, mode, onSubmit, onCa
 
   const handleFormSubmit = (data) => {
     if (!isDirty) {
-      onCancel() // Close if no changes
+      onCancel() 
       return
     }
     onSubmit(data)
