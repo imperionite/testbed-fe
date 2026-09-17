@@ -1,9 +1,11 @@
+import { useState } from 'react'
 import { Modal, Box, Typography, IconButton } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
-import { useAttendanceByInternship } from '../hooks/useAttendanceMutations'
+import { useAttendanceByInternship, useAttendanceMutations } from '../hooks/useAttendanceMutations'
 import { attendanceApi } from '../../../api/attendance'
 import { useQuery } from '@tanstack/react-query'
 import AttendanceTable from './AttendanceTable'
+import AttendanceValidationForm from './AttendanceValidationForm'
 
 const style = {
   position: 'absolute',
@@ -21,11 +23,28 @@ const style = {
 export default function AttendanceViewModal({ open, onClose, internshipId }) {
   const { data: attendance = [], isLoading: isAttendanceLoading } =
     useAttendanceByInternship(internshipId)
+  
+  const { validateAttendance } = useAttendanceMutations(internshipId)
+
   const { data: renderedHours, isLoading: isHoursLoading } = useQuery({
     queryKey: ['renderedHours', internshipId],
     queryFn: () => attendanceApi.getRenderedHours(internshipId),
     enabled: !!internshipId,
   })
+
+  const [validationData, setValidationData] = useState(null)
+
+  const handleValidate = (attendanceRecord) => {
+    setValidationData(attendanceRecord)
+  }
+
+  const handleValidationSubmit = async (data) => {
+    await validateAttendance.mutateAsync({
+        id: validationData.id,
+        validationStatus: data.validation_status
+    })
+    setValidationData(null)
+  }
 
   return (
     <Modal open={open} onClose={onClose}>
@@ -41,10 +60,18 @@ export default function AttendanceViewModal({ open, onClose, internshipId }) {
             Total Validated Hours: {isHoursLoading ? 'Loading...' : renderedHours?.totalHours || 0}
           </Typography>
         </Box>
-        {isAttendanceLoading ? (
+        
+        {validationData ? (
+            <AttendanceValidationForm 
+                attendance={validationData}
+                mode="VALIDATE"
+                onSubmit={handleValidationSubmit}
+                onCancel={() => setValidationData(null)}
+            />
+        ) : isAttendanceLoading ? (
           <Typography>Loading attendance...</Typography>
         ) : (
-          <AttendanceTable data={attendance} />
+          <AttendanceTable data={attendance} onValidate={handleValidate} />
         )}
       </Box>
     </Modal>
