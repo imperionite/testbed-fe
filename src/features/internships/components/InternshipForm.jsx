@@ -23,19 +23,6 @@ export default function InternshipForm({ mode, internships = [], internship, onC
 
   const isViewOrEdit = mode !== MODES.CREATE
 
-<<<<<<< HEAD
-=======
-  const studentsWithInternships = useMemo(
-    () =>
-      new Set(
-        internships
-          .filter((i) => i.status === 'active' || i.status === 'pending')
-          .map((i) => i.student_id),
-      ),
-    [internships],
-  )
-
->>>>>>> 7ec10b3 (feat: integrate attendance tracking, document management, reporting, and audit logging modules with comprehensive code cleanup.)
   const availableStudents = useMemo(() => {
     const studentsWithInternships = new Set(
       internships
