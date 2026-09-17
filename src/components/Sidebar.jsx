@@ -13,6 +13,9 @@ import ManageAccountsOutlinedIcon from '@mui/icons-material/ManageAccountsOutlin
 import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined'
 import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined'
 import WorkOutlineOutlinedIcon from '@mui/icons-material/WorkOutlineOutlined'
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined'
+import AssessmentOutlinedIcon from '@mui/icons-material/AssessmentOutlined'
+import SecurityOutlinedIcon from '@mui/icons-material/SecurityOutlined'
 
 import { Link } from 'react-router-dom'
 
@@ -28,6 +31,13 @@ const menuItems = [
       'student',
       'hte_supervisor',
     ],
+  },
+
+  {
+    label: 'My Documents',
+    path: '/documents',
+    icon: <DescriptionOutlinedIcon />,
+    roles: ['student'],
   },
 
   {
@@ -56,6 +66,20 @@ const menuItems = [
     path: '/internships',
     icon: <WorkOutlineOutlinedIcon />,
     roles: ['administrator', 'internship_coordinator', 'faculty_adviser'],
+  },
+
+  {
+    label: 'Reports',
+    path: '/reports',
+    icon: <AssessmentOutlinedIcon />,
+    roles: ['administrator', 'internship_coordinator'],
+  },
+
+  {
+    label: 'Audit Logs',
+    path: '/audit-logs',
+    icon: <SecurityOutlinedIcon />,
+    roles: ['administrator'],
   },
 ]
 
