@@ -48,8 +48,8 @@ export default function Dashboard() {
         position: 'relative',
       }}
     >
-      {user.role === 'student' && studentProfile?.internship_id && (
-        <TimeTracker internshipId={studentProfile.internship_id} />
+      {user.role === 'student' && studentProfile?.currentInternship?.id && (
+        <TimeTracker internshipId={studentProfile.currentInternship.id} />
       )}
       <Paper
         sx={{

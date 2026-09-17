@@ -11,10 +11,12 @@ import StudentsRoute from '../features/students/StudentsRoute'
 import StudentProfilePage from '../features/students/StudentProfilePage'
 import InternshipManagementPage from '../features/internships/InternshipManagementPage'
 
-import Dashboard from '../pages/Dashboard'
-import ReportsPage from '../pages/ReportsPage'
-import AuditLogsPage from '../pages/AuditLogsPage'
-import UserManagementPage from '../features/users/UserManagementPage'
+import Dashboard from "../pages/Dashboard";
+import ReportsPage from "../pages/ReportsPage";
+import AuditLogsPage from "../pages/AuditLogsPage";
+import StudentDocumentsPage from "../pages/StudentDocumentsPage";
+import UserManagementPage from "../features/users/UserManagementPage";
+
 import HteManagementPage from '../features/htes/HTEManagementPage'
 import AppLayout from '../layouts/AppLayout'
 import AuthGuard from '../guards/AuthGuard'
@@ -49,6 +51,7 @@ export default function AppRouter() {
           <Route path="/internships" element={<InternshipManagementPage />} />
           <Route path="/students" element={<StudentsRoute />} />
           <Route path="/students/me" element={<StudentProfilePage />} />
+          <Route path="/documents" element={<StudentDocumentsPage />} />
           <Route path="/reports" element={<ReportsPage />} />
           <Route path="/audit-logs" element={<AuditLogsPage />} />
         </Route>
