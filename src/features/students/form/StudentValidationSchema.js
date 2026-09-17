@@ -33,5 +33,4 @@ export const StudentValidationSchema = z.object({
     .regex(phoneRegex, 'Invalid phone number format')
     .optional()
     .nullable(),
-  internshipStatus: z.enum(['pending', 'active', 'completed', 'dropped']),
 })
