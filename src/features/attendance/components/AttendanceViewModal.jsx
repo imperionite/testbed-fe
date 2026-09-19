@@ -23,7 +23,7 @@ const style = {
 export default function AttendanceViewModal({ open, onClose, internshipId }) {
   const { data: attendance = [], isLoading: isAttendanceLoading } =
     useAttendanceByInternship(internshipId)
-  
+
   const { validateAttendance } = useAttendanceMutations(internshipId)
 
   const { data: renderedHours, isLoading: isHoursLoading } = useQuery({
@@ -40,8 +40,8 @@ export default function AttendanceViewModal({ open, onClose, internshipId }) {
 
   const handleValidationSubmit = async (data) => {
     await validateAttendance.mutateAsync({
-        id: validationData.id,
-        validationStatus: data.validation_status
+      id: validationData.id,
+      validationStatus: data.validation_status,
     })
     setValidationData(null)
   }
@@ -60,14 +60,14 @@ export default function AttendanceViewModal({ open, onClose, internshipId }) {
             Total Validated Hours: {isHoursLoading ? 'Loading...' : renderedHours?.totalHours || 0}
           </Typography>
         </Box>
-        
+
         {validationData ? (
-            <AttendanceValidationForm 
-                attendance={validationData}
-                mode="VALIDATE"
-                onSubmit={handleValidationSubmit}
-                onCancel={() => setValidationData(null)}
-            />
+          <AttendanceValidationForm
+            attendance={validationData}
+            mode="VALIDATE"
+            onSubmit={handleValidationSubmit}
+            onCancel={() => setValidationData(null)}
+          />
         ) : isAttendanceLoading ? (
           <Typography>Loading attendance...</Typography>
         ) : (
