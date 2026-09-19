@@ -1,4 +1,16 @@
-import { Box, TextField, MenuItem, Button, Stack } from '@mui/material'
+import { useState, useEffect } from 'react'
+import {
+  Box,
+  TextField,
+  MenuItem,
+  Button,
+  Stack,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Typography,
+} from '@mui/material'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import getValidationSchema from '../validation/InternshipValidationSchema'
@@ -6,6 +18,13 @@ import getValidationSchema from '../validation/InternshipValidationSchema'
 export default function InternshipStatusForm({ internship, mode, onSubmit, onCancel }) {
   const currentStatus = internship?.status || 'pending'
   const isCompleted = currentStatus === 'completed'
+
+  const [warningDialogOpen, setWarningDialogOpen] = useState(false)
+  const [confirmationDialogOpen, setConfirmationDialogOpen] = useState(false)
+  const [pendingData, setPendingData] = useState(null)
+
+  const [isWarningReady, setIsWarningReady] = useState(false)
+  const [isConfirmationReady, setIsConfirmationReady] = useState(false)
 
   const {
     control,
@@ -16,19 +35,63 @@ export default function InternshipStatusForm({ internship, mode, onSubmit, onCan
     defaultValues: { status: currentStatus },
   })
 
+  // Timer for 3-second delay on Warning
+  useEffect(() => {
+    let timer
+    if (warningDialogOpen) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setIsWarningReady(false)
+      timer = setTimeout(() => setIsWarningReady(true), 3000)
+    }
+    return () => clearTimeout(timer)
+  }, [warningDialogOpen])
+
+  // Timer for 2-second delay on Confirmation
+  useEffect(() => {
+    if (confirmationDialogOpen) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setIsConfirmationReady(false)
+      const timer = setTimeout(() => setIsConfirmationReady(true), 2000)
+      return () => clearTimeout(timer)
+    }
+  }, [confirmationDialogOpen])
+
   const getDisabledStatus = (option) => {
-    // If already in that status, disable it to prevent redundant API calls
     if (currentStatus === option) return true
-
-    // Logic constraints
-    if (isCompleted) return true // Completed locks all
-    if (currentStatus === 'active' && option === 'pending') return true // Active cannot revert to pending
-
+    if (isCompleted) return true
+    if (currentStatus === 'active' && option === 'pending') return true
     return false
   }
 
+  const checkAndSubmit = (data) => {
+    if (data.status === 'active' && new Date() < new Date(internship.start_date)) {
+      // Include startDate update in pending data
+      setPendingData({
+        ...data,
+        updateStartDate: new Date().toISOString().split('T')[0],
+      })
+      setIsWarningReady(false)
+      setWarningDialogOpen(true)
+    } else {
+      onSubmit(data)
+    }
+  }
+
+  const handleWarningConfirm = () => {
+    if (!isWarningReady) return
+    setWarningDialogOpen(false)
+    setIsConfirmationReady(false)
+    setConfirmationDialogOpen(true)
+  }
+
+  const handleFinalConfirm = () => {
+    if (!isConfirmationReady) return
+    setConfirmationDialogOpen(false)
+    onSubmit(pendingData)
+  }
+
   return (
-    <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ mt: 2 }}>
+    <Box component="form" onSubmit={handleSubmit(checkAndSubmit)} sx={{ mt: 2 }}>
       <Stack spacing={2}>
         {isCompleted ? (
           <TextField
@@ -87,6 +150,48 @@ export default function InternshipStatusForm({ internship, mode, onSubmit, onCan
           )}
         </Stack>
       </Stack>
+
+      {/* Warning Dialog - 3s delay */}
+      <Dialog open={warningDialogOpen} onClose={() => setWarningDialogOpen(false)}>
+        <DialogTitle>Early Activation Warning</DialogTitle>
+        <DialogContent>
+          <Typography>
+            You are trying to activate this internship before the original start date (
+            {internship.start_date}). The start date will be changed to today (
+            {new Date().toISOString().split('T')[0]}).
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setWarningDialogOpen(false)}>Cancel</Button>
+          <Button
+            onClick={handleWarningConfirm}
+            variant="contained"
+            color="warning"
+            disabled={!isWarningReady}
+          >
+            {isWarningReady ? 'Proceed' : 'Please wait...'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Final Confirmation Dialog - 2s delay */}
+      <Dialog open={confirmationDialogOpen} onClose={() => setConfirmationDialogOpen(false)}>
+        <DialogTitle>Final Confirmation</DialogTitle>
+        <DialogContent>
+          <Typography>This action cannot be undone. Are you sure you want to proceed?</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConfirmationDialogOpen(false)}>Cancel</Button>
+          <Button
+            onClick={handleFinalConfirm}
+            variant="contained"
+            color="error"
+            disabled={!isConfirmationReady}
+          >
+            {isConfirmationReady ? 'Confirm' : 'Please wait...'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   )
 }
