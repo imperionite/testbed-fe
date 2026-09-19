@@ -18,7 +18,7 @@ import {
 } from '@mui/icons-material'
 import { useMaterialReactTable } from '@glebcha/material-react-table'
 import { useMemo, useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { attendanceApi } from '../../api/attendance'
 import CardStat from '../shared/components/CardStat'
 import InternshipTable from './components/InternshipTable'
@@ -37,7 +37,8 @@ function ProgressCell({ internshipId, requiredHours }) {
   })
 
   if (isLoading) return 'Loading...'
-  return `${data?.totalHours || 0} / ${requiredHours || 0} hours`
+  const hours = data?.totalHours || 0
+  return `${Number(hours).toFixed(2)} / ${requiredHours || 0} hours`
 }
 
 export default function InternshipManagementPage() {
@@ -51,6 +52,7 @@ export default function InternshipManagementPage() {
     internship: null,
   })
 
+  const queryClient = useQueryClient()
   const { internships, studentMap, adviserMap, isLoading, isError, refetch } = useInternshipsData()
   const { createInternship, updateStatus, assignAdviser, updateInternship } =
     useInternshipMutations()
@@ -73,6 +75,8 @@ export default function InternshipManagementPage() {
   }
 
   const handleCloseAttendance = () => {
+    // Invalidate renderedHours query when closing attendance modal
+    queryClient.invalidateQueries({ queryKey: ['renderedHours', attendanceModalState.internship?.id] })
     setAttendanceModalState({ open: false, internship: null })
   }
 
@@ -195,6 +199,16 @@ export default function InternshipManagementPage() {
   })
 
   const handleUpdateStatus = async (data) => {
+    // If startDate needs to be updated (Early Activation)
+    if (data.updateStartDate) {
+      await updateInternship.mutateAsync({
+        id: modalState.internship.id,
+        payload: {
+          startDate: data.updateStartDate
+        }
+      })
+    }
+    // Update status
     await updateStatus.mutateAsync({ id: modalState.internship.id, status: data.status })
     handleCloseModal()
   }
