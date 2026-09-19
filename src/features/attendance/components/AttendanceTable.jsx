@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { useMaterialReactTable, MaterialReactTable } from '@glebcha/material-react-table'
 import { BadgeAttendanceStatus } from './BadgeAttendanceStatus'
 
+// eslint-disable-next-line no-unused-vars
 export default function AttendanceTable({ data = [], onValidate }) {
   const columns = useMemo(
     () => [
