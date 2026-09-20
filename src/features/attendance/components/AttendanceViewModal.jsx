@@ -6,11 +6,8 @@ import { attendanceApi } from '../../../api/attendance'
 import { useQuery } from '@tanstack/react-query'
 import AttendanceTable from './AttendanceTable'
 import AttendanceValidationForm from './AttendanceValidationForm'
-<<<<<<< HEAD
 import AttendanceFormModal from './AttendanceFormModal'
 import useAuth from '../../../hooks/useAuth'
-=======
->>>>>>> f1159aa6db675e8fc4b5e7051019b066bc26cb6e
 
 const style = {
   position: 'absolute',
@@ -32,13 +29,8 @@ export default function AttendanceViewModal({ open, onClose, internshipId }) {
 
   const { data: attendance = [], isLoading: isAttendanceLoading } =
     useAttendanceByInternship(internshipId)
-<<<<<<< HEAD
   
   const { validateAttendance, updateAttendance } = useAttendanceMutations(internshipId)
-=======
-
-  const { validateAttendance } = useAttendanceMutations(internshipId)
->>>>>>> f1159aa6db675e8fc4b5e7051019b066bc26cb6e
 
   const { data: renderedHours, isLoading: isHoursLoading } = useQuery({
     queryKey: ['renderedHours', internshipId],

@@ -37,9 +37,9 @@ const menuItems = [
     label: 'My Documents',
     path: '/documents',
     icon: <DescriptionOutlinedIcon />,
-    roles: ['student'],
+    roles: ['student', 'hte_supervisor'],
   },
-
+  
   {
     label: 'User & Roles',
     path: '/userandroles',
