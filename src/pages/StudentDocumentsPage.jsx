@@ -1,11 +1,11 @@
-import { Box, Typography } from '@mui/material'
-import { StudentDocumentsView } from '../features/documents'
-import useAuth from '../hooks/useAuth'
-import { useStudents } from '../features/students/hooks/useStudents'
+import { Box, Typography } from "@mui/material";
+import { StudentDocumentsView } from "../features/documents";
+import useAuth from "../hooks/useAuth";
+import { useStudents } from "../features/students/hooks/useStudents";
 
 export default function StudentDocumentsPage() {
-  const { user } = useAuth()
-  const { data: studentProfile } = useStudents(user?.role)
+  const { user } = useAuth();
+  const { data: studentProfile } = useStudents(user?.role);
 
   return (
     <Box sx={{ p: 3 }}>
@@ -18,5 +18,5 @@ export default function StudentDocumentsPage() {
         <Typography>No active internship found.</Typography>
       )}
     </Box>
-  )
+  );
 }

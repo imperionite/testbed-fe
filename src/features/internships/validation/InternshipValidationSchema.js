@@ -17,7 +17,10 @@ const createInternshipValidationSchema = z.object({
   facultyAdviserId: z.string().uuid('Faculty Adviser is required'),
   startDate: z.string().min(1, 'Start date is required'),
   endDate: z.string().min(1, 'End date is required'),
-  requiredHours: z.coerce.number().int().positive('Required hours must be a positive number'),
+  requiredHours: z.coerce
+    .number()
+    .int()
+    .positive('Required hours must be a positive number'),
 })
 
 const editStatusValidationSchema = z.object({

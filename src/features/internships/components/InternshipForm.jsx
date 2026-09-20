@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { Box, TextField, MenuItem, Button, Stack } from '@mui/material'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -19,9 +19,16 @@ export default function InternshipForm({ mode, internships = [], internship, onC
   const { data: users = [] } = useUsers()
   const facultyAdvisers = users.filter((u) => u.role === 'faculty_adviser')
 
-  const { updateInternship, updateStatus, assignAdviser } = useInternshipMutations()
+  const { updateInternship, updateStatus, assignAdviser } =
+    useInternshipMutations()
 
   const isViewOrEdit = mode !== MODES.CREATE
+
+  const studentsWithInternships = useMemo(() => new Set(
+    internships
+      .filter((i) => i.status === 'active' || i.status === 'pending')
+      .map((i) => i.student_id),
+  ), [internships])
 
   const availableStudents = useMemo(() => {
     const studentsWithInternships = new Set(
@@ -38,6 +45,8 @@ export default function InternshipForm({ mode, internships = [], internship, onC
     control,
     handleSubmit,
     formState: { errors },
+    watch,
+    setValue,
   } = useForm({
     resolver: zodResolver(getValidationSchema(mode)),
     defaultValues: {
@@ -48,15 +57,37 @@ export default function InternshipForm({ mode, internships = [], internship, onC
       requiredHours: internship?.required_hours || 480,
       status: internship?.status || 'pending',
       facultyAdviserId: internship?.faculty_adviser_id || '',
+      startDate: internship?.start_date || '',
+      endDate: internship?.end_date || '',
     },
   })
+
+  // Watch fields to trigger auto-calculation
+  const startDate = watch('startDate')
+  const requiredHours = watch('requiredHours')
+
+  useEffect(() => {
+    if (startDate && requiredHours && mode === MODES.CREATE) {
+      const start = new Date(startDate)
+      // 8 hours per day, 25% buffer (1.25 factor)
+      // Days needed = (hours / 8) * 1.25
+      const daysNeeded = Math.ceil((Number(requiredHours) / 8) * 1.25)
+      const end = new Date(start)
+      end.setDate(end.getDate() + daysNeeded)
+      
+      setValue('endDate', end.toISOString().split('T')[0])
+    }
+  }, [startDate, requiredHours, mode, setValue])
 
   const onSubmitHandler = (data) => {
     if (mode === MODES.CREATE) {
       onSubmit({
         studentId: data.studentId,
         hteId: data.hteId,
-        requiredHours: data.requiredHours ? Number(data.requiredHours) : null,
+        facultyAdviserId: data.facultyAdviserId,
+        startDate: data.startDate,
+        endDate: data.endDate,
+        requiredHours: Number(data.requiredHours),
       })
     } else {
       const promises = []
@@ -81,14 +112,19 @@ export default function InternshipForm({ mode, internships = [], internship, onC
 
       if (
         data.hteId !== internship.hte_id ||
-        Number(data.requiredHours) !== (internship.required_hours || 480)
+        Number(data.requiredHours) !== (internship.required_hours || 480) ||
+        data.startDate !== internship.start_date ||
+        data.endDate !== internship.end_date
       ) {
         promises.push(
           updateInternship.mutateAsync({
             id: internship.id,
             payload: {
               hteId: data.hteId,
-              requiredHours: data.requiredHours ? Number(data.requiredHours) : null,
+              facultyAdviserId: data.facultyAdviserId,
+              startDate: data.startDate,
+              endDate: data.endDate,
+              requiredHours: Number(data.requiredHours),
             },
           }),
         )
@@ -104,9 +140,10 @@ export default function InternshipForm({ mode, internships = [], internship, onC
         <Controller
           name="studentId"
           control={control}
-          render={({ field }) => (
+          render={({ field: { ref, ...field } }) => (
             <TextField
               {...field}
+              inputRef={ref}
               select
               label={
                 isStudentsLoading
@@ -148,9 +185,10 @@ export default function InternshipForm({ mode, internships = [], internship, onC
         <Controller
           name="hteId"
           control={control}
-          render={({ field }) => (
+          render={({ field: { ref, ...field } }) => (
             <TextField
               {...field}
+              inputRef={ref}
               select
               label="HTE"
               disabled={mode === MODES.VIEW}
@@ -166,43 +204,12 @@ export default function InternshipForm({ mode, internships = [], internship, onC
           )}
         />
         <Controller
-          name="requiredHours"
-          control={control}
-          render={({ field }) => (
-            <TextField
-              {...field}
-              type="number"
-              label="Required Hours"
-              disabled={mode === MODES.VIEW}
-              error={!!errors.requiredHours}
-              helperText={errors.requiredHours?.message}
-            />
-          )}
-        />
-        <Controller
-          name="status"
-          control={control}
-          render={({ field }) => (
-            <TextField
-              {...field}
-              select
-              label="Status"
-              disabled={mode === MODES.VIEW}
-              error={!!errors.status}
-              helperText={errors.status?.message}
-            >
-              <MenuItem value="pending">Pending</MenuItem>
-              <MenuItem value="active">Active</MenuItem>
-              <MenuItem value="completed">Completed</MenuItem>
-            </TextField>
-          )}
-        />
-        <Controller
           name="facultyAdviserId"
           control={control}
-          render={({ field }) => (
+          render={({ field: { ref, ...field } }) => (
             <TextField
               {...field}
+              inputRef={ref}
               select
               label="Faculty Adviser"
               disabled={mode === MODES.VIEW}
@@ -215,6 +222,72 @@ export default function InternshipForm({ mode, internships = [], internship, onC
                   {u.email}
                 </MenuItem>
               ))}
+            </TextField>
+          )}
+        />
+        <Controller
+          name="startDate"
+          control={control}
+          render={({ field: { ref, ...field } }) => (
+            <TextField
+              {...field}
+              inputRef={ref}
+              type="date"
+              label="Start Date"
+              InputLabelProps={{ shrink: true }}
+              disabled={mode === MODES.VIEW}
+              error={!!errors.startDate}
+              helperText={errors.startDate?.message}
+            />
+          )}
+        />
+        <Controller
+          name="endDate"
+          control={control}
+          render={({ field: { ref, ...field } }) => (
+            <TextField
+              {...field}
+              inputRef={ref}
+              type="date"
+              label="End Date"
+              InputLabelProps={{ shrink: true }}
+              disabled={mode === MODES.VIEW}
+              error={!!errors.endDate}
+              helperText={errors.endDate?.message}
+            />
+          )}
+        />
+        <Controller
+          name="requiredHours"
+          control={control}
+          render={({ field: { ref, ...field } }) => (
+            <TextField
+              {...field}
+              inputRef={ref}
+              type="number"
+              label="Required Hours"
+              disabled={mode === MODES.VIEW}
+              error={!!errors.requiredHours}
+              helperText={errors.requiredHours?.message}
+            />
+          )}
+        />
+        <Controller
+          name="status"
+          control={control}
+          render={({ field: { ref, ...field } }) => (
+            <TextField
+              {...field}
+              inputRef={ref}
+              select
+              label="Status"
+              disabled={mode === MODES.VIEW}
+              error={!!errors.status}
+              helperText={errors.status?.message}
+            >
+              <MenuItem value="pending">Pending</MenuItem>
+              <MenuItem value="active">Active</MenuItem>
+              <MenuItem value="completed">Completed</MenuItem>
             </TextField>
           )}
         />

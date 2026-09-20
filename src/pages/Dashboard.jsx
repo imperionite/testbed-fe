@@ -1,8 +1,9 @@
 import { Box, Paper, Stack, Typography } from '@mui/material'
 
 import useAuth from '../hooks/useAuth'
-import TimeTracker from '../features/attendance/components/TimeTracker'
+import StudentDashboard from '../features/attendance/components/StudentDashboard'
 import { useStudents } from '../features/students/hooks/useStudents'
+import TimeTracker from '../features/attendance/components/TimeTracker'
 
 const roleDashboard = {
   administrator: {
@@ -54,6 +55,7 @@ export default function Dashboard() {
       <Paper
         sx={{
           p: 4,
+          mb: 3,
         }}
       >
         <Stack spacing={2}>
@@ -70,6 +72,10 @@ export default function Dashboard() {
           <Typography variant="body2">Role: {user.role}</Typography>
         </Stack>
       </Paper>
+      
+      {user.role === 'student' && studentProfile?.currentInternship?.id && (
+        <StudentDashboard internshipId={studentProfile.currentInternship.id} />
+      )}
     </Box>
   )
 }

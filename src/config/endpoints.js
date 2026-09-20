@@ -62,8 +62,8 @@ const endpoints = {
   },
 
   audit: {
-    list: '/audit-logs',
+    list: "/audit-logs",
   },
-}
+  };
 
 export default Object.freeze(endpoints)
