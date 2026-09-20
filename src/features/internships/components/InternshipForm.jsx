@@ -31,9 +31,15 @@ export default function InternshipForm({ mode, internships = [], internship, onC
   ), [internships])
 
   const availableStudents = useMemo(() => {
+    const studentsWithInternships = new Set(
+      internships
+        .filter((i) => i.status === 'active' || i.status === 'pending')
+        .map((i) => i.student_id),
+    )
+
     if (mode !== MODES.CREATE) return students
     return students.filter((s) => !studentsWithInternships.has(s.id))
-  }, [students, studentsWithInternships, mode])
+  }, [students, internships, mode])
 
   const {
     control,

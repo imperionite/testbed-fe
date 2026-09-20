@@ -3,6 +3,7 @@ import { Box, Paper, Stack, Typography } from '@mui/material'
 import useAuth from '../hooks/useAuth'
 import StudentDashboard from '../features/attendance/components/StudentDashboard'
 import { useStudents } from '../features/students/hooks/useStudents'
+import TimeTracker from '../features/attendance/components/TimeTracker'
 
 const roleDashboard = {
   administrator: {
@@ -48,6 +49,9 @@ export default function Dashboard() {
         position: 'relative',
       }}
     >
+      {user.role === 'student' && studentProfile?.currentInternship?.id && (
+        <TimeTracker internshipId={studentProfile.currentInternship.id} />
+      )}
       <Paper
         sx={{
           p: 4,

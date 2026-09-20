@@ -204,8 +204,13 @@ export default function InternshipManagementPage() {
       await updateInternship.mutateAsync({
         id: modalState.internship.id,
         payload: {
+<<<<<<< HEAD
           startDate: data.updateStartDate
         }
+=======
+          startDate: data.updateStartDate,
+        },
+>>>>>>> f1159aa6db675e8fc4b5e7051019b066bc26cb6e
       })
     }
     // Update status
