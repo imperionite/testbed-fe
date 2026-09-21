@@ -3,18 +3,17 @@ import {
   MaterialReactTable,
   useMaterialReactTable,
 } from "@glebcha/material-react-table";
-import { Box, Button, CircularProgress } from "@mui/material";
+import { CircularProgress, IconButton, Tooltip } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
+import EditIcon from "@mui/icons-material/Edit";
 
 import { createEvaluationTableColumns } from "./evaluationTableColumns";
-import notify from "../../../utils/toast";
-import ActionConfirmDialog from "../../../components/common/ActionConfirmDialog";
+import ActionConfirmDialog from "../../shared/components/ActionConfirmDialog";
 
 export default function EvaluationsTable({
   evaluations,
   permissions,
   internMap = {},
-  onBulkStatusChange,
   onEvaluationClick,
 }) {
   const [rowSelection, setRowSelection] = useState({});
@@ -22,10 +21,10 @@ export default function EvaluationsTable({
   const [confirmation, setConfirmation] = useState(null);
   const [pendingAction, setPendingAction] = useState(null);
 
-  const askForConfirmation = (message) =>
-    new Promise((resolve) => {
-      setConfirmation({ message, resolve });
-    });
+  // const askForConfirmation = (message) =>
+  //   new Promise((resolve) => {
+  //     setConfirmation({ message, resolve });
+  //   });
 
   const closeConfirmation = (confirmed) => {
     confirmation?.resolve(confirmed);
@@ -58,6 +57,7 @@ export default function EvaluationsTable({
     enableStickyHeader: true,
     enableStickyFooter: true,
     enableEditing: false,
+    enableRowActions: permissions.canEdit,
     positionActionsColumn: "last",
     positionGlobalFilter: "right",
     initialState: {
@@ -118,64 +118,62 @@ export default function EvaluationsTable({
         zIndex: 2,
       },
     },
-    muiTableBodyRowProps: ({ row }) => ({
-      onClick: (event) => {
-        if (
-          event.target.closest("button") ||
-          event.target.closest("input") ||
-          event.target.closest('[role="checkbox"]')
-        ) {
-          return;
-        }
+    renderRowActions: ({ row }) => (
+      <Tooltip title={row.original.status?.toLowerCase() === "draft" ? "Edit evaluation" : "View evaluation"}>
+        <IconButton
+          aria-label={`${row.original.status?.toLowerCase() === "draft" ? "Edit" : "View"} evaluation`}
+          onClick={(event) => {
+            event.stopPropagation();
+            onEvaluationClick?.(row.original);
+          }}
+          size="small"
+        >
+          <EditIcon fontSize="small" />
+        </IconButton>
+      </Tooltip>
+    ),
+    // renderBottomToolbarCustomActions: ({ table: currentTable }) =>
+    //   permissions.canBulkEdit ? (
+    //     <Box sx={{ display: "flex", gap: 1 }}>
+    //       <Button
+    //         size="small"
+    //         variant="contained"
+    //         disabled={
+    //           pendingAction !== null ||
+    //           !currentTable
+    //             .getSelectedRowModel()
+    //             .rows.some((row) => row.original.status === "Draft")
+    //         }
+    //         onClick={async () => {
+    //           const ids = currentTable
+    //             .getSelectedRowModel()
+    //             .rows
+    //             .filter((row) => row.original.status === "Draft")
+    //             .map((row) => row.original.id);
 
-        onEvaluationClick?.(row.original);
-      },
-      sx: {
-        cursor: onEvaluationClick ? "pointer" : "default",
-      },
-    }),
-    renderBottomToolbarCustomActions: ({ table: currentTable }) =>
-      permissions.canBulkEdit ? (
-        <Box sx={{ display: "flex", gap: 1 }}>
-          <Button
-            size="small"
-            variant="contained"
-            disabled={
-              pendingAction !== null ||
-              !currentTable
-                .getSelectedRowModel()
-                .rows.some((row) => row.original.status === "Draft")
-            }
-            onClick={async () => {
-              const ids = currentTable
-                .getSelectedRowModel()
-                .rows
-                .filter((row) => row.original.status === "Draft")
-                .map((row) => row.original.id);
+    //           if (!ids.length || !(await askForConfirmation("Are you sure you want to submit the selected draft evaluations? Once an evaluation is submitted, it is final and cannot be undone."))) {
+    //             return;
+    //           }
 
-              if (!ids.length || !(await askForConfirmation("Are you sure you want to submit the selected draft evaluations? Once an evaluation is submitted, it is final and cannot be undone."))) {
-                return;
-              }
-
-              setPendingAction("bulk-submit");
-              try {
-                await onBulkStatusChange({ ids });
-                notify.success("Evaluations submitted successfully.");
-              } catch (error) {
-                console.error("Failed to submit evaluations:", error);
-                notify.error(
-                  error.response?.data?.message || "Failed to submit evaluations.",
-                );
-              } finally {
-                setPendingAction(null);
-              }
-            }}
-            startIcon={pendingAction === "bulk-submit" ? <CircularProgress size={16} /> : null}
-          >
-            {pendingAction === "bulk-submit" ? "Submitting..." : "Submit drafts"}
-          </Button>
-        </Box>
-      ) : null,
+    //           setPendingAction("bulk-submit");
+    //           try {
+    //             await onBulkStatusChange({ ids });
+    //             notify.success("Evaluations submitted successfully.");
+    //           } catch (error) {
+    //             console.error("Failed to submit evaluations:", error);
+    //             notify.error(
+    //               error.response?.data?.message || "Failed to submit evaluations.",
+    //             );
+    //           } finally {
+    //             setPendingAction(null);
+    //           }
+    //         }}
+    //         startIcon={pendingAction === "bulk-submit" ? <CircularProgress size={16} /> : null}
+    //       >
+    //         {pendingAction === "bulk-submit" ? "Submitting..." : "Submit drafts"}
+    //       </Button>
+    //     </Box>
+    //   ) : null,
   });
 
   return (

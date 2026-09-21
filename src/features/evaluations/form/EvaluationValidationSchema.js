@@ -57,7 +57,7 @@ const createEvaluationValidationSchema = z.object({
   internship_id: requiredString("Internship ID", 255),
 
   evaluation_type: z
-    .literal("hte_supervisor")
+    .enum(["hte_supervisor", "faculty_adviser"])
     .optional()
     .default("hte_supervisor"),
 

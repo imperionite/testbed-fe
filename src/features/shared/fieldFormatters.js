@@ -25,6 +25,8 @@ export function formatSentenceCase(value) {
   if (!value) return ''
 
   return value
+    .replace(/_/g, ' ')
     .toLowerCase()
-    .replace(/(^\s*|[.!?]\s+)([a-z])/g, (_, prefix, letter) => prefix + letter.toUpperCase())
+    .replace(/\b\w/g, (letter) => letter.toUpperCase())
 }
+

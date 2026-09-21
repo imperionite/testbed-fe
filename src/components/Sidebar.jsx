@@ -16,6 +16,7 @@ import WorkOutlineOutlinedIcon from '@mui/icons-material/WorkOutlineOutlined'
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined'
 import AssessmentOutlinedIcon from '@mui/icons-material/AssessmentOutlined'
 import SecurityOutlinedIcon from '@mui/icons-material/SecurityOutlined'
+import FactCheckOutlinedIcon from '@mui/icons-material/FactCheckOutlined';
 
 import { Link } from 'react-router-dom'
 
@@ -71,8 +72,8 @@ const menuItems = [
   {
     label: "Evaluations",
     path: "/evaluations",
-    icon: <SchoolOutlinedIcon />,
-    roles: ["hte_supervisor", "internship_coordinator", "student"],
+    icon: <FactCheckOutlinedIcon />,
+    roles: ["hte_supervisor", "internship_coordinator", "student", 'faculty_adviser'],
   },
 
   {

@@ -12,24 +12,25 @@ export function useUsers(options = {}) {
 
 export function useStudentUsers(options = {}) {
   return useQuery({
-    queryKey: ['students'],
-    queryFn: usersApi.getUsersByRole('students'),
+    queryKey: ['users'],
+    queryFn: () => usersApi.getUsersByRole('students'),
     ...options,
   })
 }
 
 export function useFacultyUsers(options = {}) {
   return useQuery({
-    queryKey: ['faculty_advisers'],
-    queryFn: usersApi.getUsersByRole('faculty_adviser'),
+    queryKey: ['users'],
+    queryFn: () => usersApi.getUsersByRole('faculty_adviser'),
     ...options,
   })
 }
 
 export function useSupervisorUsers(options = {}) {
   return useQuery({
-    queryKey: ['faculty_advisers'],
-    queryFn: usersApi.getUsersByRole('hte_supervisor'),
+    queryKey: ['users', 'hte_supervisor'],
+    queryFn: () => usersApi.getUsersByRole('hte_supervisor'),
     ...options,
   })
 }
+

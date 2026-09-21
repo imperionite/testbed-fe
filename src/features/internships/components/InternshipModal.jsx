@@ -90,7 +90,7 @@ export default function InternshipModal({
   }
 
   return (
-    <Modal open={open} onClose={onClose}>
+    <Modal open={open} onClose={onClose} disableRestoreFocus>
       <Box sx={style}>
         <Typography variant="h6">
           {mode === MODES.CREATE && 'Add New Intern'}

@@ -1,11 +1,13 @@
 import { Chip } from "@mui/material";
 
 function BadgeStatus({ value }) {
+  const normalizedValue = String(value || "").toLowerCase();
+
   return (
     <Chip
       label={value}
       size="small"
-      color={value === "Submitted" ? "success" : "theme.palette.warning.main"}
+      color={normalizedValue === "submitted" ? "success" : "default"}
       variant="filled"
     />
   );

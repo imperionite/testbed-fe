@@ -33,8 +33,13 @@ const InternshipCoordinatorAndStudentRules = (create, edit, view) => ({
   },
 });
 
-const HteSupervisorRules = (create, edit, view) => ({
+const HteSupervisorAndFacultyAdviserRules = (create, edit, view) => ({
   [ROLES.HTE_SUPERVISOR]: {
+    [MODES.CREATE]: create,
+    [MODES.EDIT]: edit,
+    [MODES.VIEW]: view,
+  },
+  [ROLES.FACULTY_ADVISER]: {
     [MODES.CREATE]: create,
     [MODES.EDIT]: edit,
     [MODES.VIEW]: view,
@@ -48,10 +53,10 @@ export const evaluationFormConfig = [
     type: "text",
     rbac: [InternshipCoordinatorAndStudentRules(
       FIELD_RULES.HIDDEN,
-      FIELD_RULES.HIDDEN,
+      FIELD_RULES.READONLY,
       FIELD_RULES.READONLY,
     ),
-    HteSupervisorRules(
+    HteSupervisorAndFacultyAdviserRules(
       FIELD_RULES.HIDDEN,
       FIELD_RULES.READONLY,
       FIELD_RULES.READONLY,
@@ -66,7 +71,7 @@ export const evaluationFormConfig = [
       FIELD_RULES.HIDDEN,
       FIELD_RULES.READONLY,
     ),
-    HteSupervisorRules(
+    HteSupervisorAndFacultyAdviserRules(
       FIELD_RULES.EDITABLE,
       FIELD_RULES.READONLY,
       FIELD_RULES.READONLY,
@@ -79,26 +84,26 @@ export const evaluationFormConfig = [
    rbac: [InternshipCoordinatorAndStudentRules(
       FIELD_RULES.HIDDEN,
       FIELD_RULES.HIDDEN,
-      FIELD_RULES.READONLY,
-    ),
-    HteSupervisorRules(
       FIELD_RULES.HIDDEN,
-      FIELD_RULES.READONLY,
-      FIELD_RULES.READONLY,
+    ),
+    HteSupervisorAndFacultyAdviserRules(
+      FIELD_RULES.HIDDEN,
+      FIELD_RULES.HIDDEN,
+      FIELD_RULES.HIDDEN,
     )]
   },
     {
     name: "evaluation_type",
     label: "Evaluation Type",
-    type: "evaluation_type",
+    type: "text",
     rbac: [InternshipCoordinatorAndStudentRules(
       FIELD_RULES.HIDDEN,
       FIELD_RULES.HIDDEN,
       FIELD_RULES.READONLY,
     ),
-    HteSupervisorRules(
-      FIELD_RULES.EDITABLE,
-      FIELD_RULES.EDITABLE,
+    HteSupervisorAndFacultyAdviserRules(
+      FIELD_RULES.READONLY,
+      FIELD_RULES.READONLY,
       FIELD_RULES.READONLY,
     )]
   },
@@ -111,7 +116,7 @@ export const evaluationFormConfig = [
       FIELD_RULES.HIDDEN,
       FIELD_RULES.READONLY,
     ),
-    HteSupervisorRules(
+    HteSupervisorAndFacultyAdviserRules(
       FIELD_RULES.EDITABLE,
       FIELD_RULES.EDITABLE,
       FIELD_RULES.READONLY,
@@ -126,7 +131,7 @@ export const evaluationFormConfig = [
       FIELD_RULES.HIDDEN,
       FIELD_RULES.READONLY,
     ),
-    HteSupervisorRules(
+    HteSupervisorAndFacultyAdviserRules(
       FIELD_RULES.EDITABLE,
       FIELD_RULES.EDITABLE,
       FIELD_RULES.READONLY,
@@ -142,7 +147,7 @@ export const evaluationFormConfig = [
       FIELD_RULES.HIDDEN,
       FIELD_RULES.READONLY,
     ),
-      HteSupervisorRules(
+      HteSupervisorAndFacultyAdviserRules(
       FIELD_RULES.HIDDEN,
       FIELD_RULES.READONLY,
       FIELD_RULES.READONLY,
@@ -158,7 +163,23 @@ export const evaluationFormConfig = [
       FIELD_RULES.HIDDEN,
       FIELD_RULES.READONLY,
     ),
-      HteSupervisorRules(
+      HteSupervisorAndFacultyAdviserRules(
+      FIELD_RULES.HIDDEN,
+      FIELD_RULES.READONLY,
+      FIELD_RULES.READONLY,
+    )],
+  },
+    {
+    name: "submitted_at",
+    label: "Submitted At",
+    type: "text",
+      format: "date",
+    rbac: [InternshipCoordinatorAndStudentRules(
+      FIELD_RULES.HIDDEN,
+      FIELD_RULES.READONLY,
+      FIELD_RULES.READONLY,
+    ),
+      HteSupervisorAndFacultyAdviserRules(
       FIELD_RULES.HIDDEN,
       FIELD_RULES.READONLY,
       FIELD_RULES.READONLY,
@@ -173,22 +194,7 @@ export const evaluationFormConfig = [
       FIELD_RULES.HIDDEN,
       FIELD_RULES.READONLY,
     ),
-      HteSupervisorRules(
-      FIELD_RULES.HIDDEN,
-      FIELD_RULES.EDITABLE,
-      FIELD_RULES.READONLY,
-    )],
-  },
-    {
-    name: "submitted_at",
-    label: "Submitted At",
-    type: "text",
-    rbac: [InternshipCoordinatorAndStudentRules(
-      FIELD_RULES.HIDDEN,
-      FIELD_RULES.HIDDEN,
-      FIELD_RULES.READONLY,
-    ),
-      HteSupervisorRules(
+      HteSupervisorAndFacultyAdviserRules(
       FIELD_RULES.HIDDEN,
       FIELD_RULES.READONLY,
       FIELD_RULES.READONLY,

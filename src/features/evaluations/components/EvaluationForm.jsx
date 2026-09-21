@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import { useForm, Controller, useWatch } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useState, useMemo } from 'react'
+import { useForm, Controller, useWatch } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import {
   Box,
   Button,
@@ -18,15 +18,14 @@ import {
   Switch,
   TextField,
   Typography,
-} from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
-import { evaluationFormConfig } from "../form/formConfig";
-import {
-  getEvaluationFormPermissions,
-  getVisibleEvaluationFields,
-} from "../evaluationPermissions";
-import getValidationSchema from "../form/EvaluationValidationSchema";
-import { formatEvaluationStatus, formatDate } from "../form/fieldFormatters";
+} from '@mui/material'
+import DeleteIcon from '@mui/icons-material/Delete'
+import { evaluationFormConfig } from '../form/formConfig'
+import { getEvaluationFormPermissions, getVisibleEvaluationFields } from '../evaluationPermissions'
+import { MODES, ROLES } from '../form/formConfig'
+import getValidationSchema from '../form/EvaluationValidationSchema'
+import { formatEvaluationStatus, formatDate } from '../form/fieldFormatters'
+import { formatSentenceCase } from '../../shared/fieldFormatters'
 
 export default function EvaluationForm({
   role,
@@ -34,16 +33,23 @@ export default function EvaluationForm({
   defaultValues = {},
   onSubmit,
   onInvalid,
-  formId = "evaluation-form",
-  evaluationTypeOptions = ["hte_supervisor"],
+  formId = 'evaluation-form',
+  evaluationTypeOptions = ['hte_supervisor', 'faculty_adviser'],
   internOptions = [],
+  internMap = {},
   criteriaList = [], // Pass hardcoded criteria from parent
   allowDynamicCriteria = true, // Enable/disable dynamic criteria input
 }) {
-  const { getFieldRule } = getEvaluationFormPermissions(role, mode);
-  const schema = getValidationSchema(mode);
-  const [criteria, setCriteria] = useState(criteriaList);
-  const [newCriterion, setNewCriterion] = useState("");
+  const { getFieldRule } = getEvaluationFormPermissions(role, mode)
+  const schema = getValidationSchema(mode)
+  const availableInternOptions = Array.isArray(internOptions) ? internOptions : []
+  const [criteria, setCriteria] = useState(() => {
+    const savedCriteria = Object.keys(defaultValues?.responses || {})
+    return mode === MODES.EDIT || mode === MODES.VIEW
+      ? savedCriteria
+      : [...new Set([...criteriaList, ...savedCriteria])]
+  })
+  const [newCriterion, setNewCriterion] = useState('')
 
   const {
     control,
@@ -53,58 +59,74 @@ export default function EvaluationForm({
   } = useForm({
     resolver: zodResolver(schema),
     defaultValues,
-    mode: "onBlur",
-  });
+    mode: 'onBlur',
+  })
 
-  const responsesValue = useWatch({
-    control,
-    name: "responses",
-    defaultValue: {},
-  }) || {};
+  const responsesValue =
+    useWatch({
+      control,
+      name: 'responses',
+      defaultValue: {},
+    }) || {}
 
   const handleAddCriterion = () => {
-    const trimmedCriterion = newCriterion.trim();
+    const trimmedCriterion = newCriterion.trim()
 
     if (!trimmedCriterion || criteria.includes(trimmedCriterion)) {
-      return;
+      return
     }
 
-    setCriteria((previousCriteria) => [...previousCriteria, trimmedCriterion]);
+    setCriteria((previousCriteria) => [...previousCriteria, trimmedCriterion])
 
-    setNewCriterion("");
-  };
+    setNewCriterion('')
+  }
 
   const handleRemoveCriterion = (criterionToRemove) => {
     setCriteria((previousCriteria) =>
       previousCriteria.filter((criterion) => criterion !== criterionToRemove),
-    );
+    )
 
-    const updatedResponses = { ...responsesValue };
-    delete updatedResponses[criterionToRemove];
+    const updatedResponses = { ...responsesValue }
+    delete updatedResponses[criterionToRemove]
 
-    setValue("responses", updatedResponses);
-  };
+    setValue('responses', updatedResponses)
+  }
 
   const handleRatingChange = (criterion, newValue) => {
-    setValue("responses", {
+    setValue('responses', {
       ...responsesValue,
       [criterion]: newValue,
-    });
-  };
+    })
+  }
 
   const handleSubmitData = (data) => {
     const payload = evaluationFormConfig.reduce((acc, field) => {
-      if (getFieldRule(field) !== "hidden" && data[field.name] !== undefined) {
-        acc[field.name] = data[field.name];
+      if (getFieldRule(field) !== 'hidden' && data[field.name] !== undefined) {
+        acc[field.name] = data[field.name]
       }
-      return acc;
-    }, {});
+      return acc
+    }, {})
 
-    onSubmit?.(payload);
-  };
+    // For roles where evaluation_type is hidden, ensure it's included
+    if (role === ROLES.HTE_SUPERVISOR && !payload.evaluation_type) {
+      payload.evaluation_type = 'hte_supervisor'
+    } else if (role === ROLES.FACULTY_ADVISER && !payload.evaluation_type) {
+      payload.evaluation_type = 'faculty_adviser'
+    }
 
-  const visibleFields = getVisibleEvaluationFields(role, mode);
+    onSubmit?.(payload)
+  }
 
+  const formattedEvaluationTypeOptions = useMemo(
+    () =>
+      evaluationTypeOptions.map((option) => ({
+        value: option,
+        label: formatSentenceCase(option),
+      })),
+    [evaluationTypeOptions],
+  )
+
+  const visibleFields = getVisibleEvaluationFields(role, mode)
   return (
     <Stack
       component="form"
@@ -113,9 +135,9 @@ export default function EvaluationForm({
       spacing={2}
     >
       {visibleFields.map((field) => {
-        const rule = getFieldRule(field);
-        const isDisabled = rule === "readonly";
-        const isRequired = rule === "required";
+        const rule = getFieldRule(field)
+        const isDisabled = rule === 'readonly'
+        const isRequired = rule === 'required'
 
         return (
           <Controller
@@ -123,16 +145,12 @@ export default function EvaluationForm({
             name={field.name}
             control={control}
             render={({ field: rhfField }) => {
-              if (field.type === "intern-select") {
+              if (field.type === 'intern-select') {
                 if (isDisabled) {
-                  const match = internOptions.find(
-                    (u) => u.id === rhfField.value,
-                  );
-                  const displayName = match
-                    ? [match.last_name, match.first_name]
-                        .filter(Boolean)
-                        .join(", ")
-                    : rhfField.value;
+                  const match = availableInternOptions.find(
+                    (u) => String(u.id) === String(rhfField.value),
+                  )
+                  const displayName = match?.name || internMap[rhfField.value] || rhfField.value
                   return (
                     <TextField
                       value={displayName}
@@ -141,60 +159,47 @@ export default function EvaluationForm({
                       fullWidth
                       size="small"
                     />
-                  );
+                  )
                 }
                 return (
-                  <FormControl
-                    fullWidth
-                    size="small"
-                    error={!!errors[field.name]}
-                  >
+                  <FormControl fullWidth size="small" error={!!errors[field.name]}>
                     <InputLabel>{field.label}</InputLabel>
-                    <Select
-                      {...rhfField}
-                      value={rhfField.value ?? ""}
-                      label={field.label}
-                    >
+                    <Select {...rhfField} value={rhfField.value ?? ''} label={field.label}>
                       <MenuItem value="">
                         <em>None</em>
                       </MenuItem>
-                      {internOptions.map((u) => (
+                      {availableInternOptions.map((u) => (
                         <MenuItem key={u.id} value={u.id}>
-                          {[u.last_name, u.first_name]
-                            .filter(Boolean)
-                            .join(", ")}
+                          {u.name}
                         </MenuItem>
                       ))}
                     </Select>
                   </FormControl>
-                );
+                )
               }
 
-              if (field.type === "evaluation_type") {
+              if (field.type === 'evaluation_type') {
                 return (
-                  <FormControl
-                    fullWidth
-                    size="small"
-                    error={!!errors[field.name]}
-                  >
+                  <FormControl fullWidth size="small" error={!!errors[field.name]}>
                     <InputLabel>{field.label}</InputLabel>
                     <Select
                       {...rhfField}
-                      value={rhfField.value ?? ""}
+                      value={rhfField.value ?? ''}
                       label={field.label}
                       disabled={isDisabled}
+                      renderValue={(value) => formatSentenceCase(value)}
                     >
-                      {evaluationTypeOptions.map((option) => (
-                        <MenuItem key={option} value={option}>
-                          {option}
+                      {formattedEvaluationTypeOptions.map(({ value, label }) => (
+                        <MenuItem key={value} value={value}>
+                          {label}
                         </MenuItem>
                       ))}
                     </Select>
                   </FormControl>
-                );
+                )
               }
 
-              if (field.type === "responses") {
+              if (field.type === 'responses') {
                 return (
                   <Paper
                     key={field.name}
@@ -203,7 +208,7 @@ export default function EvaluationForm({
                       p: 2,
                       mb: 2,
                       borderRadius: 2,
-                      backgroundColor: "background.paper",
+                      backgroundColor: 'background.paper',
                     }}
                   >
                     <Box sx={{ mb: 2 }}>
@@ -217,23 +222,17 @@ export default function EvaluationForm({
                     </Box>
 
                     {allowDynamicCriteria && !isDisabled && (
-                      <Stack
-                        direction={{ xs: "column", sm: "row" }}
-                        spacing={1}
-                        sx={{ mb: 2 }}
-                      >
+                      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} sx={{ mb: 2 }}>
                         <TextField
                           fullWidth
                           size="small"
                           label="Add criterion"
                           value={newCriterion}
-                          onChange={(event) =>
-                            setNewCriterion(event.target.value)
-                          }
+                          onChange={(event) => setNewCriterion(event.target.value)}
                           onKeyDown={(event) => {
-                            if (event.key === "Enter") {
-                              event.preventDefault();
-                              handleAddCriterion();
+                            if (event.key === 'Enter') {
+                              event.preventDefault()
+                              handleAddCriterion()
                             }
                           }}
                         />
@@ -254,14 +253,14 @@ export default function EvaluationForm({
                         <Box
                           key={criterion}
                           sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "space-between",
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
                             gap: 2,
                             px: 1.5,
                             py: 1,
                             borderRadius: 1,
-                            backgroundColor: "action.hover",
+                            backgroundColor: 'action.hover',
                           }}
                         >
                           <Typography
@@ -270,7 +269,7 @@ export default function EvaluationForm({
                               flex: 1,
                               minWidth: 0,
                               fontWeight: 500,
-                              overflowWrap: "anywhere",
+                              overflowWrap: 'anywhere',
                             }}
                           >
                             {criterion}
@@ -278,45 +277,39 @@ export default function EvaluationForm({
 
                           <Box
                             sx={{
-                              display: "flex",
-                              alignItems: "center",
+                              display: 'flex',
+                              alignItems: 'center',
                               gap: 1,
                               flexShrink: 0,
                             }}
                           >
                             <Rating
                               value={responsesValue[criterion] ?? 0}
-                              onChange={(_, newValue) =>
-                                handleRatingChange(criterion, newValue)
-                              }
+                              onChange={(_, newValue) => handleRatingChange(criterion, newValue)}
                               disabled={isDisabled}
                               max={5}
                               size="medium"
                             />
 
-                            {allowDynamicCriteria &&
-                              !isDisabled &&
-                              !criteriaList.includes(criterion) && (
-                                <IconButton
-                                  size="small"
-                                  color="error"
-                                  aria-label={`Remove ${criterion}`}
-                                  onClick={() =>
-                                    handleRemoveCriterion(criterion)
-                                  }
-                                >
-                                  <DeleteIcon fontSize="small" />
-                                </IconButton>
-                              )}
+                            {allowDynamicCriteria && !isDisabled && (
+                              <IconButton
+                                size="small"
+                                color="error"
+                                aria-label={`Remove ${criterion}`}
+                                onClick={() => handleRemoveCriterion(criterion)}
+                              >
+                                <DeleteIcon fontSize="small" />
+                              </IconButton>
+                            )}
                           </Box>
                         </Box>
                       ))}
                     </Stack>
                   </Paper>
-                );
+                )
               }
 
-              if (field.type === "comments") {
+              if (field.type === 'comments') {
                 return (
                   <TextField
                     {...rhfField}
@@ -330,43 +323,42 @@ export default function EvaluationForm({
                     rows={4}
                     size="small"
                   />
-                );
+                )
               }
 
-              if (field.type === "status" && isDisabled) {
+              if (field.type === 'status' && isDisabled) {
+                const isSubmitted =
+                  rhfField.value === true || String(rhfField.value).toLowerCase() === 'submitted'
+
                 return (
                   <Chip
-                    label={formatEvaluationStatus(rhfField.value)}
-                    color={rhfField.value === "true" ? "success" : "disabled"}
+                    label={isSubmitted ? 'Submitted' : 'Draft'}
+                    color={isSubmitted ? 'success' : 'default'}
                     variant="outlined"
                   />
-                );
+                )
               }
 
-              if (field.type === "status") {
+              if (field.type === 'status') {
                 return (
                   <FormControlLabel
                     control={
                       <Switch
                         checked={rhfField.value === true}
-                        onChange={(event) =>
-                          rhfField.onChange(event.target.checked)
-                        }
+                        onChange={(event) => rhfField.onChange(event.target.checked)}
                         disabled={isDisabled}
                       />
                     }
                     label={formatEvaluationStatus(rhfField.value)}
                   />
-                );
+                )
               }
 
               return (
                 <TextField
                   {...rhfField}
                   value={
-                    field.format === "date"
-                      ? formatDate(rhfField.value)
-                      : (rhfField.value ?? "")
+                    field.format === 'date' ? formatDate(rhfField.value) : (rhfField.value ?? '')
                   }
                   label={field.label}
                   type={field.type}
@@ -377,11 +369,11 @@ export default function EvaluationForm({
                   fullWidth
                   size="small"
                 />
-              );
+              )
             }}
           />
-        );
+        )
       })}
     </Stack>
-  );
+  )
 }

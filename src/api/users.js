@@ -3,12 +3,12 @@ import { endpoints } from '../config'
 
 //Filters out Test Seed Users - DELETE in prod
 const TEST_USER_EMAILS = [
-  'sbims-test-admin@maildrop.cc',
-  'sbims-test-student@maildrop.cc',
-  'sbims-test-coordinator@maildrop.cc',
-  'sbims-test-hte-supervisor@maildrop.cc',
-  'sbims-test-hte-supervisor-2@maildrop.cc',
-  'sbims-test-first-login@maildrop.cc',
+  // 'sbims-test-admin@maildrop.cc',
+  // 'sbims-test-student@maildrop.cc',
+  // 'sbims-test-coordinator@maildrop.cc',
+  // 'sbims-test-hte-supervisor@maildrop.cc',
+  // 'sbims-test-hte-supervisor-2@maildrop.cc',
+  // 'sbims-test-first-login@maildrop.cc',
 ]
 
 const normalizeUser = (user) => ({

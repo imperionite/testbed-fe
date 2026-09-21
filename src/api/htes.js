@@ -26,6 +26,17 @@ export const htesApi = {
     return hteRecords.map(normalizeHte)
   },
 
+  async getMyHteStudents() {
+    const response = await api.get(endpoints.htes.my_students)
+    console.log('HTE API Response:', response.data)
+    
+    // Handle different response structures
+    const data = response.data?.data ?? response.data
+    
+    // Return array if it's a list of students, otherwise wrap single object
+    return Array.isArray(data) ? data : (data?.students ?? data?.items ?? [data])
+  },
+
   async getHte(id) {
     const response = await api.get(endpoints.htes.details(id))
     return normalizeHte(response.data.data)

@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useInternships } from './useInternshipMutations'
+import { internshipsApi } from '../../../api/internships'
 import { usersApi } from '../../../api/users'
 
 export function useInternshipsData() {
@@ -14,6 +15,11 @@ export function useInternshipsData() {
   const advisersQuery = useQuery({
     queryKey: ['users', 'faculty_adviser'],
     queryFn: () => usersApi.getUsersByRole('faculty_adviser'),
+  })
+
+  const internshipMeQuery = useQuery({
+    queryKey: ['internship'],
+    queryFn: internshipsApi.getOwnInternship,
   })
 
   const studentMap = useMemo(() => {
@@ -34,10 +40,19 @@ export function useInternshipsData() {
 
   return {
     internships: internshipsQuery.data || [],
+    internshipMe: internshipMeQuery.data || [],
     studentMap,
     adviserMap,
     isLoading: internshipsQuery.isLoading || studentsQuery.isLoading || advisersQuery.isLoading,
     isError: internshipsQuery.isError || studentsQuery.isError || advisersQuery.isError,
     refetch: internshipsQuery.refetch,
   }
+}
+
+export function useInternshipMe(options = {}) {
+  return useQuery({
+    queryKey: ['internship', 'me'],
+    queryFn: internshipsApi.getOwnInternship,
+    ...options,
+  })
 }

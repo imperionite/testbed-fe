@@ -19,12 +19,14 @@ const endpoints = {
 
   students: {
     list: '/students',
+    assigned:'/students/assigned',
     me: '/students/me',
     details: (id) => `/students/${id}`,
   },
 
   htes: {
     list: '/htes',
+    my_students: 'htes/my/students',
     details: (id) => `/htes/${id}`,
     status: (id) => `/htes/${id}/status`,
     supervisor: (id) => `/htes/${id}/supervisor`,

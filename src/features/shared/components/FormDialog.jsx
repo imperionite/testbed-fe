@@ -29,6 +29,7 @@ export function FormDialog({
     <Dialog
       open={open}
       onClose={isSaving ? undefined : onClose}
+      disableRestoreFocus
       maxWidth="sm"
       fullWidth
       aria-labelledby="form-dialog-title"

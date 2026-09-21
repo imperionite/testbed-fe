@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useRef, useState, useMemo } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -12,6 +12,7 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import EvaluationForm from "./EvaluationForm";
 import { MODES } from "../form/formConfig";
+import { ROLES } from "../../shared/constants/constants";
 
 export default function EvaluationModal({
   open,
@@ -21,8 +22,9 @@ export default function EvaluationModal({
   evaluation = null,
   permissions,
   viewerRole,
-  evaluationTypeOptions = ["hte_supervisor"],
+  evaluationTypeOptions = ["hte_supervisor", "faculty_adviser"],
   internOptions = [],
+  internMap = {},
   criteriaList = [],
   allowDynamicCriteria = true,
   onSuccess,
@@ -32,44 +34,63 @@ export default function EvaluationModal({
   const [mode, setMode] = useState(initialMode);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState(null);
+  const requestedStatus = useRef("Draft");
 
   // Determine if evaluation is in draft state
-  const isDraft = evaluation?.status === "Draft";
-  const isSubmitted = evaluation?.status === "Submitted";
+  const normalizedStatus = evaluation?.status?.toLowerCase();
+  const isDraft = normalizedStatus === "draft";
+  const isSubmitted = normalizedStatus === "submitted";
 
-  const defaultValues = evaluation
+  const EVALUATION_TYPES = {
+  [ROLES.HTE_SUPERVISOR]: "hte_supervisor",
+  [ROLES.FACULTY_ADVISER]: "faculty_adviser",
+}
+
+const defaultValues = useMemo(() => {
+  return evaluation
     ? {
+        id: evaluation.id ?? "",
         internship_id: evaluation.internship_id ?? "",
-        evaluation_type: evaluation.evaluation_type ?? "hte_supervisor",
+        evaluator_id: evaluation.evaluator_id ?? "",
+        evaluation_type: evaluation.evaluation_type ?? EVALUATION_TYPES[viewerRole] ?? null,
         responses: evaluation.responses ?? {},
         comments: evaluation.comments ?? "",
+        created_at: evaluation.created_at ?? "",
+        updated_at: evaluation.updated_at ?? "–",
         status: evaluation.status ?? "Draft",
+        submitted_at: evaluation.submitted_at ?? "–",
       }
     : {
+        id: "",
         internship_id: "",
-        evaluation_type: "hte_supervisor",
+        evaluator_id: "",
+        evaluation_type: EVALUATION_TYPES[viewerRole] ?? null,
         responses: {},
         comments: "",
+        created_at: "",
+        updated_at: "–",
         status: "Draft",
+        submitted_at: "–",
       };
+}, [evaluation, viewerRole]);
 
   const canEdit = permissions?.canEdit && isDraft; // Can only edit if draft
   const canCreate = permissions?.canCreate;
 
   const handleEditBtnPressed = () => setMode(MODES.EDIT);
 
-  const handleCancelBtnPressed = () => {
-    setError(null);
-    setMode(MODES.VIEW);
-  };
+  // const handleCancelBtnPressed = () => {
+  //   setError(null);
+  //   setMode(MODES.VIEW);
+  // };
 
-  const handleSubmitButtonPressed = () => {
+  const handleSubmitButtonPressed = (status = "Draft") => {
+    requestedStatus.current = status;
     setIsSaving(true);
     document.getElementById("evaluation-form")?.requestSubmit();
   };
 
   const handleSubmit = async (data) => {
-            console.log("Submitted evaluation:", data);
     setError(null);
     try {
       if (mode === MODES.CREATE) {
@@ -79,7 +100,7 @@ export default function EvaluationModal({
           evaluation_type: data.evaluation_type,
           responses: data.responses || {},
           comments: data.comments || "",
-          status: "Draft",
+          status: requestedStatus.current,
         });
         onSuccess?.("Evaluation created successfully!");
       } else if (mode === MODES.EDIT) {
@@ -89,7 +110,7 @@ export default function EvaluationModal({
           payload: {
             responses: data.responses || {},
             comments: data.comments || "",
-            status: data.status || "Draft", // Keep or update status
+              status: requestedStatus.current,
           },
         });
         onSuccess?.("Evaluation updated successfully!");
@@ -148,6 +169,7 @@ export default function EvaluationModal({
           defaultValues={defaultValues}
           evaluationTypeOptions={evaluationTypeOptions}
           internOptions={internOptions}
+          internMap={internMap}
           criteriaList={criteriaList}
           allowDynamicCriteria={allowDynamicCriteria}
           onSubmit={handleSubmit}
@@ -174,17 +196,24 @@ export default function EvaluationModal({
 
         {mode === MODES.EDIT && (
           <>
-            <Button onClick={handleCancelBtnPressed} disabled={isSaving}>
+            {/* <Button onClick={handleCancelBtnPressed} disabled={isSaving}>
               Cancel
+            </Button> */}
+            <Button
+              onClick={() => handleSubmitButtonPressed("Draft")}
+              variant="outlined"
+              disabled={isSaving}
+            >
+              Save as Draft
             </Button>
             <Button
-              onClick={handleSubmitButtonPressed}
-              color="success"
+              onClick={() => handleSubmitButtonPressed("Submitted")}
+              color="primary"
               variant="contained"
               disabled={isSaving}
               startIcon={isSaving ? <CircularProgress size={20} /> : null}
             >
-              Save
+              Submit
             </Button>
           </>
         )}

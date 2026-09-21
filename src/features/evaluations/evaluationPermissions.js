@@ -8,21 +8,25 @@ import {
 export function getEvaluationManagementPermissions(role) {
 	const isHTE_Supervisor = role === ROLES.HTE_SUPERVISOR;
 
+	const isFaculty_Adviser = role === ROLES.FACULTY_ADVISER;
+
 	const isInternship_Coordinator = role === ROLES.INTERNSHIP_COORDINATOR;
 
 	const isStudent = role === ROLES.STUDENT;
 
+	const isAdmin = role === ROLES.ADMIN
+
 	return {
-		canViewMyEvaluationsList: isHTE_Supervisor,
-		canViewInternEvaluationsList: isInternship_Coordinator || isStudent || isHTE_Supervisor,
-		canView: isHTE_Supervisor || isStudent,
-		canViewDetail: isInternship_Coordinator || isStudent || isHTE_Supervisor,
-		canCreate: isHTE_Supervisor,
-		canEdit: isHTE_Supervisor,
-		canToggleStatus: isHTE_Supervisor,
-		canBulkEdit: isHTE_Supervisor,
-		canSelectRows: isHTE_Supervisor,
-	};
+		canViewMyEvaluationsList: isHTE_Supervisor || isFaculty_Adviser,
+		canViewInternEvaluationsList: isInternship_Coordinator || isStudent || isHTE_Supervisor || isFaculty_Adviser || isAdmin,
+		canView: isHTE_Supervisor || isStudent || isFaculty_Adviser,
+		canViewDetail: isInternship_Coordinator || isStudent || isHTE_Supervisor || isFaculty_Adviser || isAdmin,
+		canCreate: isHTE_Supervisor || isFaculty_Adviser,
+		canEdit: isHTE_Supervisor || isFaculty_Adviser,
+		canToggleStatus: isHTE_Supervisor || isFaculty_Adviser,
+		canBulkEdit: isHTE_Supervisor || isFaculty_Adviser,
+		canSelectRows: isHTE_Supervisor || isFaculty_Adviser,
+	};	
 }
 
 

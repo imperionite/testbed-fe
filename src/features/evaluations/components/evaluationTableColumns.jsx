@@ -1,4 +1,6 @@
-import { Rating } from "@mui/material";
+import { Chip, Rating } from "@mui/material";
+import BadgeStatus from "./BadgeStatus";
+import { formatSentenceCase} from '../../shared/fieldFormatters'
 
 //-----------------
 // HELPERS
@@ -48,6 +50,13 @@ export function createEvaluationTableColumns({internMap = {} }) {
       size: 200,
       enableColumnFilter: true,
       enableEditing: false,
+      Cell: ({ cell }) => (
+        <Chip
+          label={formatSentenceCase(cell.getValue())}
+          size="small"
+          variant="outlined"
+        />
+      ),
     },
     {
   accessorKey: "responses",
@@ -84,6 +93,7 @@ export function createEvaluationTableColumns({internMap = {} }) {
       size: 160,
       enableColumnFilter: true,
       enableEditing: false,
+      Cell: ({ cell }) => <BadgeStatus value={formatSentenceCase(cell.getValue())} />,
     },
     {
       accessorKey: "created_at",
@@ -92,6 +102,6 @@ export function createEvaluationTableColumns({internMap = {} }) {
       enableColumnFilter: false,
       enableEditing: false,
       Cell: ({ cell }) => formatCellDate(cell.getValue()),
-    },
+    } 
   ];
 }
