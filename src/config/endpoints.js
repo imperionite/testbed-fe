@@ -54,6 +54,24 @@ const endpoints = {
     renderedHours: (id) => `/attendance/internship/${id}/rendered-hours`,
     validation: (id) => `/attendance/${id}/validation`,
   },
-}
+
+  documents: {
+    listByInternship: (internshipId) => `/documents/internship/${internshipId}`,
+    details: (id) => `/documents/${id}`,
+    upload: '/documents',
+    approve: (id) => `/documents/${id}/approve`,
+    reject: (id) => `/documents/${id}/reject`,
+    delete: (id) => `/documents/${id}`,
+  },
+
+  reports: {
+    internships: '/reports/internships',
+    summary: '/reports/internships/summary',
+  },
+
+  audit: {
+    list: "/audit-logs",
+  },
+  };
 
 export default Object.freeze(endpoints)

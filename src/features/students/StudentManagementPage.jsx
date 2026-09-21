@@ -92,10 +92,6 @@ export default function StudentManagementPage() {
         }}
       >
         <CardStat title="Total Student Records" value={mergedStudents.length} />
-        <CardStat
-          title="Current Student Interns"
-          value={mergedStudents.filter((s) => s.internship_status === 'active').length}
-        />
       </Box>
 
       <StudentTable
@@ -111,8 +107,7 @@ export default function StudentManagementPage() {
         student={modalState.selectedStudent}
         permissions={permissions}
         onClose={modalState.close}
-        onCreate={onCreate.mutateAsync}
-        onUpdate={onUpdate.mutateAsync}
+        onSubmit={modalState.mode === MODES.CREATE ? onCreate.mutateAsync : onUpdate.mutateAsync}
         isStudent={false}
         availableUsers={userData.filter(
           (u) => u.role === 'student' && !mergedStudents.some((s) => s.userId === u.id),

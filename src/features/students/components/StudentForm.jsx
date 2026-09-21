@@ -52,8 +52,6 @@ export default function StudentForm({
         defaultValues.emergencyContactName || defaultValues.emergency_contact_name || '',
       emergencyContactNumber:
         defaultValues.emergencyContactNumber || defaultValues.emergency_contact_number || '',
-      internshipStatus:
-        defaultValues.internshipStatus || defaultValues.internship_status || 'pending',
     },
   })
 
@@ -89,8 +87,6 @@ export default function StudentForm({
         defaultValues.emergencyContactName || defaultValues.emergency_contact_name || '',
       emergencyContactNumber:
         defaultValues.emergencyContactNumber || defaultValues.emergency_contact_number || '',
-      internshipStatus:
-        defaultValues.internshipStatus || defaultValues.internship_status || 'pending',
     })
   }, [defaultValues, reset])
 
@@ -244,24 +240,6 @@ export default function StudentForm({
           error={!!errors.emergencyContactNumber}
           helperText={errors.emergencyContactNumber?.message}
           disabled={isView}
-        />
-        <Controller
-          name="internshipStatus"
-          control={control}
-          render={({ field }) => (
-            <TextField
-              {...field}
-              select
-              label="Internship Status"
-              error={!!errors.internshipStatus}
-              helperText={errors.internshipStatus?.message}
-              disabled={isView || isStudent}
-            >
-              <MenuItem value="pending">Pending</MenuItem>
-              <MenuItem value="active">Active</MenuItem>
-              <MenuItem value="completed">Completed</MenuItem>
-            </TextField>
-          )}
         />
       </Stack>
     </form>

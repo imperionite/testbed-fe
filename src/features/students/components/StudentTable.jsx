@@ -2,7 +2,6 @@ import { useMemo } from 'react'
 import { MaterialReactTable } from '@glebcha/material-react-table'
 import { IconButton } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
-import { toSentenceCase } from '../utils/formatters'
 
 export default function StudentTable({ data, onEdit, role }) {
   const columns = useMemo(() => {
@@ -30,11 +29,6 @@ export default function StudentTable({ data, onEdit, role }) {
       { accessorKey: 'address', header: 'Address' },
       { accessorKey: 'emergency_contact_name', header: 'Emergency Contact' },
       { accessorKey: 'emergency_contact_number', header: 'Emergency Phone' },
-      {
-        accessorKey: 'internship_status',
-        header: 'Internship Status',
-        Cell: ({ cell }) => toSentenceCase(cell.getValue()),
-      },
       {
         id: 'actions',
         header: 'Actions',

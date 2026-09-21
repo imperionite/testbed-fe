@@ -14,12 +14,13 @@ export const getValidationSchema = (mode) => {
 const createInternshipValidationSchema = z.object({
   studentId: z.string().uuid('Student is required'),
   hteId: z.string().uuid('HTE is required'),
-  requiredHours: z
+  facultyAdviserId: z.string().uuid('Faculty Adviser is required'),
+  startDate: z.string().min(1, 'Start date is required'),
+  endDate: z.string().min(1, 'End date is required'),
+  requiredHours: z.coerce
     .number()
     .int()
-    .positive('Required hours must be a positive number')
-    .optional()
-    .nullable(),
+    .positive('Required hours must be a positive number'),
 })
 
 const editStatusValidationSchema = z.object({
@@ -28,7 +29,10 @@ const editStatusValidationSchema = z.object({
 
 const editInternshipValidationSchema = z.object({
   hteId: z.string().uuid('HTE is required').optional(),
-  requiredHours: z
+  facultyAdviserId: z.string().uuid('Faculty Adviser is required').optional().nullable(),
+  startDate: z.string().optional(),
+  endDate: z.string().optional(),
+  requiredHours: z.coerce
     .number()
     .int()
     .positive('Required hours must be a positive number')
