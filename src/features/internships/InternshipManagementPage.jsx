@@ -182,6 +182,7 @@ export default function InternshipManagementPage() {
     columns,
     data: internships,
     enableSorting: true,
+    enableGrouping: true,
     enableColumnFilters: true,
     enablePagination: true,
     enableHiding: false,

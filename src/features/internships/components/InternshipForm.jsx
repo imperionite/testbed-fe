@@ -197,7 +197,7 @@ export default function InternshipForm({ mode, internships = [], internship, onC
             >
               {htes.map((h) => (
                 <MenuItem key={h.id} value={h.id}>
-                  {h.company_name}
+                  {h.companyName ?? h.company_name}
                 </MenuItem>
               ))}
             </TextField>

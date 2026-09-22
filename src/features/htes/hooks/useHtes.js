@@ -3,9 +3,25 @@ import { useQuery } from '@tanstack/react-query'
 import { htesApi } from '../../../api/htes'
 
 export function useHtes(options = {}) {
-  return useQuery({
+  const listHtes = useQuery({
     queryKey: ['htes'],
     queryFn: htesApi.listHtes,
     ...options,
   })
+
+  const listMyHteStudents = useQuery({
+    queryKey: ['my-htes-students'],
+    queryFn: htesApi.getMyHteStudents,
+    ...options,
+  })
+
+  return {
+    data: listHtes.data,
+    isLoading: listHtes.isLoading,
+    isError: listHtes.isError,
+    error: listHtes.error,
+    refetch: listHtes.refetch,
+    listHtes,
+    listMyHteStudents
+  }
 }

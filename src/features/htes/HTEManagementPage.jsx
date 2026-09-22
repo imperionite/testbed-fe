@@ -8,7 +8,7 @@ import useAuth from '../../hooks/useAuth'
 import { useHtes } from './hooks/useHtes'
 import { useHteMutations } from './hooks/useHteMutations'
 import { getHteManagementPermissions } from './htePermissions'
-import { useUsers } from '../users/hooks/useUsers'
+import { useSupervisorUsers } from '../users/hooks/useUsers'
 import notify from '../../utils/toast'
 
 // ============================================
@@ -51,30 +51,38 @@ export default function HteManagementLayout() {
   const permissions = getHteManagementPermissions(user?.role)
 
   const {
+    listHtes: {
     data: hteData = [],
     isLoading,
     isError,
     error,
     refetch,
+    }
   } = useHtes({
     enabled: permissions.canView,
   })
 
   // Supervisor Mapping Block
-  const { data: allUsers = [] } = useUsers({
+  const { data: supervisorUsers = [] } = useSupervisorUsers({
     enabled: permissions.canView,
   })
 
-  const supervisorOptions = allUsers.filter(
-    (u) => u.role === 'hte_supervisor' && u.is_active === true,
+  console.log({supervisorUsers});
+
+  const supervisorOptions = supervisorUsers.filter(
+    (u) => u.isActive === true,
   )
 
+  console.log('Supervisor Options:', supervisorOptions)
+
   const supervisorMap = Object.fromEntries(
-    allUsers.map((u) => [
+    supervisorUsers.map((u) => [
       u.id,
-      [u.first_name, u.middle_name, u.last_name, u.suffix].filter(Boolean).join(' '),
+      [u.firstName, u.middleName, u.lastName, u.suffix].filter(Boolean).join(' '),
     ]),
   )
+
+  console.log('Supervisor Map:', supervisorMap)
 
   const modalState = useHteModalState()
   const { createHte, updateHte, updateHteSupervisor, updateStatus, bulkUpdateStatus } =

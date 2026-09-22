@@ -8,6 +8,11 @@ export const studentApi = {
     return response.data.data
   },
 
+  async listAssignedStudents() {
+    const response = await api.get(endpoints.students.assigned)
+    return response.data.data
+  },
+
   async createStudent(payload) {
     const response = await api.post(endpoints.students.list, payload)
     return response.data.data

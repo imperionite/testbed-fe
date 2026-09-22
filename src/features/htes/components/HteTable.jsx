@@ -15,9 +15,11 @@ export default function HtesTable({
   onBulkStatusChange,
   onHteClick,
 }) {
-  const [rowSelection, setRowSelection] = useState({})
-  const [confirmation, setConfirmation] = useState(null)
-  const [pendingAction, setPendingAction] = useState(null)
+
+  const [rowSelection, setRowSelection] = useState({});
+  const [columnVisibility, setColumnVisibility] = useState({});
+  const [confirmation, setConfirmation] = useState(null);
+  const [pendingAction, setPendingAction] = useState(null);
 
   const askForConfirmation = (message) =>
     new Promise((resolve) => {
@@ -43,12 +45,13 @@ export default function HtesTable({
   const table = useMaterialReactTable({
     columns,
     data: htes,
+    enableGrouping: true,
     enableSorting: true,
     enableColumnFilters: true,
     enableGlobalFilter: true,
     enablePagination: true,
     enableRowSelection: permissions.canSelectRows,
-    enableHiding: false,
+    enableHiding: true,
     enableClickToCopy: true,
     enableColumnActions: false,
     enableColumnPinning: true,
@@ -93,6 +96,7 @@ export default function HtesTable({
       },
     },
     onRowSelectionChange: setRowSelection,
+    onColumnVisibilityChange: setColumnVisibility,
     onEditingRowSave: permissions.canEdit
       ? async ({ exitEditingMode, row, values }) => {
           const statusChanged = String(values.is_active) !== String(row.original.is_active)
