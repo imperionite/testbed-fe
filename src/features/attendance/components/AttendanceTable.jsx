@@ -6,11 +6,20 @@ import EditIcon from '@mui/icons-material/Edit'
 import AddIcon from '@mui/icons-material/Add'
 import AccessTimeIcon from '@mui/icons-material/AccessTime'
 import { BadgeAttendanceStatus } from './BadgeAttendanceStatus'
+import dayjs from 'dayjs'
 
 export default function AttendanceTable({ data = [], onValidate, onEdit, onLogAttendance, renderedHours, isStudent = false }) {
+  const sortedData = useMemo(() => {
+    return [...data].sort((a, b) => dayjs(b.attendance_date).diff(dayjs(a.attendance_date)))
+  }, [data])
+
   const columns = useMemo(
     () => [
-      { accessorKey: 'attendance_date', header: 'Date' },
+      { 
+        accessorKey: 'attendance_date', 
+        header: 'Date',
+        Cell: ({ cell }) => dayjs(cell.getValue()).format('MMM D, YYYY')
+      },
       { 
         accessorKey: 'time_in', 
         header: 'Time In', 
@@ -65,7 +74,7 @@ export default function AttendanceTable({ data = [], onValidate, onEdit, onLogAt
 
   const table = useMaterialReactTable({
     columns,
-    data,
+    data: sortedData,
     enableSorting: true,
     enableColumnFilters: true,
     enablePagination: true,
