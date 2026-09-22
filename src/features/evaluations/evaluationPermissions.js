@@ -6,15 +6,13 @@ import {
 } from "./form/formConfig";
 
 export function getEvaluationManagementPermissions(role) {
-	const isHTE_Supervisor = role === ROLES.HTE_SUPERVISOR;
+  const normalizedRole = role?.toLowerCase();
 
-	const isFaculty_Adviser = role === ROLES.FACULTY_ADVISER;
-
-	const isInternship_Coordinator = role === ROLES.INTERNSHIP_COORDINATOR;
-
-	const isStudent = role === ROLES.STUDENT;
-
-	const isAdmin = role === ROLES.ADMIN
+  const isHTE_Supervisor = normalizedRole === ROLES.HTE_SUPERVISOR?.toLowerCase();
+  const isFaculty_Adviser = normalizedRole === ROLES.FACULTY_ADVISER?.toLowerCase();
+  const isInternship_Coordinator = normalizedRole === ROLES.INTERNSHIP_COORDINATOR?.toLowerCase();
+  const isStudent = normalizedRole === ROLES.STUDENT?.toLowerCase();
+  const isAdmin = normalizedRole === ROLES.ADMIN?.toLowerCase();
 
 	return {
 		canViewMyEvaluationsList: isHTE_Supervisor || isFaculty_Adviser,

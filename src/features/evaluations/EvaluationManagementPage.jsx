@@ -81,7 +81,9 @@ export default function EvaluationManagementPage() {
   // })
 
   // Get student profile to extract internship ID
-  const myStudentProfile = useStudents(currentUserRole)
+  const myStudentProfile = useStudents(currentUserRole, {
+    enabled: currentUserRole === 'student',
+  })
   const internshipId = myStudentProfile.data?.currentInternship?.id
 
   // Query for intern evaluations
@@ -97,8 +99,6 @@ export default function EvaluationManagementPage() {
     enabled: currentUserRole === 'faculty_adviser',
   })
 
- 
-
   // Query and payload extraction config based on user role
   // internOptions -> for intern dropdown in modal
   // internMap -> for mapping of intern names in table
@@ -108,39 +108,41 @@ export default function EvaluationManagementPage() {
     case 'hte_supervisor':
       evaluations = myEvaluationsQuery.data ?? []
       students = hteStudentsQuery.listMyHteStudents?.data ?? []
+
       internOptions = students
         .filter((u) => u.status === 'active')
         .map((u) => ({
           ...u,
           name: [
-            u.student_profiles.profiles.last_name,
-            u.student_profiles.profiles.first_name,
-            u.student_profiles.profiles.middle_name,
-            u.student_profiles.profiles.suffix,
+            u.student_profiles?.profiles?.last_name,
+            u.student_profiles?.profiles?.first_name,
+            u.student_profiles?.profiles?.middle_name,
+            u.student_profiles?.profiles?.suffix,
           ]
             .filter(Boolean)
             .join(' '),
         }))
+
       internMap = Object.fromEntries(
         students.map((u) => [
           u.id,
           [
-            u.student_profiles.profiles.last_name,
-            u.student_profiles.profiles.first_name,
-            u.student_profiles.profiles.middle_name,
-            u.student_profiles.profiles.suffix,
+            u.student_profiles?.profiles?.last_name,
+            u.student_profiles?.profiles?.first_name,
+            u.student_profiles?.profiles?.middle_name,
+            u.student_profiles?.profiles?.suffix,
           ]
             .filter(Boolean)
             .join(' '),
         ]),
       )
 
-      isLoading = myEvaluationsQuery.isLoading || hteStudentsQuery.isLoading
-      isError = myEvaluationsQuery.isError || hteStudentsQuery.isError
-      error = myEvaluationsQuery.error || hteStudentsQuery.error
+      isLoading = myEvaluationsQuery.isLoading || hteStudentsQuery.listMyHteStudents?.isLoading
+      isError = myEvaluationsQuery.isError || hteStudentsQuery.listMyHteStudents?.isError
+      error = myEvaluationsQuery.error || hteStudentsQuery.listMyHteStudents?.error
       refetch = () => {
         myEvaluationsQuery.refetch()
-        hteStudentsQuery.refetch()
+        hteStudentsQuery.listMyHteStudents?.refetch()
       }
       break
 

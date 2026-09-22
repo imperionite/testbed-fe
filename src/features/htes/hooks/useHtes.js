@@ -6,13 +6,13 @@ export function useHtes(options = {}) {
   const listHtes = useQuery({
     queryKey: ['htes'],
     queryFn: htesApi.listHtes,
-    ...options,
+    ...(options.listHtes || {}),
   })
 
   const listMyHteStudents = useQuery({
     queryKey: ['my-htes-students'],
     queryFn: htesApi.getMyHteStudents,
-    ...options,
+    ...(options.listMyHteStudents || {}),
   })
 
   return {
@@ -22,6 +22,6 @@ export function useHtes(options = {}) {
     error: listHtes.error,
     refetch: listHtes.refetch,
     listHtes,
-    listMyHteStudents
+    listMyHteStudents,
   }
 }
