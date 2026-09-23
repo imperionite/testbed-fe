@@ -39,7 +39,7 @@ const menuItems = [
     icon: <DescriptionOutlinedIcon />,
     roles: ['student', 'hte_supervisor'],
   },
-  
+
   {
     label: 'User & Roles',
     path: '/userandroles',

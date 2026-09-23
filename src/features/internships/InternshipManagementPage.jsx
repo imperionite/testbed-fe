@@ -76,7 +76,9 @@ export default function InternshipManagementPage() {
 
   const handleCloseAttendance = () => {
     // Invalidate renderedHours query when closing attendance modal
-    queryClient.invalidateQueries({ queryKey: ['renderedHours', attendanceModalState.internship?.id] })
+    queryClient.invalidateQueries({
+      queryKey: ['renderedHours', attendanceModalState.internship?.id],
+    })
     setAttendanceModalState({ open: false, internship: null })
   }
 

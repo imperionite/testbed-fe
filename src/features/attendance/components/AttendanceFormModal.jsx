@@ -14,8 +14,16 @@ import dayjs from 'dayjs'
 
 export default function AttendanceFormModal({ open, onClose, onSubmit, initialData = null }) {
   const [date, setDate] = useState(initialData ? dayjs(initialData.attendance_date) : dayjs())
-  const [timeIn, setTimeIn] = useState(initialData ? dayjs(`2000-01-01T${initialData.time_in}`) : dayjs().hour(8).minute(0))
-  const [timeOut, setTimeOut] = useState(initialData ? (initialData.time_out ? dayjs(`2000-01-01T${initialData.time_out}`) : dayjs().hour(17).minute(0)) : dayjs().hour(17).minute(0))
+  const [timeIn, setTimeIn] = useState(
+    initialData ? dayjs(`2000-01-01T${initialData.time_in}`) : dayjs().hour(8).minute(0),
+  )
+  const [timeOut, setTimeOut] = useState(
+    initialData
+      ? initialData.time_out
+        ? dayjs(`2000-01-01T${initialData.time_out}`)
+        : dayjs().hour(17).minute(0)
+      : dayjs().hour(17).minute(0),
+  )
 
   const handleSubmit = () => {
     const payload = {
@@ -30,9 +38,7 @@ export default function AttendanceFormModal({ open, onClose, onSubmit, initialDa
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
-        <DialogTitle>
-          {initialData ? 'Update Attendance Record' : 'Log New Attendance'}
-        </DialogTitle>
+        <DialogTitle>{initialData ? 'Update Attendance Record' : 'Log New Attendance'}</DialogTitle>
         <DialogContent>
           <Stack spacing={2.5} sx={{ mt: 1 }}>
             <Alert severity="info" sx={{ fontSize: '0.8rem' }}>

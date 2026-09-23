@@ -7,19 +7,26 @@ import AddIcon from '@mui/icons-material/Add'
 import AccessTimeIcon from '@mui/icons-material/AccessTime'
 import { BadgeAttendanceStatus } from './BadgeAttendanceStatus'
 
-export default function AttendanceTable({ data = [], onValidate, onEdit, onLogAttendance, renderedHours, isStudent = false }) {
+export default function AttendanceTable({
+  data = [],
+  onValidate,
+  onEdit,
+  onLogAttendance,
+  renderedHours,
+  isStudent = false,
+}) {
   const columns = useMemo(
     () => [
       { accessorKey: 'attendance_date', header: 'Date' },
-      { 
-        accessorKey: 'time_in', 
-        header: 'Time In', 
-        Cell: ({ cell }) => cell.getValue() || '-' 
+      {
+        accessorKey: 'time_in',
+        header: 'Time In',
+        Cell: ({ cell }) => cell.getValue() || '-',
       },
-      { 
-        accessorKey: 'time_out', 
-        header: 'Time Out', 
-        Cell: ({ cell }) => cell.getValue() || '-' 
+      {
+        accessorKey: 'time_out',
+        header: 'Time Out',
+        Cell: ({ cell }) => cell.getValue() || '-',
       },
       {
         accessorKey: 'validation_status',
@@ -30,8 +37,8 @@ export default function AttendanceTable({ data = [], onValidate, onEdit, onLogAt
         id: 'actions',
         header: 'Actions',
         Cell: ({ row }) => {
-          const record = row.original;
-          
+          const record = row.original
+
           if (!isStudent && onValidate && record.validation_status === 'pending') {
             return (
               <Tooltip title="Validate Attendance">
@@ -39,26 +46,22 @@ export default function AttendanceTable({ data = [], onValidate, onEdit, onLogAt
                   <CheckCircleIcon />
                 </IconButton>
               </Tooltip>
-            );
+            )
           }
 
           if (isStudent && onEdit && record.validation_status === 'pending') {
             return (
               <Tooltip title="Edit Record">
-                <Button 
-                  size="small" 
-                  startIcon={<EditIcon />} 
-                  onClick={() => onEdit(record)}
-                >
+                <Button size="small" startIcon={<EditIcon />} onClick={() => onEdit(record)}>
                   Edit
                 </Button>
               </Tooltip>
-            );
+            )
           }
 
-          return null;
-        }
-      }
+          return null
+        },
+      },
     ],
     [onValidate, onEdit, isStudent],
   )
@@ -70,19 +73,23 @@ export default function AttendanceTable({ data = [], onValidate, onEdit, onLogAt
     enableColumnFilters: true,
     enablePagination: true,
     renderTopToolbarCustomActions: () => (
-      <Box sx={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center', width: '100%', p: 1 }}>
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: '1fr auto 1fr',
+          alignItems: 'center',
+          width: '100%',
+          p: 1,
+        }}
+      >
         <Box sx={{ justifySelf: 'start' }}>
           {isStudent && (
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={onLogAttendance}
-            >
+            <Button variant="contained" startIcon={<AddIcon />} onClick={onLogAttendance}>
               Log Attendance
             </Button>
           )}
         </Box>
-        
+
         <Typography variant="h6" fontWeight="bold" sx={{ justifySelf: 'center' }}>
           Attendance Logs
         </Typography>
