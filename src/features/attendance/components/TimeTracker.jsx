@@ -18,19 +18,15 @@ export default function TimeTracker({ internshipId }) {
   return (
     <Box>
       <Stack direction="row" spacing={1.5}>
-        <Button 
-          variant="contained" 
-          startIcon={<AddIcon />}
-          onClick={() => setModalOpen(true)}
-        >
+        <Button variant="contained" startIcon={<AddIcon />} onClick={() => setModalOpen(true)}>
           Log Attendance / Time Record
         </Button>
       </Stack>
 
-      <AttendanceFormModal 
+      <AttendanceFormModal
         key={modalOpen ? 'open' : 'closed'}
-        open={modalOpen} 
-        onClose={() => setModalOpen(false)} 
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
         onSubmit={handleFormSubmit}
       />
     </Box>

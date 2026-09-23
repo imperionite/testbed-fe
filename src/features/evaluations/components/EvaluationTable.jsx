@@ -1,14 +1,11 @@
-import { useMemo, useState } from "react";
-import {
-  MaterialReactTable,
-  useMaterialReactTable,
-} from "@glebcha/material-react-table";
-import { CircularProgress, IconButton, Tooltip } from "@mui/material";
-import CheckIcon from "@mui/icons-material/Check";
-import EditIcon from "@mui/icons-material/Edit";
+import { useMemo, useState } from 'react'
+import { MaterialReactTable, useMaterialReactTable } from '@glebcha/material-react-table'
+import { CircularProgress, IconButton, Tooltip } from '@mui/material'
+import CheckIcon from '@mui/icons-material/Check'
+import EditIcon from '@mui/icons-material/Edit'
 
-import { createEvaluationTableColumns } from "./evaluationTableColumns";
-import ActionConfirmDialog from "../../shared/components/ActionConfirmDialog";
+import { createEvaluationTableColumns } from './evaluationTableColumns'
+import ActionConfirmDialog from '../../shared/components/ActionConfirmDialog'
 
 export default function EvaluationsTable({
   evaluations,
@@ -16,10 +13,10 @@ export default function EvaluationsTable({
   internMap = {},
   onEvaluationClick,
 }) {
-  const [rowSelection, setRowSelection] = useState({});
-  const [columnVisibility, setColumnVisibility] = useState({});
-  const [confirmation, setConfirmation] = useState(null);
-  const [pendingAction] = useState(null);
+  const [rowSelection, setRowSelection] = useState({})
+  const [columnVisibility, setColumnVisibility] = useState({})
+  const [confirmation, setConfirmation] = useState(null)
+  const [pendingAction] = useState(null)
 
   // const askForConfirmation = (message) =>
   //   new Promise((resolve) => {
@@ -27,9 +24,9 @@ export default function EvaluationsTable({
   //   });
 
   const closeConfirmation = (confirmed) => {
-    confirmation?.resolve(confirmed);
-    setConfirmation(null);
-  };
+    confirmation?.resolve(confirmed)
+    setConfirmation(null)
+  }
 
   const columns = useMemo(
     () =>
@@ -37,9 +34,9 @@ export default function EvaluationsTable({
         internMap,
       }),
     [internMap],
-  );
+  )
 
-  const selectedRowCount = Object.keys(rowSelection).length;
+  const selectedRowCount = Object.keys(rowSelection).length
 
   const table = useMaterialReactTable({
     columns,
@@ -58,14 +55,14 @@ export default function EvaluationsTable({
     enableStickyFooter: true,
     enableEditing: false,
     enableRowActions: permissions.canEdit,
-    positionActionsColumn: "last",
-    positionGlobalFilter: "right",
+    positionActionsColumn: 'last',
+    positionGlobalFilter: 'right',
     initialState: {
       columnFiltersOpen: false,
       pagination: { pageIndex: 0, pageSize: 5 },
-      sorting: [{ id: "created_at", desc: true }],
+      sorting: [{ id: 'created_at', desc: true }],
       columnPinning: {
-      right: ["mrt-row-actions"],
+        right: ['mrt-row-actions'],
       },
     },
     icons: {
@@ -73,19 +70,16 @@ export default function EvaluationsTable({
         pendingAction ? (
           <CircularProgress size={18} color="inherit" />
         ) : (
-          <CheckIcon
-            {...props}
-            sx={{ ...props.sx, color: "success.main" }}
-          />
+          <CheckIcon {...props} sx={{ ...props.sx, color: 'success.main' }} />
         ),
     },
     displayColumnDefOptions: {
-      "mrt-row-actions": {
+      'mrt-row-actions': {
         size: 104,
         muiTableBodyCellProps: {
           sx: {
             minWidth: 104,
-            whiteSpace: "nowrap",
+            whiteSpace: 'nowrap',
           },
         },
       },
@@ -94,7 +88,7 @@ export default function EvaluationsTable({
       rowSelection,
       columnVisibility: {
         ...columnVisibility,
-        "mrt-row-actions": selectedRowCount === 0,
+        'mrt-row-actions': selectedRowCount === 0,
       },
     },
     onRowSelectionChange: setRowSelection,
@@ -102,29 +96,33 @@ export default function EvaluationsTable({
     muiTableContainerProps: {
       sx: {
         maxHeight: 600,
-        maxWidth: "100%",
-        overflowX: "auto",
+        maxWidth: '100%',
+        overflowX: 'auto',
       },
     },
     muiTableProps: {
       sx: {
-        tableLayout: "fixed",
+        tableLayout: 'fixed',
       },
     },
     muiTableHeadCellProps: {
       sx: {
-        position: "sticky",
+        position: 'sticky',
         top: 0,
         zIndex: 2,
       },
     },
     renderRowActions: ({ row }) => (
-      <Tooltip title={row.original.status?.toLowerCase() === "draft" ? "Edit evaluation" : "View evaluation"}>
+      <Tooltip
+        title={
+          row.original.status?.toLowerCase() === 'draft' ? 'Edit evaluation' : 'View evaluation'
+        }
+      >
         <IconButton
-          aria-label={`${row.original.status?.toLowerCase() === "draft" ? "Edit" : "View"} evaluation`}
+          aria-label={`${row.original.status?.toLowerCase() === 'draft' ? 'Edit' : 'View'} evaluation`}
           onClick={(event) => {
-            event.stopPropagation();
-            onEvaluationClick?.(row.original);
+            event.stopPropagation()
+            onEvaluationClick?.(row.original)
           }}
           size="small"
         >
@@ -132,7 +130,7 @@ export default function EvaluationsTable({
         </IconButton>
       </Tooltip>
     ),
-  });
+  })
 
   return (
     <>
@@ -144,5 +142,5 @@ export default function EvaluationsTable({
         onCancel={() => closeConfirmation(false)}
       />
     </>
-  );
+  )
 }

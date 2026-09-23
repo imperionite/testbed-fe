@@ -27,9 +27,11 @@ import AuditTable from '../src/features/audit/components/AuditTable'
 // Mock usersApi
 vi.mock('../src/api/users', () => ({
   usersApi: {
-    listUsers: vi.fn().mockResolvedValue([
-      { id: 'user1', firstName: 'John', lastName: 'Doe', email: 'john@example.com' },
-    ]),
+    listUsers: vi
+      .fn()
+      .mockResolvedValue([
+        { id: 'user1', firstName: 'John', lastName: 'Doe', email: 'john@example.com' },
+      ]),
   },
 }))
 

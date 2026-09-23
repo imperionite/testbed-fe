@@ -29,7 +29,7 @@ export default function AttendanceViewModal({ open, onClose, internshipId }) {
 
   const { data: attendance = [], isLoading: isAttendanceLoading } =
     useAttendanceByInternship(internshipId)
-  
+
   const { validateAttendance, updateAttendance } = useAttendanceMutations(internshipId)
 
   const { data: renderedHours, isLoading: isHoursLoading } = useQuery({
@@ -53,8 +53,8 @@ export default function AttendanceViewModal({ open, onClose, internshipId }) {
 
   const handleValidationSubmit = async (data) => {
     await validateAttendance.mutateAsync({
-        id: validationData.id,
-        validationStatus: data.validation_status
+      id: validationData.id,
+      validationStatus: data.validation_status,
     })
     setValidationData(null)
   }
@@ -71,19 +71,24 @@ export default function AttendanceViewModal({ open, onClose, internshipId }) {
     <Modal open={open} onClose={onClose}>
       <Box sx={style}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-          <Typography variant="h6" fontWeight={600}>Attendance Records & History</Typography>
+          <Typography variant="h6" fontWeight={600}>
+            Attendance Records & History
+          </Typography>
           <IconButton onClick={onClose}>
             <CloseIcon />
           </IconButton>
         </Box>
         <Box sx={{ mb: 2 }}>
           <Typography variant="subtitle1" color="primary" fontWeight={600}>
-            Total Validated Hours: {isHoursLoading ? 'Loading...' : `${Number(renderedHours?.totalHours || 0).toFixed(2)} hrs`}
+            Total Validated Hours:{' '}
+            {isHoursLoading
+              ? 'Loading...'
+              : `${Number(renderedHours?.totalHours || 0).toFixed(2)} hrs`}
           </Typography>
         </Box>
-        
+
         {validationData ? (
-          <AttendanceValidationForm 
+          <AttendanceValidationForm
             attendance={validationData}
             mode="VALIDATE"
             onSubmit={handleValidationSubmit}
@@ -92,16 +97,16 @@ export default function AttendanceViewModal({ open, onClose, internshipId }) {
         ) : isAttendanceLoading ? (
           <Typography>Loading attendance...</Typography>
         ) : (
-          <AttendanceTable 
-            data={attendance} 
-            onValidate={handleValidate} 
+          <AttendanceTable
+            data={attendance}
+            onValidate={handleValidate}
             onEdit={handleEdit}
             isStudent={isStudent}
           />
         )}
 
         {editModalOpen && (
-          <AttendanceFormModal 
+          <AttendanceFormModal
             key={selectedEditRecord?.id ?? 'edit'}
             open={editModalOpen}
             onClose={() => setEditModalOpen(false)}

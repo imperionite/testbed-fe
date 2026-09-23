@@ -19,7 +19,7 @@ const endpoints = {
 
   students: {
     list: '/students',
-    assigned:'/students/assigned',
+    assigned: '/students/assigned',
     me: '/students/me',
     details: (id) => `/students/${id}`,
   },
@@ -33,9 +33,9 @@ const endpoints = {
   },
 
   evaluations: {
-    create: "/evaluations",
-    my_list: "/evaluations/me",
-    by_intern:  (id) => `/evaluations/internship/${id}`,
+    create: '/evaluations',
+    my_list: '/evaluations/me',
+    by_intern: (id) => `/evaluations/internship/${id}`,
     details: (id) => `/evaluations/${id}`,
     submit: (id) => `/evaluations/${id}/submit`,
   },
@@ -72,8 +72,8 @@ const endpoints = {
   },
 
   audit: {
-    list: "/audit-logs",
+    list: '/audit-logs',
   },
-  };
+}
 
 export default Object.freeze(endpoints)
