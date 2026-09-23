@@ -102,6 +102,7 @@ export default function AttendanceViewModal({ open, onClose, internshipId }) {
 
         {editModalOpen && (
           <AttendanceFormModal 
+            key={selectedEditRecord?.id ?? 'edit'}
             open={editModalOpen}
             onClose={() => setEditModalOpen(false)}
             initialData={selectedEditRecord}

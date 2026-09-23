@@ -26,21 +26,16 @@ export default function InternshipStatusForm({ internship, mode, onSubmit, onCan
 
   // Timer for 3-second delay on Warning
   useEffect(() => {
-    let timer
-    if (warningDialogOpen) {
-      setIsWarningReady(false)
-      timer = setTimeout(() => setIsWarningReady(true), 3000)
-    }
+    if (!warningDialogOpen) return
+    const timer = setTimeout(() => setIsWarningReady(true), 3000)
     return () => clearTimeout(timer)
   }, [warningDialogOpen])
 
   // Timer for 2-second delay on Confirmation
   useEffect(() => {
-    if (confirmationDialogOpen) {
-      setIsConfirmationReady(false)
-      const timer = setTimeout(() => setIsConfirmationReady(true), 2000)
-      return () => clearTimeout(timer)
-    }
+    if (!confirmationDialogOpen) return
+    const timer = setTimeout(() => setIsConfirmationReady(true), 2000)
+    return () => clearTimeout(timer)
   }, [confirmationDialogOpen])
 
   const getDisabledStatus = (option) => {

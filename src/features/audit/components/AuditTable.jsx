@@ -1,7 +1,7 @@
 import { useMemo, useState, useEffect } from 'react'
 import { MaterialReactTable, useMaterialReactTable } from '@glebcha/material-react-table'
 import { usersApi } from '../../../api/users'
-import { CircularProgress } from '@mui/material'
+// import { CircularProgress } from '@mui/material'
 
 export default function AuditTable({ data = [] }) {
   const [userMap, setUserMap] = useState({})

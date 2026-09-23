@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react'
 import { Box, TextField, MenuItem, Button, Stack } from '@mui/material'
-import { useForm, Controller } from 'react-hook-form'
+import { useForm, Controller, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import getValidationSchema from '../validation/InternshipValidationSchema'
 import { useStudents } from '../../students/hooks/useStudents'
@@ -24,11 +24,11 @@ export default function InternshipForm({ mode, internships = [], internship, onC
 
   const isViewOrEdit = mode !== MODES.CREATE
 
-  const studentsWithInternships = useMemo(() => new Set(
-    internships
-      .filter((i) => i.status === 'active' || i.status === 'pending')
-      .map((i) => i.student_id),
-  ), [internships])
+  // const studentsWithInternships = useMemo(() => new Set(
+  //   internships
+  //     .filter((i) => i.status === 'active' || i.status === 'pending')
+  //     .map((i) => i.student_id),
+  // ), [internships])
 
   const availableStudents = useMemo(() => {
     const studentsWithInternships = new Set(
@@ -45,7 +45,7 @@ export default function InternshipForm({ mode, internships = [], internship, onC
     control,
     handleSubmit,
     formState: { errors },
-    watch,
+    // watch,
     setValue,
   } = useForm({
     resolver: zodResolver(getValidationSchema(mode)),
@@ -63,8 +63,8 @@ export default function InternshipForm({ mode, internships = [], internship, onC
   })
 
   // Watch fields to trigger auto-calculation
-  const startDate = watch('startDate')
-  const requiredHours = watch('requiredHours')
+  const startDate = useWatch({ control, name: 'startDate' })
+  const requiredHours = useWatch({ control, name: 'requiredHours' })
 
   useEffect(() => {
     if (startDate && requiredHours && mode === MODES.CREATE) {

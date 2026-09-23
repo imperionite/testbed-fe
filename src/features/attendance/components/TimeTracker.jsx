@@ -28,6 +28,7 @@ export default function TimeTracker({ internshipId }) {
       </Stack>
 
       <AttendanceFormModal 
+        key={modalOpen ? 'open' : 'closed'}
         open={modalOpen} 
         onClose={() => setModalOpen(false)} 
         onSubmit={handleFormSubmit}
