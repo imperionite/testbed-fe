@@ -14,6 +14,11 @@ import EvaluationForm from "./EvaluationForm";
 import { MODES } from "../form/formConfig";
 import { ROLES } from "../../shared/constants/constants";
 
+const EVALUATION_TYPES = {
+  [ROLES.HTE_SUPERVISOR]: "hte_supervisor",
+  [ROLES.FACULTY_ADVISER]: "faculty_adviser",
+}
+
 export default function EvaluationModal({
   open,
   onClose,
@@ -41,38 +46,33 @@ export default function EvaluationModal({
   const isDraft = normalizedStatus === "draft";
   const isSubmitted = normalizedStatus === "submitted";
 
-  const EVALUATION_TYPES = {
-  [ROLES.HTE_SUPERVISOR]: "hte_supervisor",
-  [ROLES.FACULTY_ADVISER]: "faculty_adviser",
-}
-
-const defaultValues = useMemo(() => {
-  return evaluation
-    ? {
-        id: evaluation.id ?? "",
-        internship_id: evaluation.internship_id ?? "",
-        evaluator_id: evaluation.evaluator_id ?? "",
-        evaluation_type: evaluation.evaluation_type ?? EVALUATION_TYPES[viewerRole] ?? null,
-        responses: evaluation.responses ?? {},
-        comments: evaluation.comments ?? "",
-        created_at: evaluation.created_at ?? "",
-        updated_at: evaluation.updated_at ?? "–",
-        status: evaluation.status ?? "Draft",
-        submitted_at: evaluation.submitted_at ?? "–",
-      }
-    : {
-        id: "",
-        internship_id: "",
-        evaluator_id: "",
-        evaluation_type: EVALUATION_TYPES[viewerRole] ?? null,
-        responses: {},
-        comments: "",
-        created_at: "",
-        updated_at: "–",
-        status: "Draft",
-        submitted_at: "–",
-      };
-}, [evaluation, viewerRole]);
+  const defaultValues = useMemo(() => {
+    return evaluation
+      ? {
+          id: evaluation.id ?? "",
+          internship_id: evaluation.internship_id ?? "",
+          evaluator_id: evaluation.evaluator_id ?? "",
+          evaluation_type: evaluation.evaluation_type ?? EVALUATION_TYPES[viewerRole] ?? null,
+          responses: evaluation.responses ?? {},
+          comments: evaluation.comments ?? "",
+          created_at: evaluation.created_at ?? "",
+          updated_at: evaluation.updated_at ?? "–",
+          status: evaluation.status ?? "Draft",
+          submitted_at: evaluation.submitted_at ?? "–",
+        }
+      : {
+          id: "",
+          internship_id: "",
+          evaluator_id: "",
+          evaluation_type: EVALUATION_TYPES[viewerRole] ?? null,
+          responses: {},
+          comments: "",
+          created_at: "",
+          updated_at: "–",
+          status: "Draft",
+          submitted_at: "–",
+        };
+  }, [evaluation, viewerRole]);
 
   const canEdit = permissions?.canEdit && isDraft; // Can only edit if draft
   const canCreate = permissions?.canCreate;

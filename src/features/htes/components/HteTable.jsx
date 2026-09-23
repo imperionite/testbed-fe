@@ -15,11 +15,13 @@ export default function HtesTable({
   onBulkStatusChange,
   onHteClick,
 }) {
-
-  const [rowSelection, setRowSelection] = useState({});
-  const [columnVisibility, setColumnVisibility] = useState({});
-  const [confirmation, setConfirmation] = useState(null);
-  const [pendingAction, setPendingAction] = useState(null);
+  const [rowSelection, setRowSelection] = useState({})
+  const [columnVisibility, setColumnVisibility] = useState({
+    // Sets default visibility (false = hidden by default)
+    id: false
+  })
+  const [confirmation, setConfirmation] = useState(null)
+  const [pendingAction, setPendingAction] = useState(null)
 
   const askForConfirmation = (message) =>
     new Promise((resolve) => {
@@ -48,6 +50,8 @@ export default function HtesTable({
     enableGrouping: true,
     enableSorting: true,
     enableColumnFilters: true,
+    enableColumnOrdering: true,
+    // enableColumnDragging: true,
     enableGlobalFilter: true,
     enablePagination: true,
     enableRowSelection: permissions.canSelectRows,
@@ -66,9 +70,7 @@ export default function HtesTable({
       columnFiltersOpen: false,
       pagination: { pageIndex: 0, pageSize: 5 },
       sorting: [{ id: 'created_at', desc: true }],
-      columnPinning: {
-        right: ['mrt-row-actions'],
-      },
+      columnPinning: { right: ['mrt-row-actions'] },
     },
     icons: {
       SaveIcon: (props) =>
@@ -92,6 +94,7 @@ export default function HtesTable({
     state: {
       rowSelection,
       columnVisibility: {
+        ...columnVisibility,
         'mrt-row-actions': selectedRowCount === 0,
       },
     },

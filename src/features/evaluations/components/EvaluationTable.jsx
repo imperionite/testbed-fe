@@ -19,7 +19,7 @@ export default function EvaluationsTable({
   const [rowSelection, setRowSelection] = useState({});
   const [columnVisibility, setColumnVisibility] = useState({});
   const [confirmation, setConfirmation] = useState(null);
-  const [pendingAction, setPendingAction] = useState(null);
+  const [pendingAction] = useState(null);
 
   // const askForConfirmation = (message) =>
   //   new Promise((resolve) => {
@@ -132,48 +132,6 @@ export default function EvaluationsTable({
         </IconButton>
       </Tooltip>
     ),
-    // renderBottomToolbarCustomActions: ({ table: currentTable }) =>
-    //   permissions.canBulkEdit ? (
-    //     <Box sx={{ display: "flex", gap: 1 }}>
-    //       <Button
-    //         size="small"
-    //         variant="contained"
-    //         disabled={
-    //           pendingAction !== null ||
-    //           !currentTable
-    //             .getSelectedRowModel()
-    //             .rows.some((row) => row.original.status === "Draft")
-    //         }
-    //         onClick={async () => {
-    //           const ids = currentTable
-    //             .getSelectedRowModel()
-    //             .rows
-    //             .filter((row) => row.original.status === "Draft")
-    //             .map((row) => row.original.id);
-
-    //           if (!ids.length || !(await askForConfirmation("Are you sure you want to submit the selected draft evaluations? Once an evaluation is submitted, it is final and cannot be undone."))) {
-    //             return;
-    //           }
-
-    //           setPendingAction("bulk-submit");
-    //           try {
-    //             await onBulkStatusChange({ ids });
-    //             notify.success("Evaluations submitted successfully.");
-    //           } catch (error) {
-    //             console.error("Failed to submit evaluations:", error);
-    //             notify.error(
-    //               error.response?.data?.message || "Failed to submit evaluations.",
-    //             );
-    //           } finally {
-    //             setPendingAction(null);
-    //           }
-    //         }}
-    //         startIcon={pendingAction === "bulk-submit" ? <CircularProgress size={16} /> : null}
-    //       >
-    //         {pendingAction === "bulk-submit" ? "Submitting..." : "Submit drafts"}
-    //       </Button>
-    //     </Box>
-    //   ) : null,
   });
 
   return (

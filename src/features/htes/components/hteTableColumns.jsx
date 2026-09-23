@@ -31,6 +31,20 @@ const formatCellDate = (value) => {
 export function createHteTableColumns({ canEdit, supervisorMap = {} }) {
   return [
     {
+      accessorKey: 'id',
+      header: 'ID',
+      size: 80,
+      enableColumnFilter: true,
+      enableEditing: false,
+      muiTableBodyCellProps: {
+        sx: {
+          overflow: 'default',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+        },
+      },
+    },
+    {
       accessorKey: 'company_name',
       header: 'Company Name',
       size: 200,
@@ -108,5 +122,13 @@ export function createHteTableColumns({ canEdit, supervisorMap = {} }) {
       enableEditing: false,
       Cell: ({ cell }) => formatCellDate(cell.getValue()),
     },
+    // {
+    //   accessorKey: 'updated_at',
+    //   header: 'Updated',
+    //   size: 160,
+    //   enableColumnFilter: false,
+    //   enableEditing: false,
+    //   Cell: ({ cell }) => formatCellDate(cell.getValue()),
+    // },
   ]
 }

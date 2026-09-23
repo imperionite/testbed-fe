@@ -5,12 +5,10 @@ import EvaluationTable from './components/EvaluationTable'
 import EvaluationModal from './components/EvaluationModal'
 import { useEvaluationModalState } from './hooks/useEvaluationsModalState'
 import useAuth from '../../hooks/useAuth'
-import { useEvaluations, useInternEvaluations } from './hooks/useEvaluations'
+import { useEvaluationManagementData } from './hooks/useEvaluations'
 import { useEvaluationMutations } from './hooks/useEvaluationMutations'
 import { getEvaluationManagementPermissions } from './evaluationPermissions'
 import notify from '../../utils/toast'
-import { useHtes } from '../htes/hooks/useHtes'
-import { useStudents } from '../students/hooks/useStudents'
 import { MODES } from './form/formConfig'
 // import { useInternshipMe } from '../internships/hooks/useInternshipsData'
 
@@ -72,151 +70,17 @@ export default function EvaluationManagementPage() {
     'Adaptability',
   ]
 
+  const {
+    evaluations,
+    internOptions,
+    internMap,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useEvaluationManagementData(currentUserRole, user, isHteSupervisorOrFacultyAdviser)
+
   // Query for evaluation records
-  const myEvaluationsQuery = useEvaluations({
-    enabled: isHteSupervisorOrFacultyAdviser,
-  })
-  // const myInternship = useInternshipMe({
-  //   enabled: currentUserRole === 'student',
-  // })
-
-  // Get student profile to extract internship ID
-  const myStudentProfile = useStudents(currentUserRole, {
-    enabled: currentUserRole === 'student',
-  })
-  const internshipId = myStudentProfile.data?.currentInternship?.id
-
-  // Query for intern evaluations
-  const internEvaluationsQuery = useInternEvaluations(internshipId, {
-    enabled: !!internshipId,
-  })
-
-  // Query for student records
-  const hteStudentsQuery = useHtes({
-    listMyHteStudents: { enabled: Boolean(currentUserRole === 'hte_supervisor') },
-  })
-  const facultyStudentsQuery = useStudents(currentUserRole, {
-    enabled: currentUserRole === 'faculty_adviser',
-  })
-
-  // Query and payload extraction config based on user role
-  // internOptions -> for intern dropdown in modal
-  // internMap -> for mapping of intern names in table
-  let evaluations, students, internMap, isLoading, isError, error, refetch, internOptions
-
-  switch (currentUserRole) {
-    case 'hte_supervisor':
-      evaluations = myEvaluationsQuery.data ?? []
-      students = hteStudentsQuery.listMyHteStudents?.data ?? []
-
-      internOptions = students
-        .filter((u) => u.status === 'active')
-        .map((u) => ({
-          ...u,
-          name: [
-            u.student_profiles?.profiles?.last_name,
-            u.student_profiles?.profiles?.first_name,
-            u.student_profiles?.profiles?.middle_name,
-            u.student_profiles?.profiles?.suffix,
-          ]
-            .filter(Boolean)
-            .join(' '),
-        }))
-
-      internMap = Object.fromEntries(
-        students.map((u) => [
-          u.id,
-          [
-            u.student_profiles?.profiles?.last_name,
-            u.student_profiles?.profiles?.first_name,
-            u.student_profiles?.profiles?.middle_name,
-            u.student_profiles?.profiles?.suffix,
-          ]
-            .filter(Boolean)
-            .join(' '),
-        ]),
-      )
-
-      isLoading = myEvaluationsQuery.isLoading || hteStudentsQuery.listMyHteStudents?.isLoading
-      isError = myEvaluationsQuery.isError || hteStudentsQuery.listMyHteStudents?.isError
-      error = myEvaluationsQuery.error || hteStudentsQuery.listMyHteStudents?.error
-      refetch = () => {
-        myEvaluationsQuery.refetch()
-        hteStudentsQuery.listMyHteStudents?.refetch()
-      }
-      break
-
-    case 'faculty_adviser':
-      evaluations = myEvaluationsQuery.data ?? []
-      students = facultyStudentsQuery.data ?? []
-
-      internOptions = students
-        .filter((u) => {
-          return u.currentInternship?.status === 'active'
-        })
-        .map((u) => ({
-          ...u,
-          id: u.currentInternship.id,
-          name: [
-            u.profiles.last_name,
-            u.profiles.first_name,
-            u.profiles.middle_name,
-            u.profiles.suffix,
-          ]
-            .filter(Boolean)
-            .join(' '),
-        }))
-
-      internMap = Object.fromEntries(
-        students.map((u) => {
-          const name = [
-            u.profiles.last_name,
-            u.profiles.first_name,
-            u.profiles.middle_name,
-            u.profiles.suffix,
-          ]
-            .filter(Boolean)
-            .join(' ')
-          return [u.currentInternship.id, name]
-        }),
-      )
-
-      isLoading = myEvaluationsQuery.isLoading || facultyStudentsQuery.isLoading
-      isError = myEvaluationsQuery.isError || facultyStudentsQuery.isError
-      error = myEvaluationsQuery.error || facultyStudentsQuery.error
-      refetch = () => {
-        myEvaluationsQuery.refetch()
-        facultyStudentsQuery.refetch()
-      }
-      break
-
-    case 'student':
-      evaluations = internEvaluationsQuery.data ?? []
-      students = user ? [user] : []
-      internOptions = null
-      internMap = Object.fromEntries(
-        students.map((u) => [
-          u.id,
-          [u.lastName, u.firstName, u.middleName, u.suffix].filter(Boolean).join(' '),
-        ]),
-      )
-
-      isLoading = internEvaluationsQuery.isLoading
-      isError = internEvaluationsQuery.isError
-      error = internEvaluationsQuery.error
-      refetch = internEvaluationsQuery.refetch
-      break
-    default:
-      evaluations = []
-      students
-      internOptions = null
-      internMap = {}
-      isLoading = false
-      isError = false
-      error = null
-      refetch = () => {}
-      break
-  }
 
   const modalState = useEvaluationModalState()
   const { createEvaluation, updateEvaluation, bulkSubmitEvaluations } = useEvaluationMutations()
