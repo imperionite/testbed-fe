@@ -1,196 +1,327 @@
-import { Alert, Button, CircularProgress, Typography } from '@mui/material'
-import { Add as AddIcon } from '@mui/icons-material'
+import { useMemo, useState } from 'react'
+import {
+  Alert,
+  Box,
+  Button,
+  CircularProgress,
+  MenuItem,
+  Paper,
+  Stack,
+  TextField,
+  Typography,
+} from '@mui/material'
+import AddIcon from '@mui/icons-material/Add'
+
+import useAuth from '../../hooks/useAuth'
 import CardStat from '../shared/components/CardStat'
 import EvaluationTable from './components/EvaluationTable'
 import EvaluationModal from './components/EvaluationModal'
-import { useEvaluationModalState } from './hooks/useEvaluationsModalState'
-import useAuth from '../../hooks/useAuth'
-import { useEvaluationManagementData } from './hooks/useEvaluations'
+import { getEvaluationPermissions, ROLES } from './permissions'
+import { MODES } from './form/evaluationConfig'
+import {
+  useEvaluationContext,
+  toInternshipOption,
+  useInternEvaluations,
+} from './hooks/useEvaluations'
 import { useEvaluationMutations } from './hooks/useEvaluationMutations'
-import { getEvaluationManagementPermissions } from './evaluationPermissions'
 import notify from '../../utils/toast'
-import { MODES } from './form/formConfig'
-// import { useInternshipMe } from '../internships/hooks/useInternshipsData'
 
-// ============================================
-// STYLES
-// ============================================
-const styles = {
-  container: {
-    minHeight: '100vh',
-  },
-  topSection: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '20px',
-  },
-  headerSection: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-    gap: '16px',
-    marginBottom: '20px',
-  },
-  cardsSection: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-    gap: '16px',
-    width: '100%',
-  },
-  mainSection: {
-    paddingTop: '10px',
-  },
-  tableHeader: {
-    marginBottom: '16px',
-  },
-  tableContainer: {
-    width: '100%',
-  },
-}
-
-// ============================================
-// MAIN COMPONENT
-// ============================================
 export default function EvaluationManagementPage() {
   const { user } = useAuth()
-  const permissions = getEvaluationManagementPermissions(user?.role)
-  const isHteSupervisorOrFacultyAdviser = permissions.canViewMyEvaluationsList
 
-  const currentUserRole = user?.role?.toLowerCase()
+  const role = user?.role?.toLowerCase()
 
-  const criteriaList = [
-    'Knowledge of Assigned Tasks',
-    'Quality of Work',
-    'Productivity',
-    'Problem-Solving',
-    'Communication',
-    'Teamwork',
-    'Professionalism',
-    'Adaptability',
-  ]
+  const permissions = getEvaluationPermissions(role)
 
-  const { evaluations, internOptions, internMap, isLoading, isError, error, refetch } =
-    useEvaluationManagementData(currentUserRole, user, isHteSupervisorOrFacultyAdviser)
+  const context = useEvaluationContext(role, user)
 
-  // Query for evaluation records
+  const {
+    evaluatorQuery,
+    studentEvaluationsQuery,
+    hteStudents,
+    hteStudentsQuery,
+    facultyStudents,
+    facultyStudentsQuery,
+    staffInternships,
+    staffInternshipsQuery,
+  } = context
 
-  const modalState = useEvaluationModalState()
   const { createEvaluation, updateEvaluation, submitEvaluation } = useEvaluationMutations()
 
+  const [modal, setModal] = useState({
+    open: false,
+    mode: MODES.VIEW,
+    evaluation: null,
+  })
+
+  const [selectedInternshipId, setSelectedInternshipId] = useState('')
+
+  const isEvaluator = permissions.isEvaluator
+  const isStudent = permissions.isStudent
+  const isReadOnlyStaff = permissions.isReadOnlyStaff
+
+  // ------------------------------------------------------------
+  // Internships available for creating evaluations
+  // ------------------------------------------------------------
+  const internshipOptions = useMemo(() => {
+    if (role === ROLES.HTE_SUPERVISOR) {
+      return hteStudents.map(toInternshipOption).filter(Boolean)
+    }
+
+    if (role === ROLES.FACULTY_ADVISER) {
+      return facultyStudents
+        .map((student) =>
+          toInternshipOption({
+            ...student,
+            internship_id: student.currentInternship?.id,
+          }),
+        )
+        .filter(Boolean)
+    }
+
+    return []
+  }, [role, hteStudents, facultyStudents])
+
+  // ------------------------------------------------------------
+  // Staff evaluation query
+  // ------------------------------------------------------------
+  const selectedStaffEvaluationsQuery = useInternEvaluations(selectedInternshipId, isReadOnlyStaff)
+
+  const staffEvaluations = selectedStaffEvaluationsQuery.data ?? []
+
+  // ------------------------------------------------------------
+  // Determine which evaluation dataset to display
+  // ------------------------------------------------------------
+  const evaluations = isEvaluator
+    ? (evaluatorQuery.data ?? [])
+    : isStudent
+      ? (studentEvaluationsQuery.data ?? [])
+      : staffEvaluations
+
+  // ------------------------------------------------------------
+  // Loading state
+  // ------------------------------------------------------------
+  const isLoading = isEvaluator
+    ? evaluatorQuery.isLoading || hteStudentsQuery.isLoading || facultyStudentsQuery.isLoading
+    : isStudent
+      ? studentEvaluationsQuery.isLoading
+      : staffInternshipsQuery.isLoading || selectedStaffEvaluationsQuery.isLoading
+
+  // ------------------------------------------------------------
+  // Error state
+  // ------------------------------------------------------------
+  const isError = isEvaluator
+    ? evaluatorQuery.isError || hteStudentsQuery.isError || facultyStudentsQuery.isError
+    : isStudent
+      ? studentEvaluationsQuery.isError
+      : staffInternshipsQuery.isError || selectedStaffEvaluationsQuery.isError
+
+  const error =
+    evaluatorQuery.error ||
+    studentEvaluationsQuery.error ||
+    hteStudentsQuery.error ||
+    facultyStudentsQuery.error ||
+    staffInternshipsQuery.error ||
+    selectedStaffEvaluationsQuery.error
+
+  // ------------------------------------------------------------
+  // Internship labels
+  // ------------------------------------------------------------
+  const internshipLabels = useMemo(() => {
+    // Admin / Coordinator
+    if (isReadOnlyStaff) {
+      return Object.fromEntries(
+        staffInternships.map((internship) => {
+          const student = internship.student_profiles ?? {}
+
+          const name =
+            [student.first_name, student.middle_name, student.last_name, student.suffix]
+              .filter(Boolean)
+              .join(' ') || internship.student_id
+
+          return [internship.id, name]
+        }),
+      )
+    }
+
+    // HTE Supervisor / Faculty Adviser
+    return Object.fromEntries(
+      internshipOptions.map((option) => [option.internshipId, option.studentName]),
+    )
+  }, [isReadOnlyStaff, staffInternships, internshipOptions])
+
+  // ------------------------------------------------------------
+  // Modal handlers
+  // ------------------------------------------------------------
+  const openCreate = () => {
+    setModal({
+      open: true,
+      mode: MODES.CREATE,
+      evaluation: null,
+    })
+  }
+
+  const closeModal = () => {
+    setModal({
+      open: false,
+      mode: MODES.VIEW,
+      evaluation: null,
+    })
+  }
+
+  if (!permissions.canView) {
+    return <Alert severity="error">You do not have permission to view evaluations.</Alert>
+  }
+
+  const draftCount = evaluations.filter((item) => item.status === 'draft').length
+
+  const submittedCount = evaluations.filter((item) => item.status === 'submitted').length
+
   return (
-    <div style={styles.container}>
-      {/* ==================== TOP SECTION ==================== */}
-      <div style={styles.topSection}>
-        {/* Header: Title + Action Button */}
-        <div style={styles.headerSection}>
-          <Typography variant="h5" fontWeight={600}>
-            Evaluations
-          </Typography>
+    <Box>
+      <Stack spacing={2}>
+        {/* ----------------------------------------------------
+            Page Header
+        ----------------------------------------------------- */}
+        <Stack
+          direction={{
+            xs: 'column',
+            sm: 'row',
+          }}
+          justifyContent="space-between"
+          alignItems={{
+            xs: 'stretch',
+            sm: 'center',
+          }}
+          spacing={2}
+        >
+          <Box>
+            <Typography variant="h5" fontWeight={600}>
+              Evaluations
+            </Typography>
+
+            <Typography variant="body2" color="text.secondary">
+              {isEvaluator
+                ? 'Manage your assigned internship evaluations.'
+                : isStudent
+                  ? 'View submitted evaluation results for your internship.'
+                  : 'View evaluation records by internship.'}
+            </Typography>
+          </Box>
+
           {permissions.canCreate && (
             <Button
-              startIcon={<AddIcon />}
               variant="contained"
-              onClick={() => modalState.open('create')}
+              startIcon={<AddIcon />}
+              onClick={openCreate}
+              sx={{
+                width: { xs: '100%', sm: 'auto' },
+                alignSelf: { xs: 'stretch', sm: 'center' },
+              }}
             >
               New Evaluation
             </Button>
           )}
-        </div>
+        </Stack>
 
-        {/* Stats Cards */}
-        <div style={styles.cardsSection}>
-          <CardStat title="Total Evaluations" value={evaluations?.length || 0} />
-          <CardStat
-            title="Draft Evaluations"
-            value={evaluations?.filter((evaluation) => evaluation.status === 'draft').length || 0}
+        {/* ----------------------------------------------------
+            Admin / Coordinator internship selector
+        ----------------------------------------------------- */}
+        {isReadOnlyStaff && (
+          <Paper sx={{ p: 2 }}>
+            <TextField
+              select
+              fullWidth
+              size="small"
+              label="Select Internship"
+              value={selectedInternshipId}
+              onChange={(event) => setSelectedInternshipId(event.target.value)}
+            >
+              <MenuItem value="">
+                <em>Select internship</em>
+              </MenuItem>
+
+              {staffInternships.map((internship) => (
+                <MenuItem key={internship.id} value={internship.id}>
+                  {internshipLabels[internship.id] ?? internship.id}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Paper>
+        )}
+
+        {/* ----------------------------------------------------
+            Statistics
+        ----------------------------------------------------- */}
+        <Stack
+          direction={{
+            xs: 'column',
+            sm: 'row',
+          }}
+          spacing={2}
+        >
+          <CardStat title="Total Evaluations" value={evaluations.length} />
+
+          <CardStat title="Draft" value={draftCount} />
+
+          <CardStat title="Submitted" value={submittedCount} />
+        </Stack>
+
+        {/* ----------------------------------------------------
+            Loading
+        ----------------------------------------------------- */}
+        {isLoading ? (
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              py: 5,
+            }}
+          >
+            <CircularProgress />
+          </Box>
+        ) : isError ? (
+          <Alert severity="error">
+            {error?.response?.data?.message ?? error?.message ?? 'Unable to load evaluations.'}
+          </Alert>
+        ) : isReadOnlyStaff && !selectedInternshipId ? (
+          <Alert severity="info">Select an internship to view its evaluations.</Alert>
+        ) : evaluations.length === 0 ? (
+          <Alert severity="info">
+            {isStudent ? 'No submitted evaluations are available yet.' : 'No evaluations found.'}
+          </Alert>
+        ) : (
+          <EvaluationTable
+            evaluations={evaluations}
+            readOnly={!isEvaluator}
+            onRowClick={(evaluation) => {
+              setModal({
+                open: true,
+                mode: MODES.VIEW,
+                evaluation,
+              })
+            }}
           />
-          <CardStat
-            title="Submitted Evaluations"
-            value={
-              evaluations?.filter((evaluation) => evaluation.status === 'submitted').length || 0
-            }
+        )}
+
+        {/* ----------------------------------------------------
+            Evaluation Modal
+        ----------------------------------------------------- */}
+        {permissions.canView && (
+          <EvaluationModal
+            open={modal.open}
+            onClose={closeModal}
+            mode={modal.mode}
+            role={role}
+            evaluation={modal.evaluation}
+            internshipOptions={internshipOptions}
+            onCreate={createEvaluation.mutateAsync}
+            onUpdate={updateEvaluation.mutateAsync}
+            onSubmitEvaluation={submitEvaluation.mutateAsync}
+            onSuccess={notify.success}
           />
-        </div>
-      </div>
-
-      {/* ==================== MAIN SECTION ==================== */}
-      <div style={styles.mainSection}>
-        {/* Table Header */}
-        <div style={styles.tableHeader}></div>
-
-        {/* Data Table */}
-        <div style={styles.tableContainer}>
-          {!permissions.canView ? (
-            <Alert severity="error">You do not have permission to view evaluations.</Alert>
-          ) : isLoading ? (
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'center',
-                padding: '32px',
-              }}
-            >
-              <CircularProgress size={28} />
-            </div>
-          ) : isError ? (
-            <Alert
-              severity="error"
-              action={
-                <Button color="inherit" size="small" onClick={refetch}>
-                  Retry
-                </Button>
-              }
-            >
-              {error?.response?.data?.message || 'Unable to load evaluations. Please try again.'}
-            </Alert>
-          ) : evaluations.length === 0 ? (
-            <Alert
-              severity="info"
-              action={
-                permissions.canCreate ? (
-                  <Button color="inherit" size="small" onClick={() => modalState.open('create')}>
-                    New Evaluation
-                  </Button>
-                ) : undefined
-              }
-            >
-              No evaluations found.
-            </Alert>
-          ) : (
-            <EvaluationTable
-              evaluations={evaluations}
-              permissions={permissions}
-              internMap={internMap}
-              onEvaluationClick={(selectedEvaluation) =>
-                modalState.open(
-                  selectedEvaluation.status?.toLowerCase() === 'draft' ? MODES.EDIT : MODES.VIEW,
-                  selectedEvaluation,
-                )
-              }
-            />
-          )}
-        </div>
-      </div>
-
-      {permissions.canView && (
-        <EvaluationModal
-          key={`${modalState.mode}-${modalState.selectedRecord?.id ?? 'new'}-${modalState.isOpen}`}
-          open={modalState.isOpen}
-          mode={modalState.mode}
-          criteriaList={criteriaList}
-          evaluation={modalState.selectedRecord}
-          permissions={permissions}
-          viewerRole={user?.role}
-          internOptions={internOptions}
-          internMap={internMap}
-          onClose={modalState.close}
-          onSuccess={notify.success}
-          onCreate={createEvaluation.mutateAsync}
-          onUpdate={updateEvaluation.mutateAsync}
-          onSubmitEvaluation={submitEvaluation.mutateAsync}
-        />
-      )}
-    </div>
+        )}
+      </Stack>
+    </Box>
   )
 }

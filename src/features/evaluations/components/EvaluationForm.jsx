@@ -1,379 +1,177 @@
-import { useState, useMemo } from 'react'
-import { useForm, Controller, useWatch } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
-  Box,
-  Button,
-  Chip,
   FormControl,
-  FormControlLabel,
-  // FormHelperText,
-  Paper,
-  IconButton,
-  InputLabel,
-  MenuItem,
+  FormHelperText,
   Rating,
-  Select,
   Stack,
-  Switch,
   TextField,
   Typography,
+  MenuItem,
 } from '@mui/material'
-import DeleteIcon from '@mui/icons-material/Delete'
-import { evaluationFormConfig } from '../form/formConfig'
-import { getEvaluationFormPermissions, getVisibleEvaluationFields } from '../evaluationPermissions'
-import { MODES, ROLES } from '../form/formConfig'
-import getValidationSchema from '../form/EvaluationValidationSchema'
-import { formatEvaluationStatus, formatDate } from '../form/fieldFormatters'
-import { formatSentenceCase } from '../../shared/fieldFormatters'
+
+import { EVALUATION_CRITERIA, getEvaluationTypeForRole } from '../form/evaluationConfig'
+import { getValidationSchema } from '../form/EvaluationValidationSchema'
+
+function buildDefaultValues(evaluation, role) {
+  if (evaluation) {
+    return {
+      internship_id: evaluation.internship_id ?? '',
+      evaluation_type: evaluation.evaluation_type ?? getEvaluationTypeForRole(role),
+      responses: evaluation.responses ?? {},
+      comments: evaluation.comments ?? '',
+    }
+  }
+
+  return {
+    internship_id: '',
+    evaluation_type: getEvaluationTypeForRole(role),
+    responses: {},
+    comments: '',
+  }
+}
 
 export default function EvaluationForm({
   role,
   mode,
-  defaultValues = {},
+  evaluation = null,
+  internshipOptions = [],
   onSubmit,
-  onInvalid,
   formId = 'evaluation-form',
-  evaluationTypeOptions = ['hte_supervisor', 'faculty_adviser'],
-  internOptions = [],
-  internMap = {},
-  criteriaList = [], // Pass hardcoded criteria from parent
-  allowDynamicCriteria = true, // Enable/disable dynamic criteria input
 }) {
-  const { getFieldRule } = getEvaluationFormPermissions(role, mode)
+  const isReadOnly = mode === 'view'
   const schema = getValidationSchema(mode)
-  const availableInternOptions = Array.isArray(internOptions) ? internOptions : []
-  const [criteria, setCriteria] = useState(() => {
-    const savedCriteria = Object.keys(defaultValues?.responses || {})
-    return mode === MODES.EDIT || mode === MODES.VIEW
-      ? savedCriteria
-      : [...new Set([...criteriaList, ...savedCriteria])]
-  })
-  const [newCriterion, setNewCriterion] = useState('')
 
   const {
     control,
     handleSubmit,
     formState: { errors },
-    setValue,
   } = useForm({
     resolver: zodResolver(schema),
-    defaultValues,
+    defaultValues: buildDefaultValues(evaluation, role),
     mode: 'onBlur',
   })
 
-  const responsesValue =
-    useWatch({
-      control,
-      name: 'responses',
-      defaultValue: {},
-    }) || {}
-
-  const handleAddCriterion = () => {
-    const trimmedCriterion = newCriterion.trim()
-
-    if (!trimmedCriterion || criteria.includes(trimmedCriterion)) {
-      return
-    }
-
-    setCriteria((previousCriteria) => [...previousCriteria, trimmedCriterion])
-
-    setNewCriterion('')
-  }
-
-  const handleRemoveCriterion = (criterionToRemove) => {
-    setCriteria((previousCriteria) =>
-      previousCriteria.filter((criterion) => criterion !== criterionToRemove),
+  const submit = (data) => {
+    const responses = Object.fromEntries(
+      Object.entries(data.responses ?? {}).filter(([, score]) => Number(score) >= 1),
     )
 
-    const updatedResponses = { ...responsesValue }
-    delete updatedResponses[criterionToRemove]
-
-    setValue('responses', updatedResponses)
-  }
-
-  const handleRatingChange = (criterion, newValue) => {
-    setValue('responses', {
-      ...responsesValue,
-      [criterion]: newValue,
+    onSubmit?.({
+      ...data,
+      responses,
     })
   }
 
-  const handleSubmitData = (data) => {
-    const payload = evaluationFormConfig.reduce((acc, field) => {
-      if (getFieldRule(field) !== 'hidden' && data[field.name] !== undefined) {
-        acc[field.name] = data[field.name]
-      }
-      return acc
-    }, {})
-
-    // For roles where evaluation_type is hidden, ensure it's included
-    if (role === ROLES.HTE_SUPERVISOR && !payload.evaluation_type) {
-      payload.evaluation_type = 'hte_supervisor'
-    } else if (role === ROLES.FACULTY_ADVISER && !payload.evaluation_type) {
-      payload.evaluation_type = 'faculty_adviser'
-    }
-
-    onSubmit?.(payload)
-  }
-
-  const formattedEvaluationTypeOptions = useMemo(
-    () =>
-      evaluationTypeOptions.map((option) => ({
-        value: option,
-        label: formatSentenceCase(option),
-      })),
-    [evaluationTypeOptions],
-  )
-
-  const visibleFields = getVisibleEvaluationFields(role, mode)
   return (
-    <Stack
-      component="form"
-      id={formId}
-      onSubmit={handleSubmit(handleSubmitData, onInvalid)}
-      spacing={2}
-    >
-      {visibleFields.map((field) => {
-        const rule = getFieldRule(field)
-        const isDisabled = rule === 'readonly'
-        const isRequired = rule === 'required'
+    <Stack component="form" id={formId} onSubmit={handleSubmit(submit)} spacing={2.5}>
+      {mode === 'create' && (
+        <Controller
+          name="internship_id"
+          control={control}
+          render={({ field }) => (
+            <FormControl fullWidth size="small" error={Boolean(errors.internship_id)}>
+              <TextField
+                {...field}
+                select
+                label="Internship"
+                disabled={isReadOnly}
+                value={field.value ?? ''}
+              >
+                <MenuItem value="">
+                  <em>Select internship</em>
+                </MenuItem>
 
-        return (
+                {internshipOptions.map((option) => (
+                  <MenuItem key={option.internshipId} value={option.internshipId}>
+                    {option.studentName}
+                    {option.studentNumber ? ` — ${option.studentNumber}` : ''}
+                  </MenuItem>
+                ))}
+              </TextField>
+
+              <FormHelperText>{errors.internship_id?.message}</FormHelperText>
+            </FormControl>
+          )}
+        />
+      )}
+
+      <Controller
+        name="evaluation_type"
+        control={control}
+        render={({ field }) => (
+          <TextField
+            {...field}
+            select
+            label="Evaluation Type"
+            fullWidth
+            size="small"
+            disabled
+            value={field.value ?? ''}
+          >
+            <MenuItem value="hte_supervisor">HTE Supervisor</MenuItem>
+
+            <MenuItem value="faculty_adviser">Faculty Adviser</MenuItem>
+          </TextField>
+        )}
+      />
+
+      <Stack spacing={1}>
+        <Typography variant="subtitle1" fontWeight={600}>
+          Evaluation Criteria
+        </Typography>
+
+        <Typography variant="body2" color="text.secondary">
+          Rate each applicable criterion from 1 to 5.
+        </Typography>
+
+        {EVALUATION_CRITERIA.map(({ key, label }) => (
           <Controller
-            key={field.name}
-            name={field.name}
+            key={key}
+            name={`responses.${key}`}
             control={control}
-            render={({ field: rhfField }) => {
-              if (field.type === 'intern-select') {
-                if (isDisabled) {
-                  const match = availableInternOptions.find(
-                    (u) => String(u.id) === String(rhfField.value),
-                  )
-                  const displayName = match?.name || internMap[rhfField.value] || rhfField.value
-                  return (
-                    <TextField
-                      value={displayName}
-                      label={field.label}
-                      disabled
-                      fullWidth
-                      size="small"
-                    />
-                  )
-                }
-                return (
-                  <FormControl fullWidth size="small" error={!!errors[field.name]}>
-                    <InputLabel>{field.label}</InputLabel>
-                    <Select {...rhfField} value={rhfField.value ?? ''} label={field.label}>
-                      <MenuItem value="">
-                        <em>None</em>
-                      </MenuItem>
-                      {availableInternOptions.map((u) => (
-                        <MenuItem key={u.id} value={u.id}>
-                          {u.name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                )
-              }
+            render={({ field }) => (
+              <Stack direction="row" alignitems="center" justifycontent="space-between" spacing={2}>
+                <Typography variant="body2">{label}</Typography>
 
-              if (field.type === 'evaluation_type') {
-                return (
-                  <FormControl fullWidth size="small" error={!!errors[field.name]}>
-                    <InputLabel>{field.label}</InputLabel>
-                    <Select
-                      {...rhfField}
-                      value={rhfField.value ?? ''}
-                      label={field.label}
-                      disabled={isDisabled}
-                      renderValue={(value) => formatSentenceCase(value)}
-                    >
-                      {formattedEvaluationTypeOptions.map(({ value, label }) => (
-                        <MenuItem key={value} value={value}>
-                          {label}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                )
-              }
-
-              if (field.type === 'responses') {
-                return (
-                  <Paper
-                    key={field.name}
-                    variant="outlined"
-                    sx={{
-                      p: 2,
-                      mb: 2,
-                      borderRadius: 2,
-                      backgroundColor: 'background.paper',
-                    }}
-                  >
-                    <Box sx={{ mb: 2 }}>
-                      <Typography variant="subtitle1" fontWeight={600}>
-                        {field.label}
-                      </Typography>
-
-                      <Typography variant="body2" color="text.secondary">
-                        Rate each criterion from 1 to 5.
-                      </Typography>
-                    </Box>
-
-                    {allowDynamicCriteria && !isDisabled && (
-                      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} sx={{ mb: 2 }}>
-                        <TextField
-                          fullWidth
-                          size="small"
-                          label="Add criterion"
-                          value={newCriterion}
-                          onChange={(event) => setNewCriterion(event.target.value)}
-                          onKeyDown={(event) => {
-                            if (event.key === 'Enter') {
-                              event.preventDefault()
-                              handleAddCriterion()
-                            }
-                          }}
-                        />
-
-                        <Button
-                          type="button"
-                          variant="outlined"
-                          onClick={handleAddCriterion}
-                          disabled={!newCriterion.trim()}
-                        >
-                          Add
-                        </Button>
-                      </Stack>
-                    )}
-
-                    <Stack spacing={1}>
-                      {criteria.map((criterion) => (
-                        <Box
-                          key={criterion}
-                          sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            gap: 2,
-                            px: 1.5,
-                            py: 1,
-                            borderRadius: 1,
-                            backgroundColor: 'action.hover',
-                          }}
-                        >
-                          <Typography
-                            variant="body2"
-                            sx={{
-                              flex: 1,
-                              minWidth: 0,
-                              fontWeight: 500,
-                              overflowWrap: 'anywhere',
-                            }}
-                          >
-                            {criterion}
-                          </Typography>
-
-                          <Box
-                            sx={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: 1,
-                              flexShrink: 0,
-                            }}
-                          >
-                            <Rating
-                              value={responsesValue[criterion] ?? 0}
-                              onChange={(_, newValue) => handleRatingChange(criterion, newValue)}
-                              disabled={isDisabled}
-                              max={5}
-                              size="medium"
-                            />
-
-                            {allowDynamicCriteria && !isDisabled && (
-                              <IconButton
-                                size="small"
-                                color="error"
-                                aria-label={`Remove ${criterion}`}
-                                onClick={() => handleRemoveCriterion(criterion)}
-                              >
-                                <DeleteIcon fontSize="small" />
-                              </IconButton>
-                            )}
-                          </Box>
-                        </Box>
-                      ))}
-                    </Stack>
-                  </Paper>
-                )
-              }
-
-              if (field.type === 'comments') {
-                return (
-                  <TextField
-                    {...rhfField}
-                    label={field.label}
-                    disabled={isDisabled}
-                    required={isRequired}
-                    error={!!errors[field.name]}
-                    helperText={errors[field.name]?.message}
-                    fullWidth
-                    multiline
-                    rows={4}
-                    size="small"
-                  />
-                )
-              }
-
-              if (field.type === 'status' && isDisabled) {
-                const isSubmitted =
-                  rhfField.value === true || String(rhfField.value).toLowerCase() === 'submitted'
-
-                return (
-                  <Chip
-                    label={isSubmitted ? 'Submitted' : 'Draft'}
-                    color={isSubmitted ? 'success' : 'default'}
-                    variant="outlined"
-                  />
-                )
-              }
-
-              if (field.type === 'status') {
-                return (
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={rhfField.value === true}
-                        onChange={(event) => rhfField.onChange(event.target.checked)}
-                        disabled={isDisabled}
-                      />
-                    }
-                    label={formatEvaluationStatus(rhfField.value)}
-                  />
-                )
-              }
-
-              return (
-                <TextField
-                  {...rhfField}
+                <Rating
                   value={
-                    field.format === 'date' ? formatDate(rhfField.value) : (rhfField.value ?? '')
+                    field.value === undefined || field.value === null ? 0 : Number(field.value)
                   }
-                  label={field.label}
-                  type={field.type}
-                  disabled={isDisabled}
-                  required={isRequired}
-                  error={!!errors[field.name]}
-                  helperText={errors[field.name]?.message}
-                  fullWidth
-                  size="small"
+                  onChange={(_, value) => {
+                    field.onChange(value || undefined)
+                  }}
+                  max={5}
+                  disabled={isReadOnly}
                 />
-              )
-            }}
+              </Stack>
+            )}
           />
-        )
-      })}
+        ))}
+
+        {errors.responses && (
+          <Typography color="error" variant="body2">
+            {errors.responses.message}
+          </Typography>
+        )}
+      </Stack>
+
+      <Controller
+        name="comments"
+        control={control}
+        render={({ field }) => (
+          <TextField
+            {...field}
+            label="Comments"
+            multiline
+            rows={4}
+            fullWidth
+            disabled={isReadOnly}
+            error={Boolean(errors.comments)}
+            helperText={errors.comments?.message}
+          />
+        )}
+      />
     </Stack>
   )
 }

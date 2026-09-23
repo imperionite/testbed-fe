@@ -1,275 +1,209 @@
-import { useRef, useState, useMemo } from 'react'
+import { useRef, useState } from 'react'
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
+  Alert,
   Button,
   CircularProgress,
-  Alert,
-  IconButton,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
 } from '@mui/material'
-import CloseIcon from '@mui/icons-material/Close'
+
 import EvaluationForm from './EvaluationForm'
-import { MODES } from '../form/formConfig'
-import { ROLES } from '../../shared/constants/constants'
+import { MODES } from '../form/evaluationConfig'
 import ActionConfirmDialog from '../../shared/components/ActionConfirmDialog'
 
-const EVALUATION_TYPES = {
-  [ROLES.HTE_SUPERVISOR]: 'hte_supervisor',
-  [ROLES.FACULTY_ADVISER]: 'faculty_adviser',
+function getServerMessage(error) {
+  return error?.response?.data?.message ?? error?.message ?? 'Unable to save the evaluation.'
 }
 
 export default function EvaluationModal({
   open,
   onClose,
-  disablePortal = false,
-  mode: initialMode = MODES.VIEW,
-  evaluation = null,
-  permissions,
-  viewerRole,
-  evaluationTypeOptions = ['hte_supervisor', 'faculty_adviser'],
-  internOptions = [],
-  internMap = {},
-  criteriaList = [],
-  allowDynamicCriteria = true,
-  onSuccess,
+  mode,
+  role,
+  evaluation,
+  internshipOptions,
   onCreate,
   onUpdate,
   onSubmitEvaluation,
+  onSuccess,
 }) {
-  const [mode, setMode] = useState(initialMode)
-  const [isSaving, setIsSaving] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isConfirmOpen, setIsConfirmOpen] = useState(false)
+  const submitIntent = useRef('draft')
   const [pendingFormData, setPendingFormData] = useState(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState(null)
-  const requestedStatus = useRef('Draft')
 
-  // Determine if evaluation is in draft state
-  const normalizedStatus = evaluation?.status?.toLowerCase()
-  const isSubmitted = normalizedStatus === 'submitted'
-  const canEdit = permissions?.canEdit && !isSubmitted
-  const canCreate = permissions?.canCreate
+  const isView = mode === MODES.VIEW
+  const isCreate = mode === MODES.CREATE
+  const isEdit = mode === MODES.EDIT
+  const isDraft = evaluation?.status === 'draft'
 
-  const defaultValues = useMemo(() => {
-    return evaluation
-      ? {
-          id: evaluation.id ?? '',
-          internship_id: evaluation.internship_id ?? '',
-          evaluator_id: evaluation.evaluator_id ?? '',
-          evaluation_type: evaluation.evaluation_type ?? EVALUATION_TYPES[viewerRole] ?? null,
-          responses: evaluation.responses ?? {},
-          comments: evaluation.comments ?? '',
-          created_at: evaluation.created_at ?? '',
-          updated_at: evaluation.updated_at ?? '–',
-          status: evaluation.status ?? 'Draft',
-          submitted_at: evaluation.submitted_at ?? '–',
-        }
-      : {
-          id: '',
-          internship_id: '',
-          evaluator_id: '',
-          evaluation_type: EVALUATION_TYPES[viewerRole] ?? null,
-          responses: {},
-          comments: '',
-          created_at: '',
-          updated_at: '–',
-          status: 'Draft',
-          submitted_at: '–',
-        }
-  }, [evaluation, viewerRole])
-
-  const handleEditBtnPressed = () => setMode(MODES.EDIT)
-
-  // const handleCancelBtnPressed = () => {
-  //   setError(null);
-  //   setMode(MODES.VIEW);
-  // };
-
-  const handleSubmitButtonPressed = (status = 'Draft') => {
-    requestedStatus.current = status
-    setIsSaving(true)
+  const requestDraftSave = () => {
+    submitIntent.current = 'draft'
     document.getElementById('evaluation-form')?.requestSubmit()
   }
 
-  const handleSubmit = async (data) => {
+  const requestSubmit = () => {
+    submitIntent.current = 'submit'
+    document.getElementById('evaluation-form')?.requestSubmit()
+  }
+
+  const saveDraft = async (data) => {
+    if (isCreate) {
+      await onCreate({
+        internship_id: data.internship_id,
+        evaluation_type: data.evaluation_type,
+        responses: data.responses,
+        comments: data.comments || null,
+      })
+    } else if (isEdit) {
+      await onUpdate({
+        id: evaluation.id,
+        payload: {
+          responses: data.responses,
+          comments: data.comments || null,
+        },
+      })
+    }
+
+    onSuccess?.('Evaluation saved as draft.')
+    onClose()
+  }
+
+  const submitEvaluation = async (data) => {
+    if (isCreate) {
+      const created = await onCreate({
+        internship_id: data.internship_id,
+        evaluation_type: data.evaluation_type,
+        responses: data.responses,
+        comments: data.comments || null,
+      })
+
+      await onSubmitEvaluation({ id: created.id })
+    } else if (isEdit) {
+      await onUpdate({
+        id: evaluation.id,
+        payload: {
+          responses: data.responses,
+          comments: data.comments || null,
+        },
+      })
+
+      await onSubmitEvaluation({ id: evaluation.id })
+    }
+
+    onSuccess?.('Evaluation submitted successfully.')
+    onClose()
+  }
+
+  const handleFormSubmit = async (data) => {
     setError(null)
+
+    if (submitIntent.current === 'submit') {
+      setPendingFormData(data)
+      return
+    }
+
     try {
-      if (mode === MODES.CREATE) {
-        // Create Mode: Always calls onCreate (createEvaluation) as Draft
-        await onCreate?.({
-          internship_id: data.internship_id,
-          evaluation_type: data.evaluation_type,
-          responses: data.responses || {},
-          comments: data.comments || '',
-          status: 'Draft',
-        })
-        onSuccess?.('Evaluation created successfully!')
-      } else if (mode === MODES.EDIT) {
-        if (requestedStatus.current === 'Submitted') {
-          // Edit Mode (Submit): First saves form updates, then calls submitEvaluation
-          setPendingFormData(data)
-          setIsConfirmOpen(true)
-        } else {
-          // Save as Draft
-          setIsSaving(true)
-          await onUpdate?.({
-            id: evaluation.id,
-            payload: {
-              responses: data.responses || {},
-              comments: data.comments || '',
-              status: 'Draft',
-            },
-          })
-          onSuccess?.('Evaluation updated successfully!')
-          setIsSaving(false)
-          onClose()
-        }
-      }
-    } catch (submitError) {
-      setIsSaving(false)
-      setError(submitError.response?.data?.message || 'Unable to save Evaluation.')
+      await saveDraft(data)
+    } catch (err) {
+      setError(getServerMessage(err))
+    } finally {
+      submitIntent.current = 'draft'
     }
   }
 
-  const handleConfirmSubmit = async () => {
+  const confirmSubmit = async () => {
     if (!pendingFormData) return
+
     setIsSubmitting(true)
     setError(null)
 
     try {
-      await onUpdate?.({
-        id: evaluation.id,
-        payload: {
-          responses: pendingFormData.responses || {},
-          comments: pendingFormData.comments || '',
-          status: 'Draft',
-        },
-      })
-
-      await onSubmitEvaluation?.({ id: evaluation.id })
-
-      onSuccess?.('Evaluation submitted successfully!')
+      await submitEvaluation(pendingFormData)
+      setPendingFormData(null)
+    } catch (err) {
+      setError(getServerMessage(err))
+    } finally {
       setIsSubmitting(false)
-      setIsConfirmOpen(false)
-      onClose()
-    } catch (submitError) {
-      setIsSubmitting(false)
-      setIsConfirmOpen(false)
-      setError(submitError.response?.data?.message || 'Unable to submit Evaluation.')
     }
   }
 
-  const handleCancelSubmit = () => {
-    setIsConfirmOpen(false)
+  const cancelSubmit = () => {
     setPendingFormData(null)
-  }
-
-  const handleInvalid = () => {
-    setIsSaving(false)
-  }
-
-  const getDialogTitle = () => {
-    if (mode === MODES.VIEW) return 'View Evaluation'
-    if (mode === MODES.EDIT) return 'Edit Evaluation'
-    return 'Create Evaluation'
+    submitIntent.current = 'draft'
   }
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth disablePortal={disablePortal}>
-      <DialogTitle>
-        {getDialogTitle()}
-        <IconButton
-          aria-label="close"
-          onClick={onClose}
-          sx={(theme) => ({
-            position: 'absolute',
-            right: 8,
-            top: 8,
-            color: theme.palette.grey[500],
-          })}
-        >
-          <CloseIcon />
-        </IconButton>
-      </DialogTitle>
+    <>
+      <Dialog open={open} onClose={isSubmitting ? undefined : onClose} maxWidth="sm" fullWidth>
+        <DialogTitle>
+          {isView ? 'View Evaluation' : isCreate ? 'New Evaluation' : 'Edit Evaluation'}
+        </DialogTitle>
 
-      <DialogContent dividers>
-        {error && <Alert severity="error">{error}</Alert>}
-        <EvaluationForm
-          key={mode}
-          role={viewerRole}
-          mode={mode}
-          defaultValues={defaultValues}
-          evaluationTypeOptions={evaluationTypeOptions}
-          internOptions={internOptions}
-          internMap={internMap}
-          criteriaList={criteriaList}
-          allowDynamicCriteria={allowDynamicCriteria}
-          onSubmit={handleSubmit}
-          onInvalid={handleInvalid}
-          formId="evaluation-form"
-        />
-      </DialogContent>
+        <DialogContent dividers>
+          {error && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {error}
+            </Alert>
+          )}
 
-      <DialogActions>
-        {mode === MODES.VIEW && (
-          <>
-            {canEdit && (
-              <Button onClick={handleEditBtnPressed} variant="contained">
-                Edit
+          <EvaluationForm
+            role={role}
+            mode={mode}
+            evaluation={evaluation}
+            internshipOptions={internshipOptions}
+            onSubmit={handleFormSubmit}
+          />
+        </DialogContent>
+
+        <DialogActions>
+          {isView && <Button onClick={onClose}>Close</Button>}
+
+          {isEdit && isDraft && (
+            <>
+              <Button onClick={onClose}>Cancel</Button>
+              <Button variant="outlined" onClick={requestDraftSave}>
+                Save Draft
               </Button>
-            )}
-            {isSubmitted && (
-              <span style={{ fontSize: '0.875rem', color: '#666' }}>Submitted (Read-only)</span>
-            )}
-          </>
-        )}
+              <Button variant="contained" onClick={requestSubmit} disabled={isSubmitting}>
+                Submit
+              </Button>
+            </>
+          )}
 
-        {mode === MODES.EDIT && (
-          <>
-            <Button
-              onClick={() => handleSubmitButtonPressed('Draft')}
-              variant="outlined"
-              disabled={isSaving}
-            >
-              Save as Draft
-            </Button>
-            <Button
-              onClick={() => handleSubmitButtonPressed('Submitted')}
-              color="primary"
-              variant="contained"
-              disabled={isSaving}
-              startIcon={isSaving ? <CircularProgress size={20} /> : null}
-            >
-              Submit
-            </Button>
-          </>
-        )}
-
-        {mode === MODES.CREATE && canCreate && (
-          <Button
-            onClick={() => handleSubmitButtonPressed('Draft')}
-            color="primary"
-            variant="contained"
-            disabled={isSaving}
-            startIcon={isSaving ? <CircularProgress size={20} /> : null}
-          >
-            Save as Draft
-          </Button>
-        )}
-      </DialogActions>
+          {isCreate && (
+            <>
+              <Button onClick={onClose} disabled={isSubmitting}>
+                Cancel
+              </Button>
+              <Button variant="outlined" onClick={requestDraftSave} disabled={isSubmitting}>
+                Save Draft
+              </Button>
+              <Button
+                variant="contained"
+                onClick={requestSubmit}
+                disabled={isSubmitting}
+                startIcon={isSubmitting ? <CircularProgress size={18} /> : null}
+              >
+                Submit
+              </Button>
+            </>
+          )}
+        </DialogActions>
+      </Dialog>
 
       <ActionConfirmDialog
-        open={isConfirmOpen}
+        open={Boolean(pendingFormData)}
         title="Submit Evaluation"
-        message="Are you sure you want to submit this evaluation? Once submitted, it will be finalized and can no longer be edited."
+        message="Once submitted, this evaluation can no longer be edited. Continue?"
         confirmLabel="Submit"
         cancelLabel="Cancel"
         isLoading={isSubmitting}
-        onConfirm={handleConfirmSubmit}
-        onCancel={handleCancelSubmit}
+        onConfirm={confirmSubmit}
+        onCancel={cancelSubmit}
       />
-    </Dialog>
+    </>
   )
 }
