@@ -1,10 +1,6 @@
 import { useState } from 'react'
 import { Box, Typography, Paper } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
-<<<<<<< HEAD
-=======
-
->>>>>>> 9c7e845 (:ambulance: (atendance) edit files)
 import { useAttendanceByInternship, useAttendanceMutations } from '../hooks/useAttendanceMutations'
 import { attendanceApi } from '../../../api/attendance'
 import AttendanceTable from './AttendanceTable'
@@ -19,10 +15,8 @@ export default function StudentDashboard({ internshipId }) {
     useAttendanceByInternship(internshipId)
 
   // 2. Fetch validated rendered hours summary
-  const {
-    data: renderedHours,
-    // isLoading: isHoursLoading
-  } = useQuery({
+
+  const { data: renderedHours } = useQuery({
     queryKey: ['renderedHours', internshipId],
     queryFn: () => attendanceApi.getRenderedHours(internshipId),
     enabled: !!internshipId,
