@@ -1,22 +1,10 @@
 import { useState } from 'react'
-import {
-  Box,
-  Typography,
-  Card,
-  CardContent,
-  Stack,
-  Button,
-  Chip,
-  Paper,
-} from '@mui/material'
+import { Box, Typography, Card, CardContent, Stack, Button, Chip, Paper } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
 import AccessTimeIcon from '@mui/icons-material/AccessTime'
 import { useQuery } from '@tanstack/react-query'
 import useAuth from '../../../hooks/useAuth'
-import {
-  useAttendanceByInternship,
-  useAttendanceMutations,
-} from '../hooks/useAttendanceMutations'
+import { useAttendanceByInternship, useAttendanceMutations } from '../hooks/useAttendanceMutations'
 import { attendanceApi } from '../../../api/attendance'
 import AttendanceTable from './AttendanceTable'
 import AttendanceFormModal from './AttendanceFormModal'
@@ -80,8 +68,8 @@ export default function StudentDashboard({ internshipId }) {
             isStudent={true}
             onEdit={handleOpenEdit}
             onLogAttendance={() => {
-                setSelectedEditRecord(null)
-                setModalOpen(true)
+              setSelectedEditRecord(null)
+              setModalOpen(true)
             }}
             renderedHours={renderedHours?.totalHours || 0}
           />

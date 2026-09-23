@@ -19,22 +19,22 @@ export function useAttendanceMutations(internshipId) {
   const createAttendance = useMutation({
     mutationFn: (payload) => attendanceApi.createAttendance(payload),
     onSuccess: () => {
-      notify.success("Attendance logged successfully")
+      notify.success('Attendance logged successfully')
       invalidateAttendance()
     },
     onError: (error) => {
-      notify.error(error.message || "Failed to log attendance")
+      notify.error(error.message || 'Failed to log attendance')
     },
   })
 
   const updateAttendance = useMutation({
     mutationFn: ({ id, payload }) => attendanceApi.updateAttendance(id, payload),
     onSuccess: () => {
-      notify.success("Attendance updated successfully")
+      notify.success('Attendance updated successfully')
       invalidateAttendance()
     },
     onError: (error) => {
-      notify.error(error.message || "Failed to update attendance")
+      notify.error(error.message || 'Failed to update attendance')
     },
   })
 
@@ -42,11 +42,11 @@ export function useAttendanceMutations(internshipId) {
     mutationFn: ({ id, validationStatus }) =>
       attendanceApi.validateAttendance(id, validationStatus),
     onSuccess: () => {
-      notify.success("Attendance validation status updated")
+      notify.success('Attendance validation status updated')
       invalidateAttendance()
     },
     onError: (error) => {
-      notify.error(error.message || "Failed to update validation status")
+      notify.error(error.message || 'Failed to update validation status')
     },
   })
 

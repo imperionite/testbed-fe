@@ -70,15 +70,8 @@ export default function EvaluationManagementPage() {
     'Adaptability',
   ]
 
-  const {
-    evaluations,
-    internOptions,
-    internMap,
-    isLoading,
-    isError,
-    error,
-    refetch,
-  } = useEvaluationManagementData(currentUserRole, user, isHteSupervisorOrFacultyAdviser)
+  const { evaluations, internOptions, internMap, isLoading, isError, error, refetch } =
+    useEvaluationManagementData(currentUserRole, user, isHteSupervisorOrFacultyAdviser)
 
   // Query for evaluation records
 

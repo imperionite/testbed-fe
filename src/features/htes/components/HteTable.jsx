@@ -18,7 +18,7 @@ export default function HtesTable({
   const [rowSelection, setRowSelection] = useState({})
   const [columnVisibility, setColumnVisibility] = useState({
     // Sets default visibility (false = hidden by default)
-    id: false
+    id: false,
   })
   const [confirmation, setConfirmation] = useState(null)
   const [pendingAction, setPendingAction] = useState(null)

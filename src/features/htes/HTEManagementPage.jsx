@@ -51,13 +51,7 @@ export default function HteManagementLayout() {
   const permissions = getHteManagementPermissions(user?.role)
 
   const {
-    listHtes: {
-    data: hteData = [],
-    isLoading,
-    isError,
-    error,
-    refetch,
-    }
+    listHtes: { data: hteData = [], isLoading, isError, error, refetch },
   } = useHtes({
     enabled: permissions.canView,
   })
@@ -67,11 +61,9 @@ export default function HteManagementLayout() {
     enabled: permissions.canView,
   })
 
-  console.log({supervisorUsers});
+  console.log({ supervisorUsers })
 
-  const supervisorOptions = supervisorUsers.filter(
-    (u) => u.isActive === true,
-  )
+  const supervisorOptions = supervisorUsers.filter((u) => u.isActive === true)
 
   console.log('Supervisor Options:', supervisorOptions)
 

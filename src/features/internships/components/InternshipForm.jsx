@@ -19,16 +19,9 @@ export default function InternshipForm({ mode, internships = [], internship, onC
   const { data: users = [] } = useUsers()
   const facultyAdvisers = users.filter((u) => u.role === 'faculty_adviser')
 
-  const { updateInternship, updateStatus, assignAdviser } =
-    useInternshipMutations()
+  const { updateInternship, updateStatus, assignAdviser } = useInternshipMutations()
 
   const isViewOrEdit = mode !== MODES.CREATE
-
-  const studentsWithInternships = useMemo(() => new Set(
-    internships
-      .filter((i) => i.status === 'active' || i.status === 'pending')
-      .map((i) => i.student_id),
-  ), [internships])
 
   const availableStudents = useMemo(() => {
     const studentsWithInternships = new Set(
@@ -63,6 +56,7 @@ export default function InternshipForm({ mode, internships = [], internship, onC
   })
 
   // Watch fields to trigger auto-calculation
+  // eslint-disable-next-line react-hooks/incompatible-library
   const startDate = watch('startDate')
   const requiredHours = watch('requiredHours')
 
@@ -74,7 +68,7 @@ export default function InternshipForm({ mode, internships = [], internship, onC
       const daysNeeded = Math.ceil((Number(requiredHours) / 8) * 1.25)
       const end = new Date(start)
       end.setDate(end.getDate() + daysNeeded)
-      
+
       setValue('endDate', end.toISOString().split('T')[0])
     }
   }, [startDate, requiredHours, mode, setValue])

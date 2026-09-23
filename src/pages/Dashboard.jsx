@@ -68,7 +68,7 @@ export default function Dashboard() {
           <Typography variant="body2">Role: {user.role}</Typography>
         </Stack>
       </Paper>
-      
+
       {user.role === 'student' && studentProfile?.currentInternship?.id && (
         <StudentDashboard internshipId={studentProfile.currentInternship.id} />
       )}

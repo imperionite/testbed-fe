@@ -1,5 +1,16 @@
 import { useState, useEffect } from 'react'
-import { Box, TextField, MenuItem, Button, Stack, Dialog, DialogTitle, DialogContent, DialogActions, Typography } from '@mui/material'
+import {
+  Box,
+  TextField,
+  MenuItem,
+  Button,
+  Stack,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Typography,
+} from '@mui/material'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import getValidationSchema from '../validation/InternshipValidationSchema'
@@ -7,11 +18,11 @@ import getValidationSchema from '../validation/InternshipValidationSchema'
 export default function InternshipStatusForm({ internship, mode, onSubmit, onCancel }) {
   const currentStatus = internship?.status || 'pending'
   const isCompleted = currentStatus === 'completed'
-  
+
   const [warningDialogOpen, setWarningDialogOpen] = useState(false)
   const [confirmationDialogOpen, setConfirmationDialogOpen] = useState(false)
   const [pendingData, setPendingData] = useState(null)
-  
+
   const [isWarningReady, setIsWarningReady] = useState(false)
   const [isConfirmationReady, setIsConfirmationReady] = useState(false)
 
@@ -28,6 +39,7 @@ export default function InternshipStatusForm({ internship, mode, onSubmit, onCan
   useEffect(() => {
     let timer
     if (warningDialogOpen) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsWarningReady(false)
       timer = setTimeout(() => setIsWarningReady(true), 3000)
     }
@@ -37,6 +49,7 @@ export default function InternshipStatusForm({ internship, mode, onSubmit, onCan
   // Timer for 2-second delay on Confirmation
   useEffect(() => {
     if (confirmationDialogOpen) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsConfirmationReady(false)
       const timer = setTimeout(() => setIsConfirmationReady(true), 2000)
       return () => clearTimeout(timer)
@@ -55,7 +68,7 @@ export default function InternshipStatusForm({ internship, mode, onSubmit, onCan
       // Include startDate update in pending data
       setPendingData({
         ...data,
-        updateStartDate: new Date().toISOString().split('T')[0]
+        updateStartDate: new Date().toISOString().split('T')[0],
       })
       setIsWarningReady(false)
       setWarningDialogOpen(true)
@@ -143,16 +156,17 @@ export default function InternshipStatusForm({ internship, mode, onSubmit, onCan
         <DialogTitle>Early Activation Warning</DialogTitle>
         <DialogContent>
           <Typography>
-            You are trying to activate this internship before the original start date ({internship.start_date}). 
-            The start date will be changed to today ({new Date().toISOString().split('T')[0]}).
+            You are trying to activate this internship before the original start date (
+            {internship.start_date}). The start date will be changed to today (
+            {new Date().toISOString().split('T')[0]}).
           </Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setWarningDialogOpen(false)}>Cancel</Button>
-          <Button 
-            onClick={handleWarningConfirm} 
-            variant="contained" 
-            color="warning" 
+          <Button
+            onClick={handleWarningConfirm}
+            variant="contained"
+            color="warning"
             disabled={!isWarningReady}
           >
             {isWarningReady ? 'Proceed' : 'Please wait...'}
@@ -164,16 +178,14 @@ export default function InternshipStatusForm({ internship, mode, onSubmit, onCan
       <Dialog open={confirmationDialogOpen} onClose={() => setConfirmationDialogOpen(false)}>
         <DialogTitle>Final Confirmation</DialogTitle>
         <DialogContent>
-          <Typography>
-            This action cannot be undone. Are you sure you want to proceed?
-          </Typography>
+          <Typography>This action cannot be undone. Are you sure you want to proceed?</Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setConfirmationDialogOpen(false)}>Cancel</Button>
-          <Button 
-            onClick={handleFinalConfirm} 
-            variant="contained" 
-            color="error" 
+          <Button
+            onClick={handleFinalConfirm}
+            variant="contained"
+            color="error"
             disabled={!isConfirmationReady}
           >
             {isConfirmationReady ? 'Confirm' : 'Please wait...'}

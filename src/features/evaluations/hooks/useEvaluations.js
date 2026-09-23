@@ -1,4 +1,4 @@
-import { useMemo } from "react"
+import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { evaluationsApi } from '../../../api/evaluations'
 import { useHtes } from '../../htes/hooks/useHtes'
@@ -36,8 +36,6 @@ function formatFullNameFromPayload(profile) {
     .join(' ')
 }
 
-
-
 /**
  * Hook for resolving evaluation data, options, and permission states by role
  */
@@ -55,7 +53,7 @@ export function useEvaluationManagementData(
   const internEvaluationsQuery = useInternEvaluations(internshipId, { enabled: !!internshipId })
 
   const hteStudentsQuery = useHtes({
-    listHtes: {enabled: false},
+    listHtes: { enabled: false },
     listMyHteStudents: { enabled: currentUserRole === 'hte_supervisor' },
   })
 
