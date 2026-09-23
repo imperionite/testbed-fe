@@ -1,166 +1,123 @@
-import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
+
 import { evaluationsApi } from '../../../api/evaluations'
-import { useHtes } from '../../htes/hooks/useHtes'
-import { useStudents } from '../../students/hooks/useStudents'
+import { internshipsApi } from '../../../api/internships'
+import { studentApi } from '../../../api/students'
+import { htesApi } from '../../../api/htes'
 
-export function useEvaluations(options = {}) {
+export function useMyEvaluations(enabled = true) {
   return useQuery({
-    queryKey: ['evaluations'],
+    queryKey: ['evaluations', 'me'],
     queryFn: evaluationsApi.listMyEvaluations,
-    ...options,
+    enabled,
   })
 }
 
-export function useInternEvaluations(id, options = {}) {
+export function useInternEvaluations(internshipId, enabled = true) {
   return useQuery({
-    queryKey: ['evaluations', 'intern', id],
-    queryFn: () => evaluationsApi.listInternEvaluations(id),
-    enabled: !!id,
-    ...options,
+    queryKey: ['evaluations', 'internship', internshipId],
+    queryFn: () => evaluationsApi.listInternEvaluations(internshipId),
+    enabled: Boolean(internshipId) && enabled,
   })
 }
 
-export function useEvaluation(id, options = {}) {
+export function useEvaluation(id, enabled = true) {
   return useQuery({
     queryKey: ['evaluations', id],
     queryFn: () => evaluationsApi.getEvaluation(id),
-    enabled: !!id,
-    ...options,
+    enabled: Boolean(id) && enabled,
   })
 }
-function formatFullNameFromPayload(profile) {
-  if (!profile) return '–'
-  return [profile.last_name, profile.first_name, profile.middle_name, profile.suffix]
+
+export function useEvaluationContext(role) {
+  const normalizedRole = role?.toLowerCase()
+
+  const isEvaluator = normalizedRole === 'hte_supervisor' || normalizedRole === 'faculty_adviser'
+
+  const isStudent = normalizedRole === 'student'
+
+  const evaluatorQuery = useMyEvaluations(isEvaluator)
+
+  const hteStudentsQuery = useQuery({
+    queryKey: ['htes', 'my', 'students'],
+    queryFn: htesApi.getMyHteStudents,
+    enabled: normalizedRole === 'hte_supervisor',
+  })
+
+  const facultyStudentsQuery = useQuery({
+    queryKey: ['students', 'assigned'],
+    queryFn: studentApi.listAssignedStudents,
+    enabled: normalizedRole === 'faculty_adviser',
+  })
+
+  /*
+   * Student evaluations are retrieved directly through
+   * GET /evaluations/me.
+   *
+   * This intentionally does NOT depend on currentInternship,
+   * because completed internships must remain visible in
+   * evaluation history.
+   */
+  const studentEvaluationsQuery = useMyEvaluations(isStudent)
+
+  const staffInternshipsQuery = useQuery({
+    queryKey: ['internships', 'all'],
+    queryFn: internshipsApi.listInternships,
+    enabled: normalizedRole === 'administrator' || normalizedRole === 'internship_coordinator',
+  })
+
+  return {
+    evaluatorEvaluations: evaluatorQuery.data ?? [],
+    evaluatorQuery,
+
+    studentEvaluations: studentEvaluationsQuery.data ?? [],
+    studentEvaluationsQuery,
+
+    hteStudents: hteStudentsQuery.data ?? [],
+    hteStudentsQuery,
+
+    facultyStudents: facultyStudentsQuery.data ?? [],
+    facultyStudentsQuery,
+
+    staffInternships: staffInternshipsQuery.data ?? [],
+    staffInternshipsQuery,
+
+    studentProfile: null,
+    studentQuery: {
+      data: null,
+      isLoading: false,
+      isError: false,
+    },
+  }
+}
+
+export function toInternshipOption(record) {
+  const internshipId = record?.id ?? record?.internship_id ?? record?.currentInternship?.id
+
+  if (!internshipId) {
+    return null
+  }
+
+  const student = record?.student_profiles ?? record?.currentInternship?.student_profiles ?? record
+
+  const profile = student?.profiles ?? record?.profiles ?? null
+
+  const studentName = [
+    profile?.first_name,
+    profile?.middle_name,
+    profile?.last_name,
+    profile?.suffix,
+  ]
     .filter(Boolean)
     .join(' ')
-}
 
-/**
- * Hook for resolving evaluation data, options, and permission states by role
- */
-export function useEvaluationManagementData(
-  currentUserRole,
-  user,
-  isHteSupervisorOrFacultyAdviser,
-) {
-  const myEvaluationsQuery = useEvaluations({ enabled: isHteSupervisorOrFacultyAdviser })
-
-  // Guard student profile query to only run when role is 'student'
-  const myStudentProfile = useStudents(currentUserRole, { enabled: currentUserRole === 'student' })
-  const internshipId = myStudentProfile.data?.currentInternship?.id
-
-  const internEvaluationsQuery = useInternEvaluations(internshipId, { enabled: !!internshipId })
-
-  const hteStudentsQuery = useHtes({
-    listHtes: { enabled: false },
-    listMyHteStudents: { enabled: currentUserRole === 'hte_supervisor' },
-  })
-
-  const facultyStudentsQuery = useStudents(currentUserRole, {
-    enabled: currentUserRole === 'faculty_adviser',
-  })
-
-  // Query config per role
-  // internOptions: used in modal dropdown field
-  // internMap: used in table name mapping
-  return useMemo(() => {
-    switch (currentUserRole) {
-      case 'hte_supervisor': {
-        const hteSubQuery = hteStudentsQuery.listMyHteStudents
-        const students = hteSubQuery?.data ?? []
-
-        const internOptions = students
-          .filter((u) => u.status === 'active')
-          .map((u) => ({
-            ...u,
-            name: formatFullNameFromPayload(u.student_profiles?.profiles),
-          }))
-
-        const internMap = Object.fromEntries(
-          students.map((u) => [u.id, formatFullNameFromPayload(u.student_profiles?.profiles)]),
-        )
-
-        return {
-          evaluations: myEvaluationsQuery.data ?? [],
-          internOptions,
-          internMap,
-          isLoading: myEvaluationsQuery.isLoading || Boolean(hteSubQuery?.isLoading),
-          isError: myEvaluationsQuery.isError || Boolean(hteSubQuery?.isError),
-          error: myEvaluationsQuery.error || hteSubQuery?.error,
-          refetch: () => {
-            myEvaluationsQuery.refetch()
-            hteSubQuery?.refetch()
-          },
-        }
-      }
-
-      case 'faculty_adviser': {
-        const students = facultyStudentsQuery.data ?? []
-
-        const internOptions = students
-          .filter((u) => u.currentInternship?.status === 'active')
-          .map((u) => ({
-            ...u,
-            id: u.currentInternship?.id,
-            name: formatFullNameFromPayload(u.profiles),
-          }))
-
-        const internMap = Object.fromEntries(
-          students.map((u) => [u.currentInternship?.id, formatFullNameFromPayload(u.profiles)]),
-        )
-
-        return {
-          evaluations: myEvaluationsQuery.data ?? [],
-          internOptions,
-          internMap,
-          isLoading: myEvaluationsQuery.isLoading || facultyStudentsQuery.isLoading,
-          isError: myEvaluationsQuery.isError || facultyStudentsQuery.isError,
-          error: myEvaluationsQuery.error || facultyStudentsQuery.error,
-          refetch: () => {
-            myEvaluationsQuery.refetch()
-            facultyStudentsQuery.refetch()
-          },
-        }
-      }
-
-      case 'student': {
-        const students = user ? [user] : []
-        const internMap = Object.fromEntries(
-          students.map((u) => [
-            u.id,
-            [u.lastName, u.firstName, u.middleName, u.suffix].filter(Boolean).join(' '),
-          ]),
-        )
-
-        return {
-          evaluations: internEvaluationsQuery.data ?? [],
-          internOptions: null,
-          internMap,
-          isLoading: internEvaluationsQuery.isLoading,
-          isError: internEvaluationsQuery.isError,
-          error: internEvaluationsQuery.error,
-          refetch: internEvaluationsQuery.refetch,
-        }
-      }
-
-      default:
-        return {
-          evaluations: [],
-          internOptions: null,
-          internMap: {},
-          isLoading: false,
-          isError: false,
-          error: null,
-          refetch: () => {},
-        }
-    }
-  }, [
-    currentUserRole,
-    user,
-    myEvaluationsQuery,
-    hteStudentsQuery.listMyHteStudents,
-    facultyStudentsQuery,
-    internEvaluationsQuery,
-  ])
+  return {
+    internshipId,
+    studentName: studentName || 'Unknown student',
+    studentNumber: student?.student_number ?? '',
+    email: profile?.email ?? '',
+    program: student?.program ?? '',
+    yearLevel: student?.year_level ?? null,
+    section: student?.section ?? null,
+  }
 }

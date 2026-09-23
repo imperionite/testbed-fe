@@ -1,34 +1,37 @@
 import api from './axios'
-import { endpoints } from '../config'
 
 export const evaluationsApi = {
-  async listMyEvaluations() {
-    const response = await api.get(endpoints.evaluations.my_list)
-    return response.data.data
+  listMyEvaluations: async () => {
+    const response = await api.get('/evaluations/me')
+    return response.data?.data ?? []
   },
 
-  async listInternEvaluations(id) {
-    const response = await api.get(endpoints.evaluations.by_intern(id))
-    return response.data.data
+  listInternEvaluations: async (internshipId) => {
+    const response = await api.get(`/evaluations/internship/${internshipId}`)
+
+    return response.data?.data ?? []
   },
 
-  async getEvaluation(id) {
-    const response = await api.get(endpoints.evaluations.details(id))
-    return response.data.data
+  getEvaluation: async (id) => {
+    const response = await api.get(`/evaluations/${id}`)
+    return response.data?.data
   },
 
-  async createEvaluation(payload) {
-    const response = await api.post(endpoints.evaluations.create, payload)
-    return response.data.data
+  createEvaluation: async (payload) => {
+    const response = await api.post('/evaluations', payload)
+
+    return response.data?.data
   },
 
-  async updateEvaluation(id, payload) {
-    const response = await api.patch(endpoints.evaluations.details(id), payload)
-    return response.data.data
+  updateEvaluation: async (id, payload) => {
+    const response = await api.patch(`/evaluations/${id}`, payload)
+
+    return response.data?.data
   },
 
-  async submitEvaluation(id) {
-    const response = await api.post(endpoints.evaluations.submit(id))
-    return response.data.data
+  submitEvaluation: async (id) => {
+    const response = await api.post(`/evaluations/${id}/submit`)
+
+    return response.data?.data
   },
 }

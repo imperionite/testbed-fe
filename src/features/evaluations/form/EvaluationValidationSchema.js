@@ -1,68 +1,54 @@
 import { z } from 'zod'
-import { MODES } from './formConfig'
 
-const requiredString = (fieldName, maxLength) =>
-  z.preprocess(
-    (value) => (value === undefined || value === null ? '' : value),
-    z
-      .string({
-        required_error: `${fieldName} is required`,
-        invalid_type_error: `${fieldName} is required`,
-      })
-      .trim()
-      .min(1, `${fieldName} is required`)
-      .pipe(
-        maxLength
-          ? z.string().max(maxLength, `${fieldName} must be at most ${maxLength} characters`)
-          : z.string(),
-      ),
-  )
+import { EVALUATION_CRITERIA } from './evaluationConfig'
 
-const optionalNullable = (schema) =>
-  z.preprocess((value) => (value === '' ? null : value), schema.optional().nullable())
+/**
+ * Build the response schema from the approved evaluation criteria.
+ *
+ * Every criterion is optional because the backend supports partial
+ * responses while an evaluation is being completed as a draft.
+ *
+ * A value, when provided, must be an integer from 1 to 5.
+ */
+const responseFields = Object.fromEntries(
+  EVALUATION_CRITERIA.map(({ key }) => [key, z.number().int().min(1).max(5).optional()]),
+)
 
-const optionalNullableString = (max, message) =>
-  optionalNullable(z.string().trim().max(max, message))
-
-const evaluationResponsesSchema = z
-  .record(z.string().trim().min(1), z.number().int().min(1).max(5))
-  .refine((responses) => Object.keys(responses).length > 0, {
-    message: 'At least one evaluation criterion must be provided.',
+const responsesSchema = z
+  .object(responseFields)
+  .strict()
+  .refine((responses) => Object.values(responses).some((value) => value !== undefined), {
+    message: 'Rate at least one evaluation criterion.',
   })
 
-export const getValidationSchema = (mode) => {
-  if (mode === MODES.CREATE) {
-    return createEvaluationValidationSchema
-  }
+export const createEvaluationSchema = z.object({
+  internship_id: z.string().uuid('Please select an internship.'),
 
-  if (mode === MODES.EDIT || mode === MODES.VIEW) {
-    return editEvaluationValidationSchema
-  }
+  evaluation_type: z.enum(['hte_supervisor', 'faculty_adviser']),
 
-  return editEvaluationValidationSchema
-}
+  responses: responsesSchema,
 
-const createEvaluationValidationSchema = z.object({
-  internship_id: requiredString('Internship ID', 255),
-
-  evaluation_type: z
-    .enum(['hte_supervisor', 'faculty_adviser'])
+  comments: z
+    .string()
+    .trim()
+    .max(2000, 'Comments must not exceed 2000 characters.')
     .optional()
-    .default('hte_supervisor'),
-
-  responses: optionalNullable(evaluationResponsesSchema),
-
-  comments: optionalNullableString(2000, 'Comments must be at most 2000 characters'),
+    .nullable(),
 })
 
-const editEvaluationValidationSchema = z
-  .object({
-    responses: optionalNullable(evaluationResponsesSchema),
+export const updateEvaluationSchema = z.object({
+  responses: responsesSchema,
 
-    comments: optionalNullableString(2000, 'Comments must be at most 2000 characters'),
-  })
-  .refine((data) => data.responses !== undefined || data.comments !== undefined, {
-    message: 'At least one evaluation field must be provided.',
-  })
+  comments: z
+    .string()
+    .trim()
+    .max(2000, 'Comments must not exceed 2000 characters.')
+    .optional()
+    .nullable(),
+})
 
-export default getValidationSchema
+export function getValidationSchema(mode) {
+  return mode === 'create' ? createEvaluationSchema : updateEvaluationSchema
+}
+
+export { EVALUATION_CRITERIA }

@@ -1,12 +1,16 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+
 import { evaluationsApi } from '../../../api/evaluations'
 
 export function useEvaluationMutations() {
   const queryClient = useQueryClient()
-  const invalidateEvaluations = () => queryClient.invalidateQueries({ queryKey: ['evaluations'] })
+
+  const invalidateEvaluations = async () => {
+    await queryClient.invalidateQueries({ queryKey: ['evaluations'] })
+  }
 
   const createEvaluation = useMutation({
-    mutationFn: (payload) => evaluationsApi.createEvaluation(payload),
+    mutationFn: evaluationsApi.createEvaluation,
     onSuccess: invalidateEvaluations,
   })
 
@@ -19,12 +23,6 @@ export function useEvaluationMutations() {
     mutationFn: ({ id }) => evaluationsApi.submitEvaluation(id),
     onSuccess: invalidateEvaluations,
   })
-
-  // const bulkSubmitEvaluations = useMutation({
-  //   mutationFn: ({ ids }) =>
-  //     Promise.all(ids.map((id) => evaluationsApi.submitEvaluation(id))),
-  //   onSuccess: invalidateEvaluations,
-  // });
 
   return {
     createEvaluation,
