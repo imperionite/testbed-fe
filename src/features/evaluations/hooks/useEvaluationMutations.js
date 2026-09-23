@@ -21,16 +21,15 @@ export function useEvaluationMutations() {
     onSuccess: invalidateEvaluations,
   });
 
-  const bulkSubmitEvaluations = useMutation({
-    mutationFn: ({ ids }) =>
-      Promise.all(ids.map((id) => evaluationsApi.submitEvaluation(id))),
-    onSuccess: invalidateEvaluations,
-  });
+  // const bulkSubmitEvaluations = useMutation({
+  //   mutationFn: ({ ids }) =>
+  //     Promise.all(ids.map((id) => evaluationsApi.submitEvaluation(id))),
+  //   onSuccess: invalidateEvaluations,
+  // });
 
   return {
     createEvaluation,
     updateEvaluation,
     submitEvaluation,
-    bulkSubmitEvaluations,
   };
 }

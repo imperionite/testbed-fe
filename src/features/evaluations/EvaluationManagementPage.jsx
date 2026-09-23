@@ -83,7 +83,7 @@ export default function EvaluationManagementPage() {
   // Query for evaluation records
 
   const modalState = useEvaluationModalState()
-  const { createEvaluation, updateEvaluation, bulkSubmitEvaluations } = useEvaluationMutations()
+  const { createEvaluation, updateEvaluation, submitEvaluation } = useEvaluationMutations()
 
   return (
     <div style={styles.container}>
@@ -169,7 +169,6 @@ export default function EvaluationManagementPage() {
               evaluations={evaluations}
               permissions={permissions}
               internMap={internMap}
-              onBulkStatusChange={bulkSubmitEvaluations.mutateAsync}
               onEvaluationClick={(selectedEvaluation) =>
                 modalState.open(
                   selectedEvaluation.status?.toLowerCase() === 'draft' ? MODES.EDIT : MODES.VIEW,
@@ -196,6 +195,7 @@ export default function EvaluationManagementPage() {
           onSuccess={notify.success}
           onCreate={createEvaluation.mutateAsync}
           onUpdate={updateEvaluation.mutateAsync}
+          onSubmitEvaluation={submitEvaluation.mutateAsync}
         />
       )}
     </div>

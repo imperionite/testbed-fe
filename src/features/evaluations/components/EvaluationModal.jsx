@@ -1,4 +1,4 @@
-import { useRef, useState, useMemo } from "react";
+import { useRef, useState, useMemo } from 'react'
 import {
   Dialog,
   DialogTitle,
@@ -8,15 +8,16 @@ import {
   CircularProgress,
   Alert,
   IconButton,
-} from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
-import EvaluationForm from "./EvaluationForm";
-import { MODES } from "../form/formConfig";
-import { ROLES } from "../../shared/constants/constants";
+} from '@mui/material'
+import CloseIcon from '@mui/icons-material/Close'
+import EvaluationForm from './EvaluationForm'
+import { MODES } from '../form/formConfig'
+import { ROLES } from '../../shared/constants/constants'
+import ActionConfirmDialog from '../../shared/components/ActionConfirmDialog'
 
 const EVALUATION_TYPES = {
-  [ROLES.HTE_SUPERVISOR]: "hte_supervisor",
-  [ROLES.FACULTY_ADVISER]: "faculty_adviser",
+  [ROLES.HTE_SUPERVISOR]: 'hte_supervisor',
+  [ROLES.FACULTY_ADVISER]: 'faculty_adviser',
 }
 
 export default function EvaluationModal({
@@ -27,7 +28,7 @@ export default function EvaluationModal({
   evaluation = null,
   permissions,
   viewerRole,
-  evaluationTypeOptions = ["hte_supervisor", "faculty_adviser"],
+  evaluationTypeOptions = ['hte_supervisor', 'faculty_adviser'],
   internOptions = [],
   internMap = {},
   criteriaList = [],
@@ -35,122 +36,155 @@ export default function EvaluationModal({
   onSuccess,
   onCreate,
   onUpdate,
+  onSubmitEvaluation,
 }) {
-  const [mode, setMode] = useState(initialMode);
-  const [isSaving, setIsSaving] = useState(false);
-  const [error, setError] = useState(null);
-  const requestedStatus = useRef("Draft");
+  const [mode, setMode] = useState(initialMode)
+  const [isSaving, setIsSaving] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false)
+  const [pendingFormData, setPendingFormData] = useState(null)
+  const [error, setError] = useState(null)
+  const requestedStatus = useRef('Draft')
 
   // Determine if evaluation is in draft state
-  const normalizedStatus = evaluation?.status?.toLowerCase();
-  const isDraft = normalizedStatus === "draft";
-  const isSubmitted = normalizedStatus === "submitted";
+  const normalizedStatus = evaluation?.status?.toLowerCase()
+  const isSubmitted = normalizedStatus === 'submitted'
+  const canEdit = permissions?.canEdit && !isSubmitted
+  const canCreate = permissions?.canCreate
 
   const defaultValues = useMemo(() => {
     return evaluation
       ? {
-          id: evaluation.id ?? "",
-          internship_id: evaluation.internship_id ?? "",
-          evaluator_id: evaluation.evaluator_id ?? "",
+          id: evaluation.id ?? '',
+          internship_id: evaluation.internship_id ?? '',
+          evaluator_id: evaluation.evaluator_id ?? '',
           evaluation_type: evaluation.evaluation_type ?? EVALUATION_TYPES[viewerRole] ?? null,
           responses: evaluation.responses ?? {},
-          comments: evaluation.comments ?? "",
-          created_at: evaluation.created_at ?? "",
-          updated_at: evaluation.updated_at ?? "–",
-          status: evaluation.status ?? "Draft",
-          submitted_at: evaluation.submitted_at ?? "–",
+          comments: evaluation.comments ?? '',
+          created_at: evaluation.created_at ?? '',
+          updated_at: evaluation.updated_at ?? '–',
+          status: evaluation.status ?? 'Draft',
+          submitted_at: evaluation.submitted_at ?? '–',
         }
       : {
-          id: "",
-          internship_id: "",
-          evaluator_id: "",
+          id: '',
+          internship_id: '',
+          evaluator_id: '',
           evaluation_type: EVALUATION_TYPES[viewerRole] ?? null,
           responses: {},
-          comments: "",
-          created_at: "",
-          updated_at: "–",
-          status: "Draft",
-          submitted_at: "–",
-        };
-  }, [evaluation, viewerRole]);
+          comments: '',
+          created_at: '',
+          updated_at: '–',
+          status: 'Draft',
+          submitted_at: '–',
+        }
+  }, [evaluation, viewerRole])
 
-  const canEdit = permissions?.canEdit && isDraft; // Can only edit if draft
-  const canCreate = permissions?.canCreate;
-
-  const handleEditBtnPressed = () => setMode(MODES.EDIT);
+  const handleEditBtnPressed = () => setMode(MODES.EDIT)
 
   // const handleCancelBtnPressed = () => {
   //   setError(null);
   //   setMode(MODES.VIEW);
   // };
 
-  const handleSubmitButtonPressed = (status = "Draft") => {
-    requestedStatus.current = status;
-    setIsSaving(true);
-    document.getElementById("evaluation-form")?.requestSubmit();
-  };
+  const handleSubmitButtonPressed = (status = 'Draft') => {
+    requestedStatus.current = status
+    setIsSaving(true)
+    document.getElementById('evaluation-form')?.requestSubmit()
+  }
 
   const handleSubmit = async (data) => {
-    setError(null);
+    setError(null)
     try {
       if (mode === MODES.CREATE) {
-        // Creating new evaluation (defaults to Draft)
+        // Create Mode: Always calls onCreate (createEvaluation) as Draft
         await onCreate?.({
           internship_id: data.internship_id,
           evaluation_type: data.evaluation_type,
           responses: data.responses || {},
-          comments: data.comments || "",
-          status: requestedStatus.current,
-        });
-        onSuccess?.("Evaluation created successfully!");
+          comments: data.comments || '',
+          status: 'Draft',
+        })
+        onSuccess?.('Evaluation created successfully!')
       } else if (mode === MODES.EDIT) {
-        // Editing draft evaluation
-        await onUpdate?.({
-          id: evaluation.id,
-          payload: {
-            responses: data.responses || {},
-            comments: data.comments || "",
-              status: requestedStatus.current,
-          },
-        });
-        onSuccess?.("Evaluation updated successfully!");
+        if (requestedStatus.current === 'Submitted') {
+          // Edit Mode (Submit): First saves form updates, then calls submitEvaluation
+          setPendingFormData(data)
+          setIsConfirmOpen(true)
+        } else {
+          // Save as Draft
+          setIsSaving(true)
+          await onUpdate?.({
+            id: evaluation.id,
+            payload: {
+              responses: data.responses || {},
+              comments: data.comments || '',
+              status: 'Draft',
+            },
+          })
+          onSuccess?.('Evaluation updated successfully!')
+          setIsSaving(false)
+          onClose()
+        }
       }
-
-      setIsSaving(false);
-      onClose();
     } catch (submitError) {
-      setIsSaving(false);
-      setError(
-        submitError.response?.data?.message || "Unable to save Evaluation."
-      );
+      setIsSaving(false)
+      setError(submitError.response?.data?.message || 'Unable to save Evaluation.')
     }
-  };
+  }
+
+  const handleConfirmSubmit = async () => {
+    if (!pendingFormData) return
+    setIsSubmitting(true)
+    setError(null)
+
+    try {
+      await onUpdate?.({
+        id: evaluation.id,
+        payload: {
+          responses: pendingFormData.responses || {},
+          comments: pendingFormData.comments || '',
+          status: 'Draft',
+        },
+      })
+
+      await onSubmitEvaluation?.({ id: evaluation.id })
+
+      onSuccess?.('Evaluation submitted successfully!')
+      setIsSubmitting(false)
+      setIsConfirmOpen(false)
+      onClose()
+    } catch (submitError) {
+      setIsSubmitting(false)
+      setIsConfirmOpen(false)
+      setError(submitError.response?.data?.message || 'Unable to submit Evaluation.')
+    }
+  }
+
+  const handleCancelSubmit = () => {
+    setIsConfirmOpen(false)
+    setPendingFormData(null)
+  }
 
   const handleInvalid = () => {
-    setIsSaving(false);
-  };
+    setIsSaving(false)
+  }
 
   const getDialogTitle = () => {
-    if (mode === MODES.VIEW) return "View Evaluation";
-    if (mode === MODES.EDIT) return "Edit Evaluation";
-    return "Create Evaluation";
-  };
+    if (mode === MODES.VIEW) return 'View Evaluation'
+    if (mode === MODES.EDIT) return 'Edit Evaluation'
+    return 'Create Evaluation'
+  }
 
   return (
-    <Dialog
-      open={open}
-      onClose={onClose}
-      maxWidth="sm"
-      fullWidth
-      disablePortal={disablePortal}
-    >
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth disablePortal={disablePortal}>
       <DialogTitle>
         {getDialogTitle()}
         <IconButton
           aria-label="close"
           onClick={onClose}
           sx={(theme) => ({
-            position: "absolute",
+            position: 'absolute',
             right: 8,
             top: 8,
             color: theme.palette.grey[500],
@@ -187,27 +221,22 @@ export default function EvaluationModal({
               </Button>
             )}
             {isSubmitted && (
-              <span style={{ fontSize: "0.875rem", color: "#666" }}>
-                Submitted (Read-only)
-              </span>
+              <span style={{ fontSize: '0.875rem', color: '#666' }}>Submitted (Read-only)</span>
             )}
           </>
         )}
 
         {mode === MODES.EDIT && (
           <>
-            {/* <Button onClick={handleCancelBtnPressed} disabled={isSaving}>
-              Cancel
-            </Button> */}
             <Button
-              onClick={() => handleSubmitButtonPressed("Draft")}
+              onClick={() => handleSubmitButtonPressed('Draft')}
               variant="outlined"
               disabled={isSaving}
             >
               Save as Draft
             </Button>
             <Button
-              onClick={() => handleSubmitButtonPressed("Submitted")}
+              onClick={() => handleSubmitButtonPressed('Submitted')}
               color="primary"
               variant="contained"
               disabled={isSaving}
@@ -218,30 +247,29 @@ export default function EvaluationModal({
           </>
         )}
 
-        {mode === MODES.CREATE && (
-          <>
-            {canCreate && (
-              <>
-                <Button
-                  onClick={handleSubmitButtonPressed}
-                  variant="outlined"
-                  disabled={isSaving}
-                >
-                  Save as Draft
-                </Button>
-                <Button
-                  onClick={handleSubmitButtonPressed}
-                  variant="contained"
-                  disabled={isSaving}
-                  startIcon={isSaving ? <CircularProgress size={20} /> : null}
-                >
-                  Submit
-                </Button>
-              </>
-            )}
-          </>
+        {mode === MODES.CREATE && canCreate && (
+          <Button
+            onClick={() => handleSubmitButtonPressed('Draft')}
+            color="primary"
+            variant="contained"
+            disabled={isSaving}
+            startIcon={isSaving ? <CircularProgress size={20} /> : null}
+          >
+            Save as Draft
+          </Button>
         )}
       </DialogActions>
+
+      <ActionConfirmDialog
+        open={isConfirmOpen}
+        title="Submit Evaluation"
+        message="Are you sure you want to submit this evaluation? Once submitted, it will be finalized and can no longer be edited."
+        confirmLabel="Submit"
+        cancelLabel="Cancel"
+        isLoading={isSubmitting}
+        onConfirm={handleConfirmSubmit}
+        onCancel={handleCancelSubmit}
+      />
     </Dialog>
-  );
+  )
 }
