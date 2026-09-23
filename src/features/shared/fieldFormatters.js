@@ -29,4 +29,3 @@ export function formatSentenceCase(value) {
     .toLowerCase()
     .replace(/\b\w/g, (letter) => letter.toUpperCase())
 }
-
