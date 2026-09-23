@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import {
   Dialog,
   DialogTitle,
@@ -25,21 +25,21 @@ export default function AttendanceFormModal({ open, onClose, onSubmit, initialDa
       : dayjs().hour(17).minute(0),
   )
 
-  useEffect(() => {
-    if (initialData) {
-      setDate(dayjs(initialData.attendance_date))
-      setTimeIn(dayjs(`2000-01-01T${initialData.time_in}`))
-      setTimeOut(
-        initialData.time_out
-          ? dayjs(`2000-01-01T${initialData.time_out}`)
-          : dayjs().hour(17).minute(0),
-      )
-    } else {
-      setDate(dayjs())
-      setTimeIn(dayjs().hour(8).minute(0))
-      setTimeOut(dayjs().hour(17).minute(0))
-    }
-  }, [initialData])
+  // useEffect(() => {
+  //   if (initialData) {
+  //     setDate(dayjs(initialData.attendance_date))
+  //     setTimeIn(dayjs(`2000-01-01T${initialData.time_in}`))
+  //     setTimeOut(
+  //       initialData.time_out
+  //         ? dayjs(`2000-01-01T${initialData.time_out}`)
+  //         : dayjs().hour(17).minute(0),
+  //     )
+  //   } else {
+  //     setDate(dayjs())
+  //     setTimeIn(dayjs().hour(8).minute(0))
+  //     setTimeOut(dayjs().hour(17).minute(0))
+  //   }
+  // }, [initialData])
 
   const handleSubmit = () => {
     const payload = {

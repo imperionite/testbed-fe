@@ -1,9 +1,7 @@
 import { useState } from 'react'
-import { Box, Typography, Card, CardContent, Stack, Button, Chip, Paper } from '@mui/material'
-import AddIcon from '@mui/icons-material/Add'
-import AccessTimeIcon from '@mui/icons-material/AccessTime'
+import { Box, Typography, Paper } from '@mui/material'
+
 import { useQuery } from '@tanstack/react-query'
-import useAuth from '../../../hooks/useAuth'
 import { useAttendanceByInternship, useAttendanceMutations } from '../hooks/useAttendanceMutations'
 import { attendanceApi } from '../../../api/attendance'
 import AttendanceTable from './AttendanceTable'
@@ -18,7 +16,10 @@ export default function StudentDashboard({ internshipId }) {
     useAttendanceByInternship(internshipId)
 
   // 2. Fetch validated rendered hours summary
-  const { data: renderedHours, isLoading: isHoursLoading } = useQuery({
+  const {
+    data: renderedHours,
+    // isLoading: isHoursLoading
+  } = useQuery({
     queryKey: ['renderedHours', internshipId],
     queryFn: () => attendanceApi.getRenderedHours(internshipId),
     enabled: !!internshipId,
@@ -78,6 +79,7 @@ export default function StudentDashboard({ internshipId }) {
 
       {/* Reusable Form Modal for Create & Edit */}
       <AttendanceFormModal
+        key={selectedEditRecord?.id ?? (modalOpen ? 'new' : 'closed')}
         open={modalOpen}
         onClose={handleCloseModal}
         initialData={selectedEditRecord}
