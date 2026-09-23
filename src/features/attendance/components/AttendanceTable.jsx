@@ -20,6 +20,7 @@ export default function AttendanceTable({
     return [...data].sort((a, b) => dayjs(b.attendance_date).diff(dayjs(a.attendance_date)))
   }, [data])
 
+<<<<<<< HEAD
   const columns = useMemo(
     () => [
       {
@@ -33,6 +34,25 @@ export default function AttendanceTable({
         Cell: ({ cell }) => cell.getValue() || '-',
       },
       {
+=======
+export default function AttendanceTable({
+  data = [],
+  onValidate,
+  onEdit,
+  onLogAttendance,
+  renderedHours,
+  isStudent = false,
+}) {
+  const columns = useMemo(
+    () => [
+      { accessorKey: 'attendance_date', header: 'Date' },
+      {
+        accessorKey: 'time_in',
+        header: 'Time In',
+        Cell: ({ cell }) => cell.getValue() || '-',
+      },
+      {
+>>>>>>> refs/remotes/origin/arnel/refactor
         accessorKey: 'time_out',
         header: 'Time Out',
         Cell: ({ cell }) => cell.getValue() || '-',

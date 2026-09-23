@@ -24,6 +24,7 @@ export default function AttendanceFormModal({ open, onClose, onSubmit, initialDa
         : dayjs().hour(17).minute(0)
       : dayjs().hour(17).minute(0),
   )
+<<<<<<< HEAD
 
   useEffect(() => {
     if (initialData) {
@@ -40,6 +41,8 @@ export default function AttendanceFormModal({ open, onClose, onSubmit, initialDa
       setTimeOut(dayjs().hour(17).minute(0))
     }
   }, [initialData])
+=======
+>>>>>>> refs/remotes/origin/arnel/refactor
 
   const handleSubmit = () => {
     const payload = {

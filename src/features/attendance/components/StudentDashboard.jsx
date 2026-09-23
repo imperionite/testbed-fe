@@ -1,9 +1,16 @@
 import { useState } from 'react'
+<<<<<<< HEAD
 import { Box, Typography, Card, CardContent, Stack, Button, Chip, Paper } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
 import AccessTimeIcon from '@mui/icons-material/AccessTime'
 import { useQuery } from '@tanstack/react-query'
 import useAuth from '../../../hooks/useAuth'
+=======
+import { Box, Typography, Paper } from '@mui/material'
+
+import { useQuery } from '@tanstack/react-query'
+
+>>>>>>> refs/remotes/origin/arnel/refactor
 import { useAttendanceByInternship, useAttendanceMutations } from '../hooks/useAttendanceMutations'
 import { attendanceApi } from '../../../api/attendance'
 import AttendanceTable from './AttendanceTable'
@@ -18,7 +25,7 @@ export default function StudentDashboard({ internshipId }) {
     useAttendanceByInternship(internshipId)
 
   // 2. Fetch validated rendered hours summary
-  const { data: renderedHours, isLoading: isHoursLoading } = useQuery({
+  const { data: renderedHours } = useQuery({
     queryKey: ['renderedHours', internshipId],
     queryFn: () => attendanceApi.getRenderedHours(internshipId),
     enabled: !!internshipId,
