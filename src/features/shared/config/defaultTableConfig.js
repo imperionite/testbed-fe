@@ -24,7 +24,6 @@ export const defaultTableConfig = {
   enableHiding: true,
   enableGrouping: true,
   enableColumnOrdering: true,
-  enableClickToCopy: true,
   enableColumnActions: false,
   enableColumnPinning: true,
   enableRowActions: false,

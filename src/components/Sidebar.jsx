@@ -35,13 +35,6 @@ const menuItems = [
   },
 
   {
-    label: 'My Documents',
-    path: '/documents',
-    icon: <DescriptionOutlinedIcon />,
-    roles: ['student', 'hte_supervisor'],
-  },
-
-  {
     label: 'User & Roles',
     path: '/userandroles',
     icon: <ManageAccountsOutlinedIcon />,
@@ -66,7 +59,7 @@ const menuItems = [
     label: 'Internships',
     path: '/internships',
     icon: <WorkOutlineOutlinedIcon />,
-    roles: ['administrator', 'internship_coordinator', 'faculty_adviser'],
+    roles: ['administrator', 'internship_coordinator', 'faculty_adviser', 'hte_supervisor'],
   },
 
   {
@@ -74,6 +67,13 @@ const menuItems = [
     path: '/evaluations',
     icon: <FactCheckOutlinedIcon />,
     roles: ['hte_supervisor', 'internship_coordinator', 'student', 'faculty_adviser'],
+  },
+
+  {
+    label: 'My Documents',
+    path: '/documents',
+    icon: <DescriptionOutlinedIcon />,
+    roles: ['student', 'hte_supervisor'],
   },
 
   {
@@ -97,7 +97,7 @@ export default function Sidebar({ role, mobileOpen, onMobileClose }) {
   const navigation = (
     <Box
       sx={{
-        width: { xs: 230, sm: 220, md: 230 },
+        width: { xs: 100, sm: 172, md: 188 },
         flexShrink: 0,
         alignSelf: 'stretch',
         borderRight: 1,

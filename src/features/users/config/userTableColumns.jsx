@@ -10,7 +10,7 @@ import { formatUserDate } from '../../shared/fieldFormatters'
 
 const formatRole = (role) => ROLE_OPTIONS.find((option) => option.value === role)?.label ?? role
 
-const defaultCallEmptyStateValue = '–'
+const defaultEmptyCellValue = '–'
 
 //-----------------
 // MAIN FUNCTION
@@ -39,7 +39,7 @@ export function createUserTableColumns({ canEdit }) {
       id: 'firstName',
       header: 'First Name',
       size: 150,
-      accessorFn: (row) => row.firstName || defaultCallEmptyStateValue,
+      accessorFn: (row) => row.firstName || defaultEmptyCellValue,
       enableColumnFilter: true,
       enableEditing: false,
     },
@@ -47,7 +47,7 @@ export function createUserTableColumns({ canEdit }) {
       id: 'lastName',
       header: 'Last Name',
       size: 150,
-      accessorFn: (row) => row.lastName || defaultCallEmptyStateValue,
+      accessorFn: (row) => row.lastName || defaultEmptyCellValue,
       enableColumnFilter: true,
       enableEditing: false,
     },
@@ -55,7 +55,7 @@ export function createUserTableColumns({ canEdit }) {
       id: 'middleName',
       header: 'Middle Name',
       size: 150,
-      accessorFn: (row) => row.middleName || defaultCallEmptyStateValue,
+      accessorFn: (row) => row.middleName || defaultEmptyCellValue,
       enableColumnFilter: true,
       enableEditing: false,
     },
@@ -63,7 +63,7 @@ export function createUserTableColumns({ canEdit }) {
       id: 'suffix',
       header: 'Suffix',
       size: 100,
-      accessorFn: (row) => row.suffix || defaultCallEmptyStateValue,
+      accessorFn: (row) => row.suffix || defaultEmptyCellValue,
       enableColumnFilter: true,
       enableEditing: false,
     },
@@ -74,7 +74,7 @@ export function createUserTableColumns({ canEdit }) {
       filterVariant: 'select',
       filterSelectOptions: ROLE_OPTIONS,
       Cell: ({ cell }) =>
-        <BadgeRole value={formatRole(cell.getValue())} /> || defaultCallEmptyStateValue,
+        <BadgeRole value={formatRole(cell.getValue())} /> || defaultEmptyCellValue,
       enableEditing: canEdit,
       muiEditTextFieldProps: {
         select: true,
@@ -95,8 +95,7 @@ export function createUserTableColumns({ canEdit }) {
         { value: 'false', label: 'Inactive' },
       ],
       Cell: ({ cell }) =>
-        <BadgeStatus value={cell.getValue() ? 'Active' : 'Inactive'} /> ||
-        defaultCallEmptyStateValue,
+        <BadgeStatus value={cell.getValue() ? 'Active' : 'Inactive'} /> || defaultEmptyCellValue,
       enableEditing: canEdit,
       muiEditTextFieldProps: {
         select: true,
@@ -112,7 +111,7 @@ export function createUserTableColumns({ canEdit }) {
     },
     {
       id: 'createdAt',
-      accessorFn: (row) => formatUserDate(row.createdAt) || defaultCallEmptyStateValue,
+      accessorFn: (row) => formatUserDate(row.createdAt) || defaultEmptyCellValue,
       header: 'Created',
       size: 130,
       enableColumnFilter: true,
