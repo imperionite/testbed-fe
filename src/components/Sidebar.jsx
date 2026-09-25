@@ -35,13 +35,6 @@ const menuItems = [
   },
 
   {
-    label: 'My Documents',
-    path: '/documents',
-    icon: <DescriptionOutlinedIcon />,
-    roles: ['student', 'hte_supervisor'],
-  },
-
-  {
     label: 'User & Roles',
     path: '/userandroles',
     icon: <ManageAccountsOutlinedIcon />,
@@ -66,7 +59,7 @@ const menuItems = [
     label: 'Internships',
     path: '/internships',
     icon: <WorkOutlineOutlinedIcon />,
-    roles: ['administrator', 'internship_coordinator', 'faculty_adviser'],
+    roles: ['administrator', 'internship_coordinator', 'faculty_adviser', 'hte_supervisor'],
   },
 
   {
@@ -74,6 +67,13 @@ const menuItems = [
     path: '/evaluations',
     icon: <FactCheckOutlinedIcon />,
     roles: ['hte_supervisor', 'internship_coordinator', 'student', 'faculty_adviser'],
+  },
+
+  {
+    label: 'My Documents',
+    path: '/documents',
+    icon: <DescriptionOutlinedIcon />,
+    roles: ['student', 'hte_supervisor'],
   },
 
   {

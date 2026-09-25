@@ -5,7 +5,7 @@ import StudentManagementPage from './StudentManagementPage'
 export default function StudentsRoute() {
   const { user } = useAuth()
   const isStudent = user?.role === 'student'
-  const isStaff = ['administrator', 'internship_coordinator', 'hte_supervisor'].includes(user?.role)
+  const isStaff = ['administrator', 'internship_coordinator'].includes(user?.role)
 
   if (isStudent) {
     return <Navigate to="/students/me" replace />

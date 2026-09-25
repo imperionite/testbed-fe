@@ -51,7 +51,11 @@ export default function HteManagementLayout() {
   const permissions = getHteManagementPermissions(user?.role)
 
   const {
-    listHtes: { data: hteData = [], isLoading, isError, error, refetch },
+    data: hteData = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
   } = useHtes({
     enabled: permissions.canView,
   })
