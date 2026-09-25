@@ -8,9 +8,7 @@ export default function InternshipRoute() {
 
   if (isHteSupervisor) {
     return <HteInternshipPage />
-  }
-
-  else {
+  } else {
     return <InternshipManagementPage />
   }
 }

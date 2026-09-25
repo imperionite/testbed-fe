@@ -1,7 +1,7 @@
 import api from './axios'
 import { endpoints } from '../config'
 
-export const normalizeHte = (hte) => {
+const normalizeHte = (hte) => {
   return {
     ...hte,
     companyName: hte.companyName ?? hte.company_name,

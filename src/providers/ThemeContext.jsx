@@ -18,10 +18,7 @@ export const ThemeContextProvider = ({ children }) => {
 
   const activeMode = mode === 'system' ? systemMode : mode
 
-  const theme = useMemo(
-    () => createAppTheme(activeMode, defaultPreferences.themeId),
-    [activeMode],
-  )
+  const theme = useMemo(() => createAppTheme(activeMode, defaultPreferences.themeId), [activeMode])
 
   useEffect(() => {
     localStorage.setItem('themeMode', mode)

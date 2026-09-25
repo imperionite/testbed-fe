@@ -95,8 +95,7 @@ export function createUserTableColumns({ canEdit }) {
         { value: 'false', label: 'Inactive' },
       ],
       Cell: ({ cell }) =>
-        <BadgeStatus value={cell.getValue() ? 'Active' : 'Inactive'} /> ||
-        defaultEmptyCellValue,
+        <BadgeStatus value={cell.getValue() ? 'Active' : 'Inactive'} /> || defaultEmptyCellValue,
       enableEditing: canEdit,
       muiEditTextFieldProps: {
         select: true,

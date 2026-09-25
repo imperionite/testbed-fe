@@ -39,7 +39,7 @@ export function presetTokens(id, mode) {
         muted: dark ? '#a6b6cb' : '#576980',
         border: dark ? '#314357' : '#dce5f0',
         radius: 14,
-      };
+      }
     case 'shadTheme':
       return {
         accent: dark ? '#fafafa' : '#27272a',
@@ -51,7 +51,7 @@ export function presetTokens(id, mode) {
         muted: dark ? '#b0b0ba' : '#66666f',
         border: dark ? '#38383f' : '#dedee3',
         radius: 8,
-      };
+      }
     case 'cyberpunkTheme':
       return {
         accent: dark ? '#ff7f85' : '#b82237',
@@ -63,7 +63,7 @@ export function presetTokens(id, mode) {
         muted: dark ? '#bfb0cf' : '#75617e',
         border: dark ? '#503347' : '#dec9d6',
         radius: 4,
-      };
+      }
     default:
       return {
         accent: dark ? '#f5a06b' : '#af4310',
@@ -75,6 +75,6 @@ export function presetTokens(id, mode) {
         muted: dark ? '#b0ada9' : '#666d77',
         border: dark ? '#3b3b3b' : '#e7e8eb',
         radius: 12,
-      };
+      }
   }
 }

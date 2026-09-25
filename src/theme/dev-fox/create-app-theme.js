@@ -1,6 +1,5 @@
 // Theme is from https://github.com/pbasiak/dev-fox-ui-mui-dashboard-theme
 
-
 import { alpha, createTheme } from '@mui/material/styles'
 import { presetTokens } from './presets'
 
@@ -65,7 +64,11 @@ export function createAppTheme(mode = 'light', preset = 'devfox') {
       MuiButton: {
         defaultProps: { disableElevation: true },
         styleOverrides: {
-          root: { borderRadius: Math.min(tokens.radius, 8), padding: '9px 15px', whiteSpace: 'nowrap' },
+          root: {
+            borderRadius: Math.min(tokens.radius, 8),
+            padding: '9px 15px',
+            whiteSpace: 'nowrap',
+          },
           outlined: { borderColor: border, color: tokens.text, backgroundColor: tokens.paper },
           sizeSmall: { padding: '5px 11px' },
         },
@@ -74,7 +77,10 @@ export function createAppTheme(mode = 'light', preset = 'devfox') {
         defaultProps: { elevation: 0 },
         styleOverrides: { root: { backgroundImage: 'none' }, outlined: { borderColor: border } },
       },
-      MuiCard: { defaultProps: { variant: 'outlined' }, styleOverrides: { root: { borderRadius: tokens.radius } } },
+      MuiCard: {
+        defaultProps: { variant: 'outlined' },
+        styleOverrides: { root: { borderRadius: tokens.radius } },
+      },
       MuiTextField: { defaultProps: { size: 'small', variant: 'outlined' } },
       MuiOutlinedInput: {
         styleOverrides: {
@@ -98,20 +104,33 @@ export function createAppTheme(mode = 'light', preset = 'devfox') {
       },
       MuiChip: {
         defaultProps: { size: 'small' },
-        styleOverrides: { root: { borderRadius: 6, fontWeight: 550, fontSize: '.68rem', height: 24 } },
+        styleOverrides: {
+          root: { borderRadius: 6, fontWeight: 550, fontSize: '.68rem', height: 24 },
+        },
       },
       MuiIconButton: { styleOverrides: { root: { borderRadius: Math.min(tokens.radius, 8) } } },
       MuiTabs: { styleOverrides: { root: { minHeight: 43 }, indicator: { height: 2 } } },
       MuiTab: {
         styleOverrides: {
-          root: { minHeight: 43, minWidth: 0, padding: '10px 18px', fontWeight: 550, textTransform: 'none' },
+          root: {
+            minHeight: 43,
+            minWidth: 0,
+            padding: '10px 18px',
+            fontWeight: 550,
+            textTransform: 'none',
+          },
         },
       },
       MuiDialog: { styleOverrides: { paper: { borderRadius: 16, padding: 4 } } },
       MuiTooltip: { defaultProps: { arrow: true } },
       MuiAvatar: {
         styleOverrides: {
-          root: { fontSize: '.75rem', fontWeight: 600, backgroundColor: alpha(accent, 0.1), color: accent },
+          root: {
+            fontSize: '.75rem',
+            fontWeight: 600,
+            backgroundColor: alpha(accent, 0.1),
+            color: accent,
+          },
         },
       },
       MuiLinearProgress: {

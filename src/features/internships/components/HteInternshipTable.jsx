@@ -1,6 +1,6 @@
 import { MaterialReactTable, useMaterialReactTable } from '@glebcha/material-react-table'
 import { IconButton, Box, Typography, Tooltip } from '@mui/material'
-import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityIcon from '@mui/icons-material/Visibility'
 import { formatUserDate } from '../../shared/fieldFormatters'
 import { BadgeStatus } from './BadgeStatus'
 import { formatSentenceCase } from '../../shared/fieldFormatters'
@@ -148,10 +148,7 @@ export default function HteInternshipTable({ data, onView }) {
       header: 'Actions',
       Cell: ({ row }) => (
         <Tooltip title="View Details">
-          <IconButton
-            aria-label="View Details"
-            onClick={() => onView(row.original)}
-          >
+          <IconButton aria-label="View Details" onClick={() => onView(row.original)}>
             <VisibilityIcon />
           </IconButton>
         </Tooltip>
@@ -191,7 +188,7 @@ export default function HteInternshipTable({ data, onView }) {
           <Box component="span" sx={{ fontWeight: 'bold' }}>
             Emergency Contact:
           </Box>{' '}
-          {row.original.student_profiles?.emergency_contact_name} | {' '}          
+          {row.original.student_profiles?.emergency_contact_name} |{' '}
           {row.original.student_profiles?.emergency_contact_number}
         </Typography>
       </Box>

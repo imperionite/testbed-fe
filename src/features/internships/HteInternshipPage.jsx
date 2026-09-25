@@ -19,12 +19,11 @@ export default function HteStudentsPage() {
 
   const modalState = useModalState()
 
-  const permissions = 
-    {
-      canView: true,
-      canEdit: false,
-      canUpdate: false
-    };
+  const permissions = {
+    canView: true,
+    canEdit: false,
+    canUpdate: false,
+  }
 
   if (isAuthLoading || isStudentsLoading) return <CircularProgress />
   if (!permissions.canView) return <Typography color="error">Access denied.</Typography>
@@ -68,8 +67,14 @@ export default function HteStudentsPage() {
         }}
       >
         <CardStat title="Total Internship Records" value={students.length} />
-        <CardStat title="Pending Internships" value={students.filter(student => student.status === "pending").length} /> 
-        <CardStat title="Active Internships" value={students.filter(student => student.status === "active").length} /> 
+        <CardStat
+          title="Pending Internships"
+          value={students.filter((student) => student.status === 'pending').length}
+        />
+        <CardStat
+          title="Active Internships"
+          value={students.filter((student) => student.status === 'active').length}
+        />
       </Box>
 
       <HteInternshipTable
@@ -78,11 +83,11 @@ export default function HteStudentsPage() {
         onView={(student) => modalState.open(MODES.VIEW, student)}
       />
 
-    <HteInternshipDetailsModal
-      open={modalState.isOpen}
-      student={modalState.selectedEntity}
-      onClose={modalState.close}
-    />
+      <HteInternshipDetailsModal
+        open={modalState.isOpen}
+        student={modalState.selectedEntity}
+        onClose={modalState.close}
+      />
     </Box>
   )
 }
