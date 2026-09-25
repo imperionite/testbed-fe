@@ -1,7 +1,8 @@
 import { createContext, useContext, useState, useEffect, useMemo } from 'react'
 import { ThemeProvider } from '@mui/material/styles'
 import CssBaseline from '@mui/material/CssBaseline'
-import { createAppTheme } from '../theme/experiment'
+import { createAppTheme } from '../theme/index.js'
+import { defaultPreferences } from '../theme/dev-fox/preferences.js'
 
 const ThemeContext = createContext()
 
@@ -17,7 +18,10 @@ export const ThemeContextProvider = ({ children }) => {
 
   const activeMode = mode === 'system' ? systemMode : mode
 
-  const theme = useMemo(() => createAppTheme(activeMode), [activeMode])
+  const theme = useMemo(
+    () => createAppTheme(activeMode, defaultPreferences.themeId),
+    [activeMode],
+  )
 
   useEffect(() => {
     localStorage.setItem('themeMode', mode)

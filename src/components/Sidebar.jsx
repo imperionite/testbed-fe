@@ -97,7 +97,7 @@ export default function Sidebar({ role, mobileOpen, onMobileClose }) {
   const navigation = (
     <Box
       sx={{
-        width: { xs: 230, sm: 220, md: 230 },
+        width: { xs: 100, sm: 172, md: 188 },
         flexShrink: 0,
         alignSelf: 'stretch',
         borderRight: 1,

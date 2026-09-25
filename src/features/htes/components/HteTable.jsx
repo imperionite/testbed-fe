@@ -56,7 +56,6 @@ export default function HtesTable({
     enablePagination: true,
     enableRowSelection: permissions.canSelectRows,
     enableHiding: true,
-    enableClickToCopy: true,
     enableColumnActions: false,
     enableColumnPinning: true,
     enableDensityToggle: true,
