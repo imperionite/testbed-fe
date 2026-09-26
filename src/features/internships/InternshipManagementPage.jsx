@@ -28,15 +28,27 @@ import AttendanceViewModal from '../attendance/components/AttendanceViewModal'
 import { useInternshipMutations } from './hooks/useInternshipMutations'
 import { useInternshipsData } from './hooks/useInternshipsData'
 import { MODES } from './form/formConfig'
+import { useUiPermissions } from '../shared/hooks/useUiPermissions'
 
 function ProgressCell({ internshipId, requiredHours }) {
+  const { isStudent, isCoordinator } = useUiPermissions()
+
+  /** 
+  * Per backend requirements in attendance.routes.ts:
+  * /internship/:internshipId/rendered-hours requires 'student' or 'internship_coordinator' 
+  */
+
+  const canViewAttendance = isStudent || isCoordinator
+
   const { data, isLoading } = useQuery({
     queryKey: ['renderedHours', internshipId],
     queryFn: () => attendanceApi.getRenderedHours(internshipId),
-    enabled: !!internshipId,
+    enabled: !!internshipId && canViewAttendance,
   })
 
+  if (!canViewAttendance) return 'N/A'
   if (isLoading) return 'Loading...'
+  
   const hours = data?.totalHours || 0
   return `${Number(hours).toFixed(2)} / ${requiredHours || 0} hours`
 }

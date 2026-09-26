@@ -12,11 +12,10 @@ import {
 } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
 
-import useAuth from '../../hooks/useAuth'
+import { useUiPermissions } from '../shared/hooks/useUiPermissions'
 import CardStat from '../shared/components/CardStat'
 import EvaluationTable from './components/EvaluationTable'
 import EvaluationModal from './components/EvaluationModal'
-import { getEvaluationPermissions, ROLES } from './permissions'
 import { MODES } from './form/evaluationConfig'
 import {
   useEvaluationContext,
@@ -24,16 +23,39 @@ import {
   useInternEvaluations,
 } from './hooks/useEvaluations'
 import { useEvaluationMutations } from './hooks/useEvaluationMutations'
+import { useUsers } from '../users/hooks/useUsers'
 import notify from '../../utils/toast'
+import { EVALUATION_STATUSES } from '../../shared/constants/constants'
 
 export default function EvaluationManagementPage() {
-  const { user } = useAuth()
+  const { isHteSupervisor, isFacultyAdviser, isStudent, isReadOnlyStaff } = useUiPermissions()
+  
+  const isEvaluator = isHteSupervisor || isFacultyAdviser
 
-  const role = user?.role?.toLowerCase()
+  const role = isHteSupervisor ? 'hte_supervisor' : isFacultyAdviser ? 'faculty_adviser' : isStudent ? 'student' : isReadOnlyStaff ? 'administrator' : 'guest'
 
-  const permissions = getEvaluationPermissions(role)
+  // Fetch all students to map IDs to Names
+  const { data: students = [] } = useUsers({ enabled: isReadOnlyStaff })
+  
+  const studentMap = useMemo(() => {
+    return students.reduce((acc, student) => {
+      acc[student.id] = student
+      return acc
+    }, {})
+  }, [students])
 
-  const context = useEvaluationContext(role, user)
+  // Compatibility mapping for existing component logic
+  const permissions = {
+    canView: isHteSupervisor || isFacultyAdviser || isStudent || isReadOnlyStaff,
+    canCreate: isEvaluator,
+    canEdit: isEvaluator,
+    canSubmit: isEvaluator,
+    isEvaluator: isEvaluator,
+    isStudent: isStudent,
+    isReadOnlyStaff: isReadOnlyStaff,
+  }
+
+  const context = useEvaluationContext(role)
 
   const {
     evaluatorQuery,
@@ -56,19 +78,15 @@ export default function EvaluationManagementPage() {
 
   const [selectedInternshipId, setSelectedInternshipId] = useState('')
 
-  const isEvaluator = permissions.isEvaluator
-  const isStudent = permissions.isStudent
-  const isReadOnlyStaff = permissions.isReadOnlyStaff
-
   // ------------------------------------------------------------
   // Internships available for creating evaluations
   // ------------------------------------------------------------
   const internshipOptions = useMemo(() => {
-    if (role === ROLES.HTE_SUPERVISOR) {
+    if (isHteSupervisor) {
       return hteStudents.map(toInternshipOption).filter(Boolean)
     }
 
-    if (role === ROLES.FACULTY_ADVISER) {
+    if (isFacultyAdviser) {
       return facultyStudents
         .map((student) =>
           toInternshipOption({
@@ -80,7 +98,7 @@ export default function EvaluationManagementPage() {
     }
 
     return []
-  }, [role, hteStudents, facultyStudents])
+  }, [isHteSupervisor, isFacultyAdviser, hteStudents, facultyStudents])
 
   // ------------------------------------------------------------
   // Staff evaluation query
@@ -132,10 +150,10 @@ export default function EvaluationManagementPage() {
     if (isReadOnlyStaff) {
       return Object.fromEntries(
         staffInternships.map((internship) => {
-          const student = internship.student_profiles ?? {}
+          const student = studentMap[internship.student_id] ?? {}
 
           const name =
-            [student.first_name, student.middle_name, student.last_name, student.suffix]
+            [student.firstName, student.middleName, student.lastName, student.suffix]
               .filter(Boolean)
               .join(' ') || internship.student_id
 
@@ -148,7 +166,7 @@ export default function EvaluationManagementPage() {
     return Object.fromEntries(
       internshipOptions.map((option) => [option.internshipId, option.studentName]),
     )
-  }, [isReadOnlyStaff, staffInternships, internshipOptions])
+  }, [isReadOnlyStaff, staffInternships, internshipOptions, studentMap])
 
   // ------------------------------------------------------------
   // Modal handlers
@@ -173,9 +191,9 @@ export default function EvaluationManagementPage() {
     return <Alert severity="error">You do not have permission to view evaluations.</Alert>
   }
 
-  const draftCount = evaluations.filter((item) => item.status === 'draft').length
+  const draftCount = evaluations.filter((item) => item.status === EVALUATION_STATUSES.DRAFT).length
 
-  const submittedCount = evaluations.filter((item) => item.status === 'submitted').length
+  const submittedCount = evaluations.filter((item) => item.status === EVALUATION_STATUSES.SUBMITTED).length
 
   return (
     <Box>
@@ -188,12 +206,14 @@ export default function EvaluationManagementPage() {
             xs: 'column',
             sm: 'row',
           }}
-          justifyContent="space-between"
-          alignItems={{
-            xs: 'stretch',
-            sm: 'center',
-          }}
           spacing={2}
+          sx={{
+            justifyContent: 'space-between',
+            alignItems: {
+              xs: 'stretch',
+              sm: 'center',
+            },
+          }}
         >
           <Box>
             <Typography variant="h5" fontWeight={600}>

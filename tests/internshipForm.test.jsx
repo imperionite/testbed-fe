@@ -1,13 +1,21 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import InternshipForm from '../src/features/internships/components/InternshipForm'
 import { MODES } from '../src/features/internships/form/formConfig'
+
+const queryClient = new QueryClient()
 
 // Setup mocks
 const mockUpdateStatus = vi.fn().mockResolvedValue({})
 const mockAssignAdviser = vi.fn().mockResolvedValue({})
 const mockUpdateInternship = vi.fn().mockResolvedValue({})
 
+vi.mock('../src/features/shared/hooks/useUiPermissions', () => ({
+  useUiPermissions: () => ({ isReadOnlyStaff: true }),
+}))
+
+// ... (rest of the mocks)
 vi.mock('../src/features/internships/hooks/useInternshipMutations', () => ({
   useInternshipMutations: () => ({
     createInternship: { mutate: vi.fn() },
@@ -40,7 +48,11 @@ describe('InternshipForm Payload Structure', () => {
       faculty_adviser_id: null,
     }
 
-    render(<InternshipForm mode={MODES.EDIT} internship={mockInternship} onClose={() => {}} />)
+    render(
+      <QueryClientProvider client={queryClient}>
+        <InternshipForm mode={MODES.EDIT} internship={mockInternship} onClose={() => {}} />
+      </QueryClientProvider>
+    )
 
     expect(screen.getByText('Pending')).toBeDefined()
   })
