@@ -1,17 +1,15 @@
 import { Navigate } from 'react-router-dom'
-import useAuth from '../../hooks/useAuth'
+import { useUiPermissions } from '../shared/hooks/useUiPermissions'
 import StudentManagementPage from './StudentManagementPage'
 
 export default function StudentsRoute() {
-  const { user } = useAuth()
-  const isStudent = user?.role === 'student'
-  const isStaff = ['administrator', 'internship_coordinator'].includes(user?.role)
+  const { isStudent, isReadOnlyStaff } = useUiPermissions()
 
   if (isStudent) {
     return <Navigate to="/students/me" replace />
   }
 
-  if (isStaff) {
+  if (isReadOnlyStaff) {
     return <StudentManagementPage />
   }
 

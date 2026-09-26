@@ -4,9 +4,11 @@ import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import getValidationSchema from '../validation/InternshipValidationSchema'
 import { useUsers } from '../../users/hooks/useUsers'
+import { useUiPermissions } from '../../shared/hooks/useUiPermissions'
 
 export default function InternshipAdviserForm({ internship, mode, onSubmit, onCancel }) {
-  const { data: users = [], isLoading } = useUsers()
+  const { isReadOnlyStaff } = useUiPermissions()
+  const { data: users = [], isLoading } = useUsers({ enabled: isReadOnlyStaff })
   const facultyAdvisers = users.filter((u) => u.role === 'faculty_adviser')
 
   const {

@@ -4,6 +4,7 @@ import { evaluationsApi } from '../../../api/evaluations'
 import { internshipsApi } from '../../../api/internships'
 import { studentApi } from '../../../api/students'
 import { htesApi } from '../../../api/htes'
+import { EVALUATION_STATUSES } from '../../../shared/constants/constants'
 
 export function useMyEvaluations(enabled = true) {
   return useQuery({
@@ -26,6 +27,12 @@ export function useEvaluation(id, enabled = true) {
     queryKey: ['evaluations', id],
     queryFn: () => evaluationsApi.getEvaluation(id),
     enabled: Boolean(id) && enabled,
+    select: (data) => ({
+      ...data,
+      isDraft: data?.status === EVALUATION_STATUSES.DRAFT,
+      isSubmitted: data?.status === EVALUATION_STATUSES.SUBMITTED,
+      displayName: `Evaluation #${data?.id}`,
+    }),
   })
 }
 

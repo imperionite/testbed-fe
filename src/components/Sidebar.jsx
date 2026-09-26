@@ -18,7 +18,7 @@ import AssessmentOutlinedIcon from '@mui/icons-material/AssessmentOutlined'
 import SecurityOutlinedIcon from '@mui/icons-material/SecurityOutlined'
 import FactCheckOutlinedIcon from '@mui/icons-material/FactCheckOutlined'
 
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 
 const menuItems = [
   {
@@ -93,6 +93,7 @@ const menuItems = [
 
 export default function Sidebar({ role, mobileOpen, onMobileClose }) {
   const allowedItems = menuItems.filter((item) => item.roles.includes(role))
+  const location = useLocation()
 
   const navigation = (
     <Box
@@ -107,13 +108,30 @@ export default function Sidebar({ role, mobileOpen, onMobileClose }) {
       }}
     >
       <List>
-        {allowedItems.map((item) => (
-          <ListItemButton key={item.path} component={Link} to={item.path} onClick={onMobileClose}>
-            <ListItemIcon sx={{ color: 'text.secondary' }}>{item.icon}</ListItemIcon>
+        {allowedItems.map((item) => {
+          const isActive = location.pathname.startsWith(item.path)
+          return (
+            <ListItemButton
+              key={item.path}
+              component={Link}
+              to={item.path}
+              onClick={onMobileClose}
+              sx={
+                isActive
+                  ? {
+                      backgroundColor: 'action.selected',
+                      '& .MuiListItemIcon-root': { color: 'primary.main' },
+                      '& .MuiListItemText-primary': { fontWeight: 'bold', color: 'primary.main' },
+                    }
+                  : {}
+              }
+            >
+              <ListItemIcon sx={{ color: 'text.secondary' }}>{item.icon}</ListItemIcon>
 
-            <ListItemText primary={item.label} />
-          </ListItemButton>
-        ))}
+              <ListItemText primary={item.label} />
+            </ListItemButton>
+          )
+        })}
       </List>
 
       <Divider />
