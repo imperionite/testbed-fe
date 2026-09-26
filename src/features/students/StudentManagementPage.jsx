@@ -12,9 +12,11 @@ import { getStudentManagementPermissions } from './studentPermissions'
 import { MODES } from './form/formConfig'
 import { useMemo } from 'react'
 import { mapStudentData } from './utils/studentUtils'
+import { useUiPermissions } from '../shared/hooks/useUiPermissions'
 
 export default function StudentManagementPage() {
   const { user, isLoading: isAuthLoading } = useAuth()
+  const { isReadOnlyStaff } = useUiPermissions()
   const {
     data: students,
     isLoading: isStudentsLoading,
@@ -22,7 +24,7 @@ export default function StudentManagementPage() {
     error: studentsError,
     refetch,
   } = useStudents(user?.role)
-  const { data: userData = [], isLoading: isUsersLoading } = useUsers()
+  const { data: userData = [], isLoading: isUsersLoading } = useUsers({ enabled: isReadOnlyStaff })
   const modalState = useStudentModalState()
   const { onCreate, onUpdate } = useStudentMutations()
 

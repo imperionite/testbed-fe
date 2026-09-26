@@ -1,10 +1,9 @@
-import useAuth from '../../hooks/useAuth'
+import { useUiPermissions } from '../shared/hooks/useUiPermissions'
 import InternshipManagementPage from './InternshipManagementPage'
-import HteInternshipPage from '../internships/HteInternshipPage'
+import HteInternshipPage from './HteInternshipPage'
 
 export default function InternshipRoute() {
-  const { user } = useAuth()
-  const isHteSupervisor = user?.role === 'hte_supervisor'
+  const { isHteSupervisor } = useUiPermissions()
 
   if (isHteSupervisor) {
     return <HteInternshipPage />

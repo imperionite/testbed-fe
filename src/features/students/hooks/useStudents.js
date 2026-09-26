@@ -1,15 +1,14 @@
 import { useQuery } from '@tanstack/react-query'
 import { studentApi } from '../../../api/students'
+import { useUiPermissions } from '../../shared/hooks/useUiPermissions'
 
 export function useStudents(role, options = {}) {
-  const isStaff = ['administrator', 'internship_coordinator', 'hte_supervisor'].includes(role)
-  const isStudent = ['student'].includes(role)
-  const isAdviser = ['faculty_adviser'].includes(role)
+  const { isAdmin, isCoordinator, isStudent, isFacultyAdviser } = useUiPermissions()
 
   return useQuery(
     (() => {
       switch (true) {
-        case isStaff:
+        case isAdmin || isCoordinator:
           return {
             queryKey: ['students', 'all'],
             queryFn: studentApi.listStudents,
@@ -23,7 +22,7 @@ export function useStudents(role, options = {}) {
             retry: 1,
             ...options,
           }
-        case isAdviser:
+        case isFacultyAdviser:
           return {
             queryKey: ['students', 'all'],
             queryFn: studentApi.listAssignedStudents,
@@ -31,7 +30,12 @@ export function useStudents(role, options = {}) {
             ...options,
           }
         default:
-          throw new Error(`Unknown role: ${role}`)
+          return {
+            queryKey: ['students', 'none'],
+            queryFn: () => Promise.resolve([]),
+            enabled: false,
+            ...options,
+          }
       }
     })(),
   )

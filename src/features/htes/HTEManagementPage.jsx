@@ -65,11 +65,7 @@ export default function HteManagementLayout() {
     enabled: permissions.canView,
   })
 
-  console.log({ supervisorUsers })
-
   const supervisorOptions = supervisorUsers.filter((u) => u.isActive === true)
-
-  console.log('Supervisor Options:', supervisorOptions)
 
   const supervisorMap = Object.fromEntries(
     supervisorUsers.map((u) => [
@@ -77,8 +73,6 @@ export default function HteManagementLayout() {
       [u.firstName, u.middleName, u.lastName, u.suffix].filter(Boolean).join(' '),
     ]),
   )
-
-  console.log('Supervisor Map:', supervisorMap)
 
   const modalState = useHteModalState()
   const { createHte, updateHte, updateHteSupervisor, updateStatus, bulkUpdateStatus } =

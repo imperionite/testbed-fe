@@ -11,9 +11,8 @@ import UserModal from './components/UserModal'
 import { useModalState } from '../shared/hooks/useModalState'
 import { useUsers } from './hooks/useUsers'
 import { useUserMutations } from './hooks/useUserMutations'
-import { getUserManagementPermissions } from './userPermissions'
+import { useUiPermissions } from '../shared/hooks/useUiPermissions'
 
-import useAuth from '../../hooks/useAuth'
 import notify from '../../utils/toast'
 
 // ============================================
@@ -55,8 +54,8 @@ const styles = {
 // MAIN PAGE COMPONENT
 // ============================================
 export default function UserManagementPage() {
-  const { user } = useAuth()
-  const permissions = getUserManagementPermissions(user?.role)
+  const { isAdmin, isReadOnlyStaff } = useUiPermissions()
+  const canView = isReadOnlyStaff // Based on original permissions: isAdmin || isCoordinator
 
   // 1. Hook for fetching data (Query)
   const {
@@ -66,7 +65,7 @@ export default function UserManagementPage() {
     error,
     refetch,
   } = useUsers({
-    enabled: permissions.canView,
+    enabled: canView,
   })
 
   // 2. Hook for centralized modal/dialog state management
@@ -75,6 +74,16 @@ export default function UserManagementPage() {
   // 3. Hook for asynchronous user data mutations
   const { createUser, updateUser, updateRole, updateStatus, bulkUpdateRole, bulkUpdateStatus } =
     useUserMutations()
+
+  const permissions = {
+    canView,
+    canCreate: isAdmin,
+    canEdit: isAdmin,
+    canChangeRole: isAdmin,
+    canChangeStatus: isAdmin,
+    canBulkEdit: isAdmin,
+    canSelectRows: isAdmin,
+  }
 
   return (
     <div style={styles.container}>

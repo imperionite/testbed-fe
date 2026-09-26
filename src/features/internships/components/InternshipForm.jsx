@@ -8,15 +8,17 @@ import { useHtes } from '../../htes/hooks/useHtes'
 import { useUsers } from '../../users/hooks/useUsers'
 import { useInternshipMutations } from '../hooks/useInternshipMutations'
 import { MODES } from '../form/formConfig'
+import { useUiPermissions } from '../../shared/hooks/useUiPermissions'
 
 export default function InternshipForm({ mode, internships = [], internship, onClose, onSubmit }) {
+  const { isReadOnlyStaff } = useUiPermissions()
   const {
     data: students = [],
     isLoading: isStudentsLoading,
     isError: isStudentsError,
   } = useStudents('administrator')
   const { data: htes = [] } = useHtes()
-  const { data: users = [] } = useUsers()
+  const { data: users = [] } = useUsers({ enabled: isReadOnlyStaff })
   const facultyAdvisers = users.filter((u) => u.role === 'faculty_adviser')
 
   const { updateInternship, updateStatus, assignAdviser } = useInternshipMutations()

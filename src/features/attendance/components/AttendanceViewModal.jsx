@@ -7,7 +7,7 @@ import { useQuery } from '@tanstack/react-query'
 import AttendanceTable from './AttendanceTable'
 import AttendanceValidationForm from './AttendanceValidationForm'
 import AttendanceFormModal from './AttendanceFormModal'
-import useAuth from '../../../hooks/useAuth'
+import { useUiPermissions } from '../../shared/hooks/useUiPermissions'
 
 const style = {
   position: 'absolute',
@@ -24,8 +24,7 @@ const style = {
 }
 
 export default function AttendanceViewModal({ open, onClose, internshipId }) {
-  const { user } = useAuth()
-  const isStudent = user?.role === 'student'
+  const { isStudent } = useUiPermissions()
 
   const { data: attendance = [], isLoading: isAttendanceLoading } =
     useAttendanceByInternship(internshipId)

@@ -15,7 +15,7 @@ export default function ReportSummaryCards({ summary }) {
   return (
     <Grid container spacing={2} sx={{ mb: 4 }}>
       {cards.map((card, index) => (
-        <Grid item xs={12} sm={6} md={4} lg={2} key={index}>
+        <Grid xs={12} sm={6} md={4} lg={2} key={index}>
           <Paper sx={{ p: 2, textAlign: 'center' }}>
             <Typography variant="subtitle2" color="text.secondary">
               {card.label}

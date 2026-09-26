@@ -2,7 +2,6 @@ import { useRef, useState } from 'react'
 import {
   Alert,
   Button,
-  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -12,6 +11,7 @@ import {
 import EvaluationForm from './EvaluationForm'
 import { MODES } from '../form/evaluationConfig'
 import ActionConfirmDialog from '../../shared/components/ActionConfirmDialog'
+import { EVALUATION_STATUSES } from '../../../shared/constants/constants'
 
 function getServerMessage(error) {
   return error?.response?.data?.message ?? error?.message ?? 'Unable to save the evaluation.'
@@ -29,7 +29,7 @@ export default function EvaluationModal({
   onSubmitEvaluation,
   onSuccess,
 }) {
-  const submitIntent = useRef('draft')
+  const submitIntent = useRef(EVALUATION_STATUSES.DRAFT)
   const [pendingFormData, setPendingFormData] = useState(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState(null)
@@ -37,10 +37,9 @@ export default function EvaluationModal({
   const isView = mode === MODES.VIEW
   const isCreate = mode === MODES.CREATE
   const isEdit = mode === MODES.EDIT
-  const isDraft = evaluation?.status === 'draft'
 
   const requestDraftSave = () => {
-    submitIntent.current = 'draft'
+    submitIntent.current = EVALUATION_STATUSES.DRAFT
     document.getElementById('evaluation-form')?.requestSubmit()
   }
 
@@ -110,7 +109,7 @@ export default function EvaluationModal({
     } catch (err) {
       setError(getServerMessage(err))
     } finally {
-      submitIntent.current = 'draft'
+      submitIntent.current = EVALUATION_STATUSES.DRAFT
     }
   }
 
@@ -132,7 +131,7 @@ export default function EvaluationModal({
 
   const cancelSubmit = () => {
     setPendingFormData(null)
-    submitIntent.current = 'draft'
+    submitIntent.current = EVALUATION_STATUSES.DRAFT
   }
 
   return (
@@ -150,59 +149,37 @@ export default function EvaluationModal({
           )}
 
           <EvaluationForm
-            role={role}
+            id="evaluation-form"
             mode={mode}
+            role={role}
             evaluation={evaluation}
             internshipOptions={internshipOptions}
             onSubmit={handleFormSubmit}
           />
         </DialogContent>
 
-        <DialogActions>
-          {isView && <Button onClick={onClose}>Close</Button>}
-
-          {isEdit && isDraft && (
-            <>
-              <Button onClick={onClose}>Cancel</Button>
-              <Button variant="outlined" onClick={requestDraftSave}>
-                Save Draft
-              </Button>
-              <Button variant="contained" onClick={requestSubmit} disabled={isSubmitting}>
-                Submit
-              </Button>
-            </>
-          )}
-
-          {isCreate && (
-            <>
-              <Button onClick={onClose} disabled={isSubmitting}>
-                Cancel
-              </Button>
-              <Button variant="outlined" onClick={requestDraftSave} disabled={isSubmitting}>
-                Save Draft
-              </Button>
-              <Button
-                variant="contained"
-                onClick={requestSubmit}
-                disabled={isSubmitting}
-                startIcon={isSubmitting ? <CircularProgress size={18} /> : null}
-              >
-                Submit
-              </Button>
-            </>
-          )}
-        </DialogActions>
+        {!isView && (
+          <DialogActions>
+            <Button onClick={onClose} color="inherit">
+              Cancel
+            </Button>
+            <Button onClick={requestDraftSave} disabled={isSubmitting}>
+              Save as Draft
+            </Button>
+            <Button onClick={requestSubmit} variant="contained" disabled={isSubmitting}>
+              Submit
+            </Button>
+          </DialogActions>
+        )}
       </Dialog>
 
       <ActionConfirmDialog
         open={Boolean(pendingFormData)}
         title="Submit Evaluation"
-        message="Once submitted, this evaluation can no longer be edited. Continue?"
-        confirmLabel="Submit"
-        cancelLabel="Cancel"
-        isLoading={isSubmitting}
+        description="Are you sure you want to submit this evaluation? This action is permanent."
         onConfirm={confirmSubmit}
         onCancel={cancelSubmit}
+        isSubmitting={isSubmitting}
       />
     </>
   )

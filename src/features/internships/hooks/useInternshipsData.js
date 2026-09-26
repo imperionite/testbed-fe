@@ -3,23 +3,28 @@ import { useQuery } from '@tanstack/react-query'
 import { useInternships } from './useInternshipMutations'
 import { internshipsApi } from '../../../api/internships'
 import { usersApi } from '../../../api/users'
+import { useUiPermissions } from '../../shared/hooks/useUiPermissions'
 
 export function useInternshipsData() {
+  const { isStudent, isReadOnlyStaff } = useUiPermissions()
   const internshipsQuery = useInternships()
 
   const studentsQuery = useQuery({
     queryKey: ['users', 'student'],
     queryFn: () => usersApi.getUsersByRole('student'),
+    enabled: isReadOnlyStaff,
   })
 
   const advisersQuery = useQuery({
     queryKey: ['users', 'faculty_adviser'],
     queryFn: () => usersApi.getUsersByRole('faculty_adviser'),
+    enabled: isReadOnlyStaff,
   })
 
   const internshipMeQuery = useQuery({
-    queryKey: ['internship'],
+    queryKey: ['internship', 'me'],
     queryFn: internshipsApi.getOwnInternship,
+    enabled: isStudent,
   })
 
   const studentMap = useMemo(() => {
@@ -43,7 +48,7 @@ export function useInternshipsData() {
     internshipMe: internshipMeQuery.data || [],
     studentMap,
     adviserMap,
-    isLoading: internshipsQuery.isLoading || studentsQuery.isLoading || advisersQuery.isLoading,
+    isLoading: internshipsQuery.isLoading || studentsQuery.isLoading || advisersQuery.isLoading || internshipMeQuery.isLoading,
     isError: internshipsQuery.isError || studentsQuery.isError || advisersQuery.isError,
     refetch: internshipsQuery.refetch,
   }
