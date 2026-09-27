@@ -84,7 +84,7 @@ export default function StudentProfilePage() {
     }
   }
 
-  const internshipStatus = student.currentInternship?.status 
+  const internshipStatus = student.currentInternship?.status
 
   return (
     <Box sx={{ p: 3, bgcolor: 'background.default', minHeight: '100vh' }}>

@@ -189,8 +189,6 @@ export default function StudentInternshipProfilePage() {
               </Grid>
 
               <Divider sx={{ my: 3 }} />
-
-            
             </>
           )}
         </CardContent>

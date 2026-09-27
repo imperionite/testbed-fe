@@ -8,13 +8,9 @@ export default function InternshipRoute() {
 
   if (isStudent) {
     return <StudentInternshipProfilePage />
-  }
-
-  else if (isHteSupervisor) {
+  } else if (isHteSupervisor) {
     return <HteInternshipPage />
-  } 
-  
-  else {
+  } else {
     return <InternshipManagementPage />
   }
 }
