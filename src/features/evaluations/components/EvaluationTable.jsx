@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
-import { Chip, Stack, Typography } from '@mui/material'
+import { Chip, Stack, Typography, Tooltip, IconButton } from '@mui/material'
 import { MaterialReactTable, useMaterialReactTable } from '@glebcha/material-react-table'
+import EditIcon from '@mui/icons-material/Edit'
 
 import { EVALUATION_CRITERIA } from '../form/evaluationConfig'
 
@@ -145,6 +146,9 @@ export default function EvaluationTable({ evaluations = [], onRowClick, readOnly
     enableColumnFilters: true,
     enableGlobalFilter: true,
     enablePagination: true,
+    enableColumnPinning: true,
+    enableColumnOrdering: true,
+    enableGrouping: true,
     enableRowActions: !readOnly,
 
     positionActionsColumn: 'last',
@@ -152,24 +156,23 @@ export default function EvaluationTable({ evaluations = [], onRowClick, readOnly
     renderRowActions: readOnly
       ? undefined
       : ({ row }) => (
-          <button
-            type="button"
+        <Tooltip title="Edit / View">
+          <IconButton
+            aria-label="Edit / View"
+            size="small"
             onClick={() => onRowClick?.(row.original)}
-            style={{
-              border: 0,
-              background: 'transparent',
-              cursor: 'pointer',
-            }}
           >
-            Edit / View
-          </button>
-        ),
+            <EditIcon />
+          </IconButton>
+        </Tooltip>
+      ),
 
     initialState: {
       pagination: {
         pageIndex: 0,
         pageSize: 10,
       },
+      columnPinning: { right: ['mrt-row-actions'] },
       sorting: [
         {
           id: 'submitted_at',

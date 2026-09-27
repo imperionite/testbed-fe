@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Box, Typography, CircularProgress, Alert, Button } from '@mui/material'
 import { Add as AddIcon } from '@mui/icons-material'
 import CardStat from '../shared/components/CardStat'
@@ -13,6 +14,8 @@ import { MODES } from './form/formConfig'
 import { useMemo } from 'react'
 import { mapStudentData } from './utils/studentUtils'
 import { useUiPermissions } from '../shared/hooks/useUiPermissions'
+import FacultyStudentDetailsModal from './components/FacultyStudentDetailsModal'
+import  notify  from '../../utils/toast'
 
 export default function StudentManagementPage() {
   const { user, isLoading: isAuthLoading } = useAuth()
@@ -27,6 +30,43 @@ export default function StudentManagementPage() {
   const { data: userData = [], isLoading: isUsersLoading } = useUsers({ enabled: isReadOnlyStaff })
   const modalState = useStudentModalState()
   const { onCreate, onUpdate } = useStudentMutations()
+
+  const [isSaving, setIsSaving] = useState(false)
+  const [error, setError] = useState(null)
+  const [viewedStudent, setViewedStudent] = useState(null)
+
+  const handleSubmit = async (data) => {
+    setError(null)
+    setIsSaving(true)
+    try {
+      if (modalState.mode === MODES.CREATE) {
+        await onCreate?.mutateAsync(data)
+      } else {
+        await onUpdate?.mutateAsync({
+          id: modalState.selectedStudent.id,
+          payload: {
+            studentNumber: data.studentNumber || null,
+            program: data.program || null,
+            yearLevel: data.yearLevel,
+            section: data.section || null,
+            contactNumber: data.contactNumber || null,
+            address: data.address || null,
+            emergencyContactName: data.emergencyContactName || null,
+            emergencyContactNumber: data.emergencyContactNumber || null,
+          },
+        })
+      }
+      setIsSaving(false)
+      modalState.close()
+      refetch()
+    } catch (submitError) {
+      setIsSaving(false)
+      const errorMsg = submitError.response?.data?.message || submitError.message || 'Unable to save Student record.'
+      setError(errorMsg)
+      notify.error(errorMsg)
+    }
+  }
+  
 
   const permissions = getStudentManagementPermissions(user?.role)
 
@@ -100,6 +140,13 @@ export default function StudentManagementPage() {
         data={mergedStudents}
         role={user?.role}
         onEdit={(student) => modalState.open(MODES.EDIT, student)}
+        onView={setViewedStudent}
+      />
+
+      <FacultyStudentDetailsModal
+        open={Boolean(viewedStudent)}
+        student={viewedStudent}
+        onClose={() => setViewedStudent(null)}
       />
 
       <StudentModal
@@ -109,8 +156,10 @@ export default function StudentManagementPage() {
         student={modalState.selectedStudent}
         permissions={permissions}
         onClose={modalState.close}
-        onSubmit={modalState.mode === MODES.CREATE ? onCreate.mutateAsync : onUpdate.mutateAsync}
+        onSubmit={handleSubmit}
         isStudent={false}
+        isSaving={isSaving}
+        error={error}
         availableUsers={userData.filter(
           (u) => u.role === 'student' && !mergedStudents.some((s) => s.userId === u.id),
         )}

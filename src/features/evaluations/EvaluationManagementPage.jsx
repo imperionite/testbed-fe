@@ -315,9 +315,11 @@ export default function EvaluationManagementPage() {
             evaluations={evaluations}
             readOnly={!isEvaluator}
             onRowClick={(evaluation) => {
+              const isDraft = evaluation.status === EVALUATION_STATUSES.DRAFT
+              const mode = isEvaluator && isDraft ? MODES.EDIT : MODES.VIEW
               setModal({
                 open: true,
-                mode: MODES.VIEW,
+                mode: mode,
                 evaluation,
               })
             }}

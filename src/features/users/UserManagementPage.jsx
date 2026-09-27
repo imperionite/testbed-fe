@@ -94,14 +94,17 @@ export default function UserManagementPage() {
           <Typography variant="h5" fontWeight={600}>
             Active Accounts by Role
           </Typography>
-          <Button
-            startIcon={<AddIcon />}
-            variant="contained"
-            onClick={() => modalState.open('create')}
-            disabled={!permissions.canCreate}
-          >
-            Add User
-          </Button>
+
+          {permissions.canCreate && (
+            <Button
+              startIcon={<AddIcon />}
+              variant="contained"
+              onClick={() => modalState.open('create')}
+              disabled={!permissions.canCreate}
+            >
+              Add User
+            </Button>
+          )}
         </div>
 
         {/* Stats Cards Dashboard */}

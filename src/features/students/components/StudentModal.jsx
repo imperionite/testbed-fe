@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import {
   Dialog,
   DialogTitle,
@@ -7,6 +6,7 @@ import {
   Button,
   Alert,
   IconButton,
+  CircularProgress,
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import StudentForm from './StudentForm'
@@ -19,45 +19,50 @@ export default function StudentModal({
   isStudent,
   onClose,
   onSubmit,
+  isSaving = false,
+  error = null,
 }) {
-  const [error, setError] = useState(null)
-
   const handleFormSubmit = async (data) => {
-    try {
-      setError(null)
-      await onSubmit(data)
-    } catch (err) {
-      setError(err.message || 'An error occurred while saving.')
-    }
+    await onSubmit(data)
   }
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
       <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         {mode === 'create' ? 'Add Student' : 'Edit Student'}
-        <IconButton onClick={onClose}>
+        <IconButton onClick={onClose} disabled={isSaving} aria-label="close">
           <CloseIcon />
         </IconButton>
       </DialogTitle>
-      <DialogContent>
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        )}
+      <DialogContent dividers>
         <StudentForm
           mode={mode}
           defaultValues={student || {}}
           availableUsers={availableUsers}
           isStudent={isStudent}
           onSubmit={handleFormSubmit}
-          onInvalid={() => setError('Please fix form errors.')}
+          formId="student-form"
         />
+
+        {error && (
+          <Alert severity="error" sx={{ mt: 2 }}>
+            {error}
+          </Alert>
+        )}
       </DialogContent>
+
       <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button type="submit" form="student-form" variant="contained">
-          {mode === 'create' ? 'Add' : 'Save'}
+        <Button onClick={onClose} disabled={isSaving}>
+          Cancel
+        </Button>
+        <Button
+          type="submit"
+          form="student-form"
+          variant="contained"
+          disabled={isSaving}
+          startIcon={isSaving ? <CircularProgress size={20} color="inherit" /> : null} // 👈 Loading spinner
+        >
+          {isSaving ? 'Saving...' : mode === 'create' ? 'Add' : 'Save'}
         </Button>
       </DialogActions>
     </Dialog>

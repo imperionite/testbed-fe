@@ -33,10 +33,10 @@ import { useUiPermissions } from '../shared/hooks/useUiPermissions'
 function ProgressCell({ internshipId, requiredHours }) {
   const { isStudent, isCoordinator } = useUiPermissions()
 
-  /** 
-  * Per backend requirements in attendance.routes.ts:
-  * /internship/:internshipId/rendered-hours requires 'student' or 'internship_coordinator' 
-  */
+  /**
+   * Per backend requirements in attendance.routes.ts:
+   * /internship/:internshipId/rendered-hours requires 'student' or 'internship_coordinator'
+   */
 
   const canViewAttendance = isStudent || isCoordinator
 
@@ -48,12 +48,15 @@ function ProgressCell({ internshipId, requiredHours }) {
 
   if (!canViewAttendance) return 'N/A'
   if (isLoading) return 'Loading...'
-  
+
   const hours = data?.totalHours || 0
   return `${Number(hours).toFixed(2)} / ${requiredHours || 0} hours`
 }
 
 export default function InternshipManagementPage() {
+  const { isCoordinator } = useUiPermissions() 
+  const canEditAttendance = isCoordinator
+
   const [modalState, setModalState] = useState({
     open: false,
     mode: MODES.CREATE,
@@ -94,8 +97,8 @@ export default function InternshipManagementPage() {
     setAttendanceModalState({ open: false, internship: null })
   }
 
-  const columns = useMemo(
-    () => [
+  const columns = useMemo(() => {
+    const allColumns = [
       {
         id: 'name',
         header: 'Name',
@@ -133,6 +136,7 @@ export default function InternshipManagementPage() {
         },
       },
       {
+        id: 'program',
         accessorKey: 'student_profiles.program',
         header: 'Program',
       },
@@ -147,6 +151,12 @@ export default function InternshipManagementPage() {
         ),
       },
       {
+        id: 'required_hours',
+        accessorKey: 'required_hours',
+        header: 'Required Hours',
+      },
+      {
+        id: 'status',
         accessorKey: 'status',
         header: 'Status',
         Cell: ({ cell }) => <BadgeStatus value={cell.getValue()} />,
@@ -180,17 +190,27 @@ export default function InternshipManagementPage() {
                 <EditIcon />
               </IconButton>
             </Tooltip>
-            <Tooltip title="View Attendance">
-              <IconButton size="small" onClick={() => handleOpenAttendance(row.original)}>
-                <HistoryIcon />
-              </IconButton>
-            </Tooltip>
+
+            {!!canEditAttendance && (
+              <Tooltip title="View Attendance">
+                <IconButton size="small" onClick={() => handleOpenAttendance(row.original)}>
+                  <HistoryIcon />
+                </IconButton>
+              </Tooltip>
+            )}
           </Stack>
         ),
       },
-    ],
-    [studentMap, adviserMap],
-  )
+    ]
+    return allColumns.filter((col) => { 
+      const colId = col.accessorKey || col.id 
+      if (canEditAttendance) { 
+        // Coordinator mode: Show 'progress', hide 'required\_hours' 
+      return colId !== 'required_hours' } else { 
+        // Admin/Other modes: Show 'required_hours', hide 'progress' 
+      return colId !== 'progress' } })
+
+  }, [studentMap, adviserMap])
 
   const table = useMaterialReactTable({
     columns,
