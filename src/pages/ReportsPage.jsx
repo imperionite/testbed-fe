@@ -1,5 +1,17 @@
 import { useState } from 'react'
-import { Box, Typography, Button, Dialog, DialogTitle, DialogContent, DialogActions, FormControl, InputLabel, Select, MenuItem } from '@mui/material'
+import {
+  Box,
+  Typography,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from '@mui/material'
 import DownloadIcon from '@mui/icons-material/Download'
 import Papa from 'papaparse'
 import { jsPDF } from 'jspdf'
@@ -29,9 +41,9 @@ export default function ReportsPage() {
       const flattenedData = detailedReport.map((row) => ({
         'Student Name': row.student?.name || 'N/A',
         'Student Number': row.student?.studentNumber || 'N/A',
-        'Program': row.student?.program || 'N/A',
-        'Company': row.hte?.companyName || 'N/A',
-        'Status': row.status || 'N/A',
+        Program: row.student?.program || 'N/A',
+        Company: row.hte?.companyName || 'N/A',
+        Status: row.status || 'N/A',
         'Rendered Hours': row.renderedHours || 0,
         'Remaining Hours': row.remainingHours || 0,
       }))
@@ -90,7 +102,6 @@ export default function ReportsPage() {
     handleClose()
   }
 
-
   return (
     <Box sx={{ p: 3 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
@@ -98,11 +109,7 @@ export default function ReportsPage() {
           Internship Reports
         </Typography>
         {isReadOnlyStaff && (
-          <Button
-            variant="contained"
-            startIcon={<DownloadIcon />}
-            onClick={handleOpen}
-          >
+          <Button variant="contained" startIcon={<DownloadIcon />} onClick={handleOpen}>
             Download Report
           </Button>
         )}
@@ -113,11 +120,7 @@ export default function ReportsPage() {
         <DialogContent dividers>
           <FormControl fullWidth>
             <InputLabel>Format</InputLabel>
-            <Select
-              value={format}
-              label="Format"
-              onChange={(e) => setFormat(e.target.value)}
-            >
+            <Select value={format} label="Format" onChange={(e) => setFormat(e.target.value)}>
               <MenuItem value="PDF">PDF</MenuItem>
               <MenuItem value="CSV">CSV</MenuItem>
             </Select>

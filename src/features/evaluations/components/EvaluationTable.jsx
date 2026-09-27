@@ -156,16 +156,16 @@ export default function EvaluationTable({ evaluations = [], onRowClick, readOnly
     renderRowActions: readOnly
       ? undefined
       : ({ row }) => (
-        <Tooltip title="Edit / View">
-          <IconButton
-            aria-label="Edit / View"
-            size="small"
-            onClick={() => onRowClick?.(row.original)}
-          >
-            <EditIcon />
-          </IconButton>
-        </Tooltip>
-      ),
+          <Tooltip title="Edit / View">
+            <IconButton
+              aria-label="Edit / View"
+              size="small"
+              onClick={() => onRowClick?.(row.original)}
+            >
+              <EditIcon />
+            </IconButton>
+          </Tooltip>
+        ),
 
     initialState: {
       pagination: {

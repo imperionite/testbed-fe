@@ -54,7 +54,7 @@ function ProgressCell({ internshipId, requiredHours }) {
 }
 
 export default function InternshipManagementPage() {
-  const { isCoordinator } = useUiPermissions() 
+  const { isCoordinator } = useUiPermissions()
   const canEditAttendance = isCoordinator
 
   const [modalState, setModalState] = useState({
@@ -202,15 +202,17 @@ export default function InternshipManagementPage() {
         ),
       },
     ]
-    return allColumns.filter((col) => { 
-      const colId = col.accessorKey || col.id 
-      if (canEditAttendance) { 
-        // Coordinator mode: Show 'progress', hide 'required\_hours' 
-      return colId !== 'required_hours' } else { 
-        // Admin/Other modes: Show 'required_hours', hide 'progress' 
-      return colId !== 'progress' } })
-
-  }, [studentMap, adviserMap])
+    return allColumns.filter((col) => {
+      const colId = col.accessorKey || col.id
+      if (canEditAttendance) {
+        // Coordinator mode: Show 'progress', hide 'required\_hours'
+        return colId !== 'required_hours'
+      } else {
+        // Admin/Other modes: Show 'required_hours', hide 'progress'
+        return colId !== 'progress'
+      }
+    })
+  }, [studentMap, adviserMap, canEditAttendance])
 
   const table = useMaterialReactTable({
     columns,

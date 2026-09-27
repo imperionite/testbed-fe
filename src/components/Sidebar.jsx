@@ -66,14 +66,26 @@ const menuItems = [
     label: 'Evaluations',
     path: '/evaluations',
     icon: <FactCheckOutlinedIcon />,
-    roles: ['hte_supervisor', 'internship_coordinator', 'student', 'faculty_adviser', 'administrator'],
+    roles: [
+      'hte_supervisor',
+      'internship_coordinator',
+      'student',
+      'faculty_adviser',
+      'administrator',
+    ],
   },
 
   {
     label: 'Documents',
     path: '/documents',
     icon: <DescriptionOutlinedIcon />,
-    roles: ['student', 'hte_supervisor', 'faculty_adviser', 'internship_coordinator', 'administrator'],
+    roles: [
+      'student',
+      'hte_supervisor',
+      'faculty_adviser',
+      'internship_coordinator',
+      'administrator',
+    ],
   },
 
   {

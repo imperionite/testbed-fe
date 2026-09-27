@@ -193,7 +193,7 @@ export default function StudentTable({ data, onEdit, onView, role }) {
       )
     }
     return allColumns
-  }, [onEdit, role])
+  }, [onEdit, onView, role])
 
   return (
     <MaterialReactTable

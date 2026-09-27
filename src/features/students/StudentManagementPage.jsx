@@ -15,7 +15,7 @@ import { useMemo } from 'react'
 import { mapStudentData } from './utils/studentUtils'
 import { useUiPermissions } from '../shared/hooks/useUiPermissions'
 import FacultyStudentDetailsModal from './components/FacultyStudentDetailsModal'
-import  notify  from '../../utils/toast'
+import notify from '../../utils/toast'
 
 export default function StudentManagementPage() {
   const { user, isLoading: isAuthLoading } = useAuth()
@@ -61,12 +61,14 @@ export default function StudentManagementPage() {
       refetch()
     } catch (submitError) {
       setIsSaving(false)
-      const errorMsg = submitError.response?.data?.message || submitError.message || 'Unable to save Student record.'
+      const errorMsg =
+        submitError.response?.data?.message ||
+        submitError.message ||
+        'Unable to save Student record.'
       setError(errorMsg)
       notify.error(errorMsg)
     }
   }
-  
 
   const permissions = getStudentManagementPermissions(user?.role)
 

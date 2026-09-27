@@ -99,11 +99,11 @@ export function useEvaluationContext(role) {
 }
 
 export function toInternshipOption(record) {
-  const internshipId = 
-  record?.internship_id ??
-  record?.currentInternship?.id ??
-  record?.current_internship?.id ??
-  record?.id
+  const internshipId =
+    record?.internship_id ??
+    record?.currentInternship?.id ??
+    record?.current_internship?.id ??
+    record?.id
 
   if (!internshipId) {
     return null
