@@ -59,7 +59,7 @@ const menuItems = [
     label: 'Internships',
     path: '/internships',
     icon: <WorkOutlineOutlinedIcon />,
-    roles: ['administrator', 'internship_coordinator', 'hte_supervisor'],
+    roles: ['administrator', 'internship_coordinator', 'hte_supervisor', 'student'],
   },
 
   {

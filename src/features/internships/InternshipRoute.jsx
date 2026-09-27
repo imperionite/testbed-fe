@@ -1,13 +1,20 @@
 import { useUiPermissions } from '../shared/hooks/useUiPermissions'
 import InternshipManagementPage from './InternshipManagementPage'
 import HteInternshipPage from './HteInternshipPage'
+import StudentInternshipProfilePage from './StudentInternshipProfilePage'
 
 export default function InternshipRoute() {
-  const { isHteSupervisor } = useUiPermissions()
+  const { isHteSupervisor, isStudent } = useUiPermissions()
 
-  if (isHteSupervisor) {
+  if (isStudent) {
+    return <StudentInternshipProfilePage />
+  }
+
+  else if (isHteSupervisor) {
     return <HteInternshipPage />
-  } else {
+  } 
+  
+  else {
     return <InternshipManagementPage />
   }
 }

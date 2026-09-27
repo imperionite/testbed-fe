@@ -9,7 +9,7 @@ import useAuth from '../../../hooks/useAuth'
 
 export function useUiPermissions() {
   const { user } = useAuth()
-  const role = user?.role?.toLowerCase()
+  const role = user?.role?.trim().toLowerCase()
 
   const isRole = (targetRole) => role === targetRole?.toLowerCase()
 
