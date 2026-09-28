@@ -2,9 +2,7 @@ import { Typography, Box } from '@mui/material'
 
 export default function PageTitleAndSubtitle({ title, subtitle }) {
   return (
-    <Box
-      sx={{mb:1.5}}
-    >
+    <Box sx={{ mb: 1.5 }}>
       <Typography variant="h5" component="h2">
         {title}
       </Typography>

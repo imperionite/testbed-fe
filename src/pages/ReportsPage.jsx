@@ -104,18 +104,21 @@ export default function ReportsPage() {
 
   return (
     <Box>
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: 1,
-            mb: 2,
-            width: '100%',
-          }}
-        >
-          <PageTitleAndSubtitle title="Internship Reports" subtitle="View and download internship reports." />
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: 1,
+          mb: 2,
+          width: '100%',
+        }}
+      >
+        <PageTitleAndSubtitle
+          title="Internship Reports"
+          subtitle="View and download internship reports."
+        />
         {isReadOnlyStaff && (
           <Button variant="contained" startIcon={<DownloadIcon />} onClick={handleOpen}>
             Download Report

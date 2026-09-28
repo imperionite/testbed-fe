@@ -63,7 +63,10 @@ export default function HteManagementLayout() {
             width: '100%',
           }}
         >
-          <PageTitleAndSubtitle title="Host Training Establishment (HTE) Management Page" subtitle="Manage HTE data and supervisor assignments." />
+          <PageTitleAndSubtitle
+            title="Host Training Establishment (HTE) Management Page"
+            subtitle="Manage HTE data and supervisor assignments."
+          />
           {permissions.canCreate && (
             <Button
               startIcon={<AddIcon />}
@@ -92,7 +95,7 @@ export default function HteManagementLayout() {
       </Box>
 
       {/* ==================== MAIN SECTION ==================== */}
-        <Box sx={{ width: '100%', mt:{xs:2.5, lg:3} }}>
+      <Box sx={{ width: '100%', mt: { xs: 2.5, lg: 3 } }}>
         {!permissions.canView ? (
           <Alert severity="error">You do not have permission to view HTEs.</Alert>
         ) : isLoading ? (

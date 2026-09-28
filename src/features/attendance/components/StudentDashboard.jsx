@@ -70,22 +70,22 @@ export default function StudentDashboard({ internshipId }) {
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
       {/* Attendance Section */}
       {/* <Paper variant="outlined" sx={{ borderRadius: 2 }}> */}
-        {isAttendanceLoading ? (
-          <Typography color="text.secondary" sx={{ py: 4, textAlign: 'center' }}>
-            Loading attendance records...
-          </Typography>
-        ) : (
-          <AttendanceTable
-            data={attendance}
-            isStudent={true}
-            onEdit={handleOpenEdit}
-            onLogAttendance={() => {
-              setSelectedEditRecord(null)
-              setModalOpen(true)
-            }}
-            renderedHours={renderedHours?.totalHours || 0}
-          />
-        )}
+      {isAttendanceLoading ? (
+        <Typography color="text.secondary" sx={{ py: 4, textAlign: 'center' }}>
+          Loading attendance records...
+        </Typography>
+      ) : (
+        <AttendanceTable
+          data={attendance}
+          isStudent={true}
+          onEdit={handleOpenEdit}
+          onLogAttendance={() => {
+            setSelectedEditRecord(null)
+            setModalOpen(true)
+          }}
+          renderedHours={renderedHours?.totalHours || 0}
+        />
+      )}
       {/* </Paper> */}
 
       {/* Reusable Form Modal for Create & Edit */}

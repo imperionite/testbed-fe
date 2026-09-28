@@ -10,8 +10,11 @@ export default function AuditLogsPage() {
 
   return (
     <Box>
-      <PageTitleAndSubtitle title="System Audit Logs" subtitle="Review system activity and user actions." />
-        <Box sx={{ width: '100%', mt:{xs:2.5, lg:3} }}>
+      <PageTitleAndSubtitle
+        title="System Audit Logs"
+        subtitle="Review system activity and user actions."
+      />
+      <Box sx={{ width: '100%', mt: { xs: 2.5, lg: 3 } }}>
         <AuditTable data={logs} />
       </Box>
     </Box>

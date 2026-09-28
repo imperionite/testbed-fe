@@ -130,9 +130,12 @@ export default function StudentDocumentsPage() {
 
   return (
     <Box>
-      <PageTitleAndSubtitle title='Internship Documents Management' subtitle='Track submitted iternship documents.'/>
+      <PageTitleAndSubtitle
+        title="Internship Documents Management"
+        subtitle="Track submitted iternship documents."
+      />
 
-      <Box sx={{ mb: { xs: 3, lg: 4 } }}/>
+      <Box sx={{ mb: { xs: 3, lg: 4 } }} />
 
       {internshipOptions.length === 0 ? (
         <Typography>No active internship found.</Typography>

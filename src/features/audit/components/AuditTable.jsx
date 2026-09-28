@@ -32,8 +32,7 @@ export default function AuditTable({ data = [] }) {
       {
         accessorKey: 'created_at',
         header: 'Timestamp',
-        Cell: ({ cell }) => formatDate(cell.getValue()) || '—'
-
+        Cell: ({ cell }) => formatDate(cell.getValue()) || '—',
       },
       { accessorKey: 'action', header: 'Action' },
       { accessorKey: 'resource_type', header: 'Resource Type' },
@@ -55,8 +54,8 @@ export default function AuditTable({ data = [] }) {
     state: { isLoading: isLoadingUsers },
     muiCircularProgressProps: { color: 'secondary' },
     initialState: {
-      ...defaultTableConfig.initialState
-    }
+      ...defaultTableConfig.initialState,
+    },
   })
 
   return <MaterialReactTable table={table} />

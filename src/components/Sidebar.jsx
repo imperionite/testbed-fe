@@ -17,7 +17,7 @@ import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined'
 import AssessmentOutlinedIcon from '@mui/icons-material/AssessmentOutlined'
 import SecurityOutlinedIcon from '@mui/icons-material/SecurityOutlined'
 // import FactCheckOutlinedIcon from '@mui/icons-material/FactCheckOutlined'
-import RateReviewOutlinedIcon from '@mui/icons-material/RateReviewOutlined';
+import RateReviewOutlinedIcon from '@mui/icons-material/RateReviewOutlined'
 
 import { Link, useLocation } from 'react-router-dom'
 

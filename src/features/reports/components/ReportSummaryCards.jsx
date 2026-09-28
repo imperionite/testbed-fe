@@ -13,7 +13,7 @@ export default function ReportSummaryCards({ summary }) {
   ]
 
   return (
-    <Grid container spacing={1} sx={{ width: '100%', mb:{xs:2.5, lg:3} }}>
+    <Grid container spacing={1} sx={{ width: '100%', mb: { xs: 2.5, lg: 3 } }}>
       {cards.map((card, index) => (
         <Grid
           size={{

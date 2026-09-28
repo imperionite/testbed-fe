@@ -10,10 +10,10 @@ export default function ReportTable({ data = [] }) {
       { accessorKey: 'student.studentNumber', header: 'Student Number' },
       { accessorKey: 'student.program', header: 'Program' },
       { accessorKey: 'hte.companyName', header: 'Company' },
-      { 
-        accessorKey: 'status', 
-        header: 'Status', 
-        Cell: ({ cell }) => formatSentenceCase(cell.getValue())
+      {
+        accessorKey: 'status',
+        header: 'Status',
+        Cell: ({ cell }) => formatSentenceCase(cell.getValue()),
       },
       { accessorKey: 'renderedHours', header: 'Rendered Hours' },
       { accessorKey: 'remainingHours', header: 'Remaining Hours' },
@@ -26,8 +26,8 @@ export default function ReportTable({ data = [] }) {
     columns,
     data,
     initialState: {
-      ...defaultTableConfig.initialState
-    }
+      ...defaultTableConfig.initialState,
+    },
   })
 
   return <MaterialReactTable table={table} />

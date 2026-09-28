@@ -65,17 +65,16 @@ export default function UserManagementPage() {
             width: '100%',
           }}
         >
-
           <PageTitleAndSubtitle
-                      title="Active Accounts by Role"
-                      subtitle={
-                        isAdmin
-                          ? 'Manage system accounts and user roles.'
-                          : isCoordinator
-                            ? 'View system accounts and user roles.'
-                            : ' '
-                      }
-                    />
+            title="Active Accounts by Role"
+            subtitle={
+              isAdmin
+                ? 'Manage system accounts and user roles.'
+                : isCoordinator
+                  ? 'View system accounts and user roles.'
+                  : ' '
+            }
+          />
 
           {permissions.canCreate && (
             <Button
@@ -100,9 +99,7 @@ export default function UserManagementPage() {
             <CardStat
               sx={{ height: '100%' }}
               title="Students"
-              value={
-                userData.filter((u) => u.isActive === true && u.role === 'student').length
-              }
+              value={userData.filter((u) => u.isActive === true && u.role === 'student').length}
             />
           </Grid>
 
@@ -174,12 +171,12 @@ export default function UserManagementPage() {
       </Box>
 
       {/* ==================== MAIN SECTION ==================== */}
-      <Box sx={{ mt:{xs:4, lg:5} }}>
+      <Box sx={{ mt: { xs: 4, lg: 5 } }}>
         {/* Table Title Header */}
         <PageTitleAndSubtitle title="User List" />
 
         {/* Data Grid Table Container */}
-        <Box sx={{ width: '100%', mt:{xs:2.5, lg:3} }}>
+        <Box sx={{ width: '100%', mt: { xs: 2.5, lg: 3 } }}>
           <GuardTableContent
             canView={permissions.canView}
             isLoading={isLoading}

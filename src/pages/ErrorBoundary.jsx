@@ -26,9 +26,7 @@ class ErrorBoundary extends Component {
       return (
         <div className="error-page">
           <h1>Something went wrong</h1>
-          <p>
-            An unexpected error occurred. Please reload the page and try again.
-          </p>
+          <p>An unexpected error occurred. Please reload the page and try again.</p>
           <button onClick={this.handleReload}>Reload page</button>
         </div>
       )

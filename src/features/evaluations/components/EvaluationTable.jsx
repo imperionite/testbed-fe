@@ -125,13 +125,13 @@ export default function EvaluationTable({ evaluations = [], onRowClick, readOnly
       {
         accessorKey: 'status',
         header: 'Status',
-        Cell: ({ cell }) => <BadgeEvaluations status={cell.getValue()} /> 
+        Cell: ({ cell }) => <BadgeEvaluations status={cell.getValue()} />,
       },
 
       {
         accessorKey: 'submitted_at',
         header: 'Submitted',
-        Cell: ({ cell }) => formatDate(cell.getValue()) || '—'
+        Cell: ({ cell }) => formatDate(cell.getValue()) || '—',
       },
     ],
     [],

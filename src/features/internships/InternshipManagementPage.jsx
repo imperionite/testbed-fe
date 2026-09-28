@@ -16,8 +16,8 @@ import {
   PersonAdd as PersonAddIcon,
   EditNote as EditNoteIcon,
 } from '@mui/icons-material'
-import DateRangeIcon from '@mui/icons-material/DateRange';
-import DomainAddIcon from '@mui/icons-material/DomainAdd';
+import DateRangeIcon from '@mui/icons-material/DateRange'
+import DomainAddIcon from '@mui/icons-material/DomainAdd'
 import { useMaterialReactTable } from '@glebcha/material-react-table'
 import { useMemo, useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
@@ -229,11 +229,11 @@ export default function InternshipManagementPage() {
     initialState: {
       ...defaultTableConfig.initialState,
       columnPinning: {
-      right: ['actions'],
-    },
+        right: ['actions'],
+      },
     },
     displayColumnDefOptions: {
-      'actions': { size: 100 },
+      actions: { size: 100 },
     },
     muiPaginationProps: {
       showFirstButton: false,
@@ -283,14 +283,10 @@ export default function InternshipManagementPage() {
           width: '100%',
         }}
       >
-                <PageTitleAndSubtitle
-                  title="Internship Overview"
-                  subtitle={
-                    isReadOnlyStaff
-                      ? 'Manage the internship lifecycle.'
-                      : ' '
-                  }
-                />
+        <PageTitleAndSubtitle
+          title="Internship Overview"
+          subtitle={isReadOnlyStaff ? 'Manage the internship lifecycle.' : ' '}
+        />
         <Button
           variant="contained"
           startIcon={<AddIcon />}

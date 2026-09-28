@@ -56,9 +56,7 @@ export default function HteStudentsPage() {
       >
         <PageTitleAndSubtitle
           title="Internship Records"
-          subtitle={
-            "View assigned student interns' information."
-          }
+          subtitle={"View assigned student interns' information."}
         />
       </Box>
 
