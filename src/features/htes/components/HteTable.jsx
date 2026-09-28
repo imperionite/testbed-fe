@@ -1,17 +1,17 @@
 import { useMemo, useState } from 'react'
 import { MaterialReactTable, useMaterialReactTable } from '@glebcha/material-react-table'
-import { Box, Button, CircularProgress } from '@mui/material'
-import CheckIcon from '@mui/icons-material/Check'
+import { Box, Button, CircularProgress, IconButton, Tooltip } from '@mui/material'
+import EditIcon from '@mui/icons-material/Edit'
 
 import { createHteTableColumns } from './hteTableColumns'
 import notify from '../../../utils/toast'
 import ActionConfirmDialog from '../../shared/components/ActionConfirmDialog'
+import { defaultTableConfig } from '../../shared/config/defaultTableConfig'
 
 export default function HtesTable({
   htes,
   permissions,
   supervisorMap = {},
-  onStatusChange,
   onBulkStatusChange,
   onHteClick,
 }) {
@@ -45,39 +45,15 @@ export default function HtesTable({
   const selectedRowCount = Object.keys(rowSelection).length
 
   const table = useMaterialReactTable({
+    ...defaultTableConfig,
     columns,
     data: htes,
-    enableGrouping: true,
-    enableSorting: true,
-    enableColumnFilters: true,
-    enableColumnOrdering: true,
-    // enableColumnDragging: true,
-    enableGlobalFilter: true,
-    enablePagination: true,
     enableRowSelection: permissions.canSelectRows,
-    enableHiding: true,
-    enableColumnActions: false,
-    enableColumnPinning: true,
-    enableDensityToggle: true,
-    enableStickyHeader: true,
-    enableStickyFooter: true,
-    enableEditing: permissions.canEdit,
-    editDisplayMode: 'row',
-    positionActionsColumn: 'last',
-    positionGlobalFilter: 'right',
+    enableEditing: false,
+    enableRowActions: permissions.canEdit,
     initialState: {
+      ...defaultTableConfig.initialState,
       columnFiltersOpen: false,
-      pagination: { pageIndex: 0, pageSize: 5 },
-      sorting: [{ id: 'created_at', desc: true }],
-      columnPinning: { right: ['mrt-row-actions'] },
-    },
-    icons: {
-      SaveIcon: (props) =>
-        pendingAction ? (
-          <CircularProgress size={18} color="inherit" />
-        ) : (
-          <CheckIcon {...props} sx={{ ...props.sx, color: 'success.main' }} />
-        ),
     },
     displayColumnDefOptions: {
       'mrt-row-actions': {
@@ -99,37 +75,20 @@ export default function HtesTable({
     },
     onRowSelectionChange: setRowSelection,
     onColumnVisibilityChange: setColumnVisibility,
-    onEditingRowSave: permissions.canEdit
-      ? async ({ exitEditingMode, row, values }) => {
-          const statusChanged = String(values.is_active) !== String(row.original.is_active)
-
-          if (!statusChanged) {
-            exitEditingMode()
-            return
-          }
-
-          if (!(await askForConfirmation('Are you sure you want to save these changes?'))) {
-            return
-          }
-
-          try {
-            setPendingAction(`row-${row.original.id}`)
-            if (statusChanged) {
-              await onStatusChange({
-                id: row.original.id,
-                isActive: values.is_active === true || values.is_active === 'true',
-              })
-            }
-            exitEditingMode()
-            notify.success('HTE updated successfully.')
-          } catch (error) {
-            console.error('Failed to update HTE:', error)
-            notify.error(error.response?.data?.message || 'Failed to update HTE.')
-          } finally {
-            setPendingAction(null)
-          }
-        }
-      : undefined,
+    renderRowActions: ({ row }) => (
+      <Tooltip title="Edit HTE">
+        <IconButton
+          aria-label={`Edit ${row.original.company_name}`}
+          onClick={(event) => {
+            event.stopPropagation()
+            onHteClick?.(row.original)
+          }}
+          size="small"
+        >
+          <EditIcon fontSize="small" />
+        </IconButton>
+      </Tooltip>
+    ),
     muiTableContainerProps: {
       sx: {
         maxHeight: 600,
@@ -149,22 +108,6 @@ export default function HtesTable({
         zIndex: 2,
       },
     },
-    muiTableBodyRowProps: ({ row }) => ({
-      onClick: (event) => {
-        if (
-          event.target.closest('button') ||
-          event.target.closest('input') ||
-          event.target.closest('[role="checkbox"]')
-        ) {
-          return
-        }
-
-        onHteClick?.(row.original)
-      },
-      sx: {
-        cursor: onHteClick ? 'pointer' : 'default',
-      },
-    }),
     renderBottomToolbarCustomActions: ({ table: currentTable }) =>
       permissions.canBulkEdit ? (
         <Box sx={{ display: 'flex', gap: 1 }}>

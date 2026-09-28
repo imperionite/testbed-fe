@@ -1,4 +1,4 @@
-import { Alert, Button, CircularProgress, Typography } from '@mui/material'
+import { Alert, Button, CircularProgress, Box, Grid } from '@mui/material'
 import { Add as AddIcon } from '@mui/icons-material'
 import CardStat from '../shared/components/CardStat'
 import HteTable from './components/HteTable'
@@ -10,38 +10,7 @@ import { useHteMutations } from './hooks/useHteMutations'
 import { getHteManagementPermissions } from './htePermissions'
 import { useSupervisorUsers } from '../users/hooks/useUsers'
 import notify from '../../utils/toast'
-
-// ============================================
-// STYLES
-// ============================================
-const styles = {
-  container: {
-    minHeight: '100vh',
-  },
-  headerSection: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-    gap: '16px',
-    marginBottom: '20px',
-  },
-  cardsSection: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-    gap: '16px',
-    width: '100%',
-  },
-  mainSection: {
-    paddingTop: '10px',
-  },
-  tableHeader: {
-    marginBottom: '16px',
-  },
-  tableContainer: {
-    width: '100%',
-  },
-}
+import PageTitleAndSubtitle from '../shared/components/PageTitleAndSubtitle'
 
 // ============================================
 // MAIN COMPONENT
@@ -79,108 +48,110 @@ export default function HteManagementLayout() {
     useHteMutations()
 
   return (
-    <div style={styles.container}>
+    <Box>
       {/* ==================== TOP SECTION ==================== */}
-      <div style={styles.topSection}>
+      <Box>
         {/* Header: Title + Action Button */}
-        <div style={styles.headerSection}>
-          <Typography variant="h5" fontWeight={600}>
-            Host Training Establishments (HTE)
-          </Typography>
-          <Button
-            startIcon={<AddIcon />}
-            variant="contained"
-            onClick={() => modalState.open('create')}
-            disabled={!permissions.canCreate}
-          >
-            Register HTE
-          </Button>
-        </div>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: 1,
+            mb: 2,
+            width: '100%',
+          }}
+        >
+          <PageTitleAndSubtitle
+            title="Host Training Establishment (HTE) Management Page"
+            subtitle="Manage HTE data and supervisor assignments."
+          />
+          {permissions.canCreate && (
+            <Button
+              startIcon={<AddIcon />}
+              variant="contained"
+              onClick={() => modalState.open('create')}
+              sx={{ flexShrink: 0 }}
+            >
+              Register HTE
+            </Button>
+          )}
+        </Box>
 
         {/* Stats Cards */}
-        <div style={styles.cardsSection}>
-          <CardStat title="Total HTE Partners" value={hteData.length} />
-          <CardStat
-            title="Active HTE Partners"
-            value={hteData.filter((u) => u.is_active === true).length}
-          />
-        </div>
-      </div>
+        <Grid container spacing={1}>
+          <Grid size={{ xs: 6, md: 4, lg: 2.5 }}>
+            <CardStat title="Total HTE Partners" value={hteData.length} />
+          </Grid>
+
+          <Grid size={{ xs: 6, md: 4, lg: 2.5 }}>
+            <CardStat
+              title="Active HTE Partners"
+              value={hteData.filter((u) => u.is_active === true).length}
+            />
+          </Grid>
+        </Grid>
+      </Box>
 
       {/* ==================== MAIN SECTION ==================== */}
-      <div style={styles.mainSection}>
-        {/* Table Header */}
-        <div style={styles.tableHeader}></div>
-
-        {/* Data Table */}
-        <div style={styles.tableContainer}>
-          {!permissions.canView ? (
-            <Alert severity="error">You do not have permission to view HTEs.</Alert>
-          ) : isLoading ? (
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'center',
-                padding: '32px',
-              }}
-            >
-              <CircularProgress size={28} />
-            </div>
-          ) : isError ? (
-            <Alert
-              severity="error"
-              action={
-                <Button color="inherit" size="small" onClick={refetch}>
-                  Retry
+      <Box sx={{ width: '100%', mt: { xs: 2.5, lg: 3 } }}>
+        {!permissions.canView ? (
+          <Alert severity="error">You do not have permission to view HTEs.</Alert>
+        ) : isLoading ? (
+          <Box display="flex" justifyContent="center" py={4}>
+            <CircularProgress size={28} />
+          </Box>
+        ) : isError ? (
+          <Alert
+            severity="error"
+            action={
+              <Button color="inherit" size="small" onClick={refetch}>
+                Retry
+              </Button>
+            }
+          >
+            {error?.response?.data?.message || 'Unable to load HTEs. Please try again.'}
+          </Alert>
+        ) : hteData.length === 0 ? (
+          <Alert
+            severity="info"
+            action={
+              permissions.canCreate ? (
+                <Button color="inherit" size="small" onClick={() => modalState.open('create')}>
+                  Register HTE
                 </Button>
-              }
-            >
-              {error?.response?.data?.message || 'Unable to load HTEs. Please try again.'}
-            </Alert>
-          ) : hteData.length === 0 ? (
-            <Alert
-              severity="info"
-              action={
-                permissions.canCreate ? (
-                  <Button color="inherit" size="small" onClick={() => modalState.open('create')}>
-                    Register HTE
-                  </Button>
-                ) : undefined
-              }
-            >
-              No HTEs found.
-            </Alert>
-          ) : (
-            <HteTable
-              htes={hteData}
-              permissions={permissions}
-              supervisorMap={supervisorMap}
-              onSupervisorChange={updateHteSupervisor.mutateAsync}
-              onStatusChange={updateStatus.mutateAsync}
-              onBulkStatusChange={bulkUpdateStatus.mutateAsync}
-              onHteClick={(selectedHte) => modalState.open('edit', selectedHte)}
-            />
-          )}
-        </div>
-      </div>
+              ) : undefined
+            }
+          >
+            No HTEs found.
+          </Alert>
+        ) : (
+          <HteTable
+            htes={hteData}
+            permissions={permissions}
+            supervisorMap={supervisorMap}
+            onBulkStatusChange={bulkUpdateStatus.mutateAsync}
+            onHteClick={(selectedHte) => modalState.open('edit', selectedHte)}
+          />
+        )}
+      </Box>
 
-      {permissions.canView && (
-        <HteModal
-          key={`${modalState.mode}-${modalState.selectedHte?.id ?? 'new'}-${modalState.isOpen}`}
-          open={modalState.isOpen}
-          mode={modalState.mode}
-          hte={modalState.selectedHte}
-          permissions={permissions}
-          viewerRole={user?.role}
-          supervisorOptions={supervisorOptions}
-          onClose={modalState.close}
-          onSuccess={notify.success}
-          onCreate={createHte.mutateAsync}
-          onUpdate={updateHte.mutateAsync}
-          onSupervisorChange={updateHteSupervisor.mutateAsync}
-          onStatusChange={updateStatus.mutateAsync}
-        />
-      )}
-    </div>
+      <HteModal
+        key={`${modalState.mode}-${modalState.selectedHte?.id ?? 'new'}-${modalState.isOpen}`}
+        open={modalState.isOpen}
+        mode={modalState.mode}
+        hte={modalState.selectedHte}
+        permissions={permissions}
+        viewerRole={user?.role}
+        supervisorOptions={supervisorOptions}
+        onClose={modalState.close}
+        onSuccess={notify.success}
+        onCreate={createHte.mutateAsync}
+        onUpdate={updateHte.mutateAsync}
+        onSupervisorChange={updateHteSupervisor.mutateAsync}
+        onStatusChange={updateStatus.mutateAsync}
+      />
+    </Box>
   )
 }

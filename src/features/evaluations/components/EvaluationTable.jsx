@@ -1,9 +1,11 @@
 import { useMemo } from 'react'
-import { Chip, Stack, Typography, Tooltip, IconButton } from '@mui/material'
+import { Stack, Typography, Tooltip, IconButton } from '@mui/material'
 import { MaterialReactTable, useMaterialReactTable } from '@glebcha/material-react-table'
 import EditIcon from '@mui/icons-material/Edit'
-
+import { BadgeEvaluations } from '../../shared/components/BadgeEvaluations'
 import { EVALUATION_CRITERIA } from '../form/evaluationConfig'
+import { formatDate } from '../../htes/form/fieldFormatters'
+import { defaultTableConfig } from '../../shared/config/defaultTableConfig'
 
 const formatPerson = (person) => person?.full_name || 'Not assigned'
 
@@ -123,32 +125,22 @@ export default function EvaluationTable({ evaluations = [], onRowClick, readOnly
       {
         accessorKey: 'status',
         header: 'Status',
-        Cell: ({ cell }) => <Chip size="small" label={cell.getValue()} />,
+        Cell: ({ cell }) => <BadgeEvaluations status={cell.getValue()} />,
       },
 
       {
         accessorKey: 'submitted_at',
         header: 'Submitted',
-        Cell: ({ cell }) => {
-          const value = cell.getValue()
-
-          return value ? new Date(value).toLocaleString() : '—'
-        },
+        Cell: ({ cell }) => formatDate(cell.getValue()) || '—',
       },
     ],
     [],
   )
 
   const table = useMaterialReactTable({
+    ...defaultTableConfig,
     columns,
     data: evaluations,
-    enableSorting: true,
-    enableColumnFilters: true,
-    enableGlobalFilter: true,
-    enablePagination: true,
-    enableColumnPinning: true,
-    enableColumnOrdering: true,
-    enableGrouping: true,
     enableRowActions: !readOnly,
 
     positionActionsColumn: 'last',
@@ -168,15 +160,12 @@ export default function EvaluationTable({ evaluations = [], onRowClick, readOnly
         ),
 
     initialState: {
-      pagination: {
-        pageIndex: 0,
-        pageSize: 10,
-      },
+      ...defaultTableConfig.initialState,
       columnPinning: { right: ['mrt-row-actions'] },
       sorting: [
         {
           id: 'submitted_at',
-          desc: true,
+          desc: false,
         },
       ],
     },

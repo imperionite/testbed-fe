@@ -1,60 +1,24 @@
-import { Button, Typography } from '@mui/material'
+import { Button, Grid, Box } from '@mui/material'
 import { Add as AddIcon } from '@mui/icons-material'
 
-// Reusable layout and components
 import CardStat from '../shared/components/CardStat'
 import GuardTableContent from '../shared/components/GuardTableContent'
 
-// Refactored features components and hooks
 import UsersTable from './components/UsersTable'
 import UserModal from './components/UserModal'
 import { useModalState } from '../shared/hooks/useModalState'
 import { useUsers } from './hooks/useUsers'
 import { useUserMutations } from './hooks/useUserMutations'
 import { useUiPermissions } from '../shared/hooks/useUiPermissions'
+import PageTitleAndSubtitle from '../shared/components/PageTitleAndSubtitle'
 
 import notify from '../../utils/toast'
-
-// ============================================
-// STYLES
-// ============================================
-const styles = {
-  container: {
-    minHeight: '100vh',
-  },
-  topSection: {
-    padding: '0px',
-  },
-  headerSection: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-    gap: '16px',
-    marginBottom: '20px',
-  },
-  cardsSection: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(190px, 1fr))',
-    gap: 10,
-    width: '100%',
-  },
-  mainSection: {
-    paddingTop: '43px',
-  },
-  tableHeader: {
-    marginBottom: '16px',
-  },
-  tableContainer: {
-    width: '100%',
-  },
-}
 
 // ============================================
 // MAIN PAGE COMPONENT
 // ============================================
 export default function UserManagementPage() {
-  const { isAdmin, isReadOnlyStaff } = useUiPermissions()
+  const { isAdmin, isReadOnlyStaff, isCoordinator } = useUiPermissions()
   const canView = isReadOnlyStaff // Based on original permissions: isAdmin || isCoordinator
 
   // 1. Hook for fetching data (Query)
@@ -86,70 +50,133 @@ export default function UserManagementPage() {
   }
 
   return (
-    <div style={styles.container}>
+    <Box>
       {/* ==================== TOP SECTION ==================== */}
-      <div style={styles.topSection}>
+      <Box>
         {/* Header: Title + Primary Action Button */}
-        <div style={styles.headerSection}>
-          <Typography variant="h5" fontWeight={600}>
-            Active Accounts by Role
-          </Typography>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: 1,
+            mb: 2,
+            width: '100%',
+          }}
+        >
+          <PageTitleAndSubtitle
+            title="Active Accounts by Role"
+            subtitle={
+              isAdmin
+                ? 'Manage system accounts and user roles.'
+                : isCoordinator
+                  ? 'View system accounts and user roles.'
+                  : ' '
+            }
+          />
 
           {permissions.canCreate && (
             <Button
               startIcon={<AddIcon />}
               variant="contained"
               onClick={() => modalState.open('create')}
-              disabled={!permissions.canCreate}
             >
               Add User
             </Button>
           )}
-        </div>
+        </Box>
 
-        {/* Stats Cards Dashboard */}
-        <div style={styles.cardsSection}>
-          <CardStat
-            title="Students"
-            value={userData.filter((u) => u.isActive === true && u.role === 'student').length}
-          />
-          <CardStat
-            title="Administrators"
-            value={userData.filter((u) => u.isActive === true && u.role === 'administrator').length}
-          />
-          <CardStat
-            title="HTE Supervisors"
-            value={
-              userData.filter((u) => u.isActive === true && u.role === 'hte_supervisor').length
-            }
-          />
-          <CardStat
-            title="Faculty Advisers"
-            value={
-              userData.filter((u) => u.isActive === true && u.role === 'faculty_adviser').length
-            }
-          />
-          <CardStat
-            title="Internship Coordinators"
-            value={
-              userData.filter((u) => u.isActive === true && u.role === 'internship_coordinator')
-                .length
-            }
-          />
-        </div>
-      </div>
+        {/* Stats Cards */}
+        <Grid container spacing={1}>
+          <Grid
+            size={{
+              xs: 6,
+              md: 3,
+              lg: 2.4,
+            }}
+          >
+            <CardStat
+              sx={{ height: '100%' }}
+              title="Students"
+              value={userData.filter((u) => u.isActive === true && u.role === 'student').length}
+            />
+          </Grid>
+
+          <Grid
+            size={{
+              xs: 6,
+              md: 3,
+              lg: 2.4,
+            }}
+          >
+            <CardStat
+              sx={{ height: '100%' }}
+              title="Administrators"
+              value={
+                userData.filter((u) => u.isActive === true && u.role === 'administrator').length
+              }
+            />
+          </Grid>
+
+          <Grid
+            size={{
+              xs: 6,
+              md: 3,
+              lg: 2.4,
+            }}
+          >
+            <CardStat
+              sx={{ height: '100%' }}
+              title="HTE Supervisors"
+              value={
+                userData.filter((u) => u.isActive === true && u.role === 'hte_supervisor').length
+              }
+            />
+          </Grid>
+
+          <Grid
+            size={{
+              xs: 6,
+              md: 3,
+              lg: 2.4,
+            }}
+          >
+            <CardStat
+              sx={{ height: '100%' }}
+              title="Faculty Advisers"
+              value={
+                userData.filter((u) => u.isActive === true && u.role === 'faculty_adviser').length
+              }
+            />
+          </Grid>
+
+          <Grid
+            size={{
+              xs: 6,
+              md: 3,
+              lg: 2.4,
+            }}
+          >
+            <CardStat
+              sx={{ height: '100%' }}
+              title="Internship Coordinators"
+              value={
+                userData.filter((u) => u.isActive === true && u.role === 'internship_coordinator')
+                  .length
+              }
+            />
+          </Grid>
+        </Grid>
+      </Box>
 
       {/* ==================== MAIN SECTION ==================== */}
-      <div style={styles.mainSection}>
+      <Box sx={{ mt: { xs: 4, lg: 5 } }}>
         {/* Table Title Header */}
-        <div style={styles.tableHeader}>
-          <Typography variant="h5" fontWeight={600}>
-            User List
-          </Typography>
-        </div>
+        <PageTitleAndSubtitle title="User List" />
 
         {/* Data Grid Table Container */}
-        <div style={styles.tableContainer}>
+        <Box sx={{ width: '100%', mt: { xs: 2.5, lg: 3 } }}>
           <GuardTableContent
             canView={permissions.canView}
             isLoading={isLoading}
@@ -170,10 +197,10 @@ export default function UserManagementPage() {
               onEditRow={(selectedUser) => modalState.open('edit', selectedUser)}
             />
           </GuardTableContent>
-        </div>
-      </div>
+        </Box>
+      </Box>
 
-      {/* ==================== DIALOGS / MODALS ==================== */}
+      {/* ==================== MODAL ==================== */}
       {permissions.canView && modalState.isOpen && (
         <UserModal
           key={`${modalState.mode}-${modalState.selectedEntity?.id ?? 'new'}-${modalState.isOpen}`}
@@ -191,6 +218,6 @@ export default function UserManagementPage() {
           onSuccess={notify.success}
         />
       )}
-    </div>
+    </Box>
   )
 }

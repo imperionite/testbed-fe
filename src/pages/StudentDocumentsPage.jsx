@@ -10,6 +10,7 @@ import { internshipsApi } from '../api/internships'
 import { usersApi } from '../api/users'
 import { studentApi } from '../api/students'
 import { toInternshipOption } from '../features/evaluations/hooks/useEvaluations'
+import PageTitleAndSubtitle from '../features/shared/components/PageTitleAndSubtitle'
 
 export default function StudentDocumentsPage() {
   const { user } = useAuth()
@@ -128,10 +129,13 @@ export default function StudentDocumentsPage() {
   if (isLoading) return <CircularProgress />
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Typography variant="h4" fontWeight={700} gutterBottom>
-        Internship Documents Management
-      </Typography>
+    <Box>
+      <PageTitleAndSubtitle
+        title="Internship Documents Management"
+        subtitle="Track submitted iternship documents."
+      />
+
+      <Box sx={{ mb: { xs: 3, lg: 4 } }} />
 
       {internshipOptions.length === 0 ? (
         <Typography>No active internship found.</Typography>

@@ -1,6 +1,8 @@
 import { useMemo, useState, useEffect } from 'react'
 import { MaterialReactTable, useMaterialReactTable } from '@glebcha/material-react-table'
 import { usersApi } from '../../../api/users'
+import { formatDate } from '../../htes/form/fieldFormatters'
+import { defaultTableConfig } from '../../shared/config/defaultTableConfig'
 // import { CircularProgress } from '@mui/material'
 
 export default function AuditTable({ data = [] }) {
@@ -30,7 +32,7 @@ export default function AuditTable({ data = [] }) {
       {
         accessorKey: 'created_at',
         header: 'Timestamp',
-        Cell: ({ cell }) => new Date(cell.getValue()).toLocaleString(),
+        Cell: ({ cell }) => formatDate(cell.getValue()) || '—',
       },
       { accessorKey: 'action', header: 'Action' },
       { accessorKey: 'resource_type', header: 'Resource Type' },
@@ -46,13 +48,14 @@ export default function AuditTable({ data = [] }) {
   )
 
   const table = useMaterialReactTable({
+    ...defaultTableConfig,
     columns,
     data,
-    enableSorting: true,
-    enableColumnFilters: true,
-    enablePagination: true,
     state: { isLoading: isLoadingUsers },
     muiCircularProgressProps: { color: 'secondary' },
+    initialState: {
+      ...defaultTableConfig.initialState,
+    },
   })
 
   return <MaterialReactTable table={table} />

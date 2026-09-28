@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useMemo } from 'react'
-import { ThemeProvider } from '@mui/material/styles'
+import { ThemeProvider, responsiveFontSizes } from '@mui/material/styles'
 import CssBaseline from '@mui/material/CssBaseline'
 import { createAppTheme } from '../theme/index.js'
 import { defaultPreferences } from '../theme/dev-fox/preferences.js'
@@ -18,7 +18,15 @@ export const ThemeContextProvider = ({ children }) => {
 
   const activeMode = mode === 'system' ? systemMode : mode
 
-  const theme = useMemo(() => createAppTheme(activeMode, defaultPreferences.themeId), [activeMode])
+  const theme = useMemo(() => {
+    const baseTheme = createAppTheme(activeMode, defaultPreferences.themeId)
+
+    return responsiveFontSizes(baseTheme, {
+      breakpoints: ['sm', 'md', 'lg'],
+      factor: 2,
+      variants: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'subtitle1', 'subtitle2'],
+    })
+  }, [activeMode])
 
   useEffect(() => {
     localStorage.setItem('themeMode', mode)

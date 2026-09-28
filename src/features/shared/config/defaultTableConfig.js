@@ -1,16 +1,17 @@
-import {
-  ViewListOutlined,
-  FullscreenOutlined,
-  FullscreenExitOutlined,
-  VisibilityOutlined,
-  FilterListOutlined,
-  SortOutlined,
-  MoreVertOutlined,
-  SearchOutlined,
-  ClearOutlined,
-  ArrowDownwardOutlined,
-  DensityMediumOutlined,
-} from '@mui/icons-material'
+// import {
+//   ViewListOutlined,
+//   FullscreenOutlined,
+//   FullscreenExitOutlined,
+//   VisibilityOutlined,
+//   FilterListOutlined,
+//   SortOutlined,
+//   MoreVertOutlined,
+//   SearchOutlined,
+//   ClearOutlined,
+//   ArrowDownwardOutlined,
+//   DensityMediumOutlined,
+// } from '@mui/icons-material'
+// import EditIcon from '@mui/icons-material/Edit'
 
 /**
  * Base configuration shared across all features (Users, HTEs, Students)
@@ -24,33 +25,32 @@ export const defaultTableConfig = {
   enableHiding: true,
   enableGrouping: true,
   enableColumnOrdering: true,
-  enableColumnActions: false,
   enableColumnPinning: true,
-  enableRowActions: false,
   enableDensityToggle: true,
   enableStickyHeader: true,
   enableStickyFooter: true,
   positionActionsColumn: 'last',
   positionGlobalFilter: 'right',
 
-  icons: {
-    ViewListIcon: ViewListOutlined,
-    FullscreenIcon: FullscreenOutlined,
-    FullscreenExitIcon: FullscreenExitOutlined,
-    VisibilityIcon: VisibilityOutlined,
-    FilterListIcon: FilterListOutlined,
-    SortIcon: SortOutlined,
-    MoreVertIcon: MoreVertOutlined,
-    SearchIcon: SearchOutlined,
-    SearchOffIcon: ClearOutlined,
-    ArrowDownwardIcon: ArrowDownwardOutlined,
-    DensityMediumIcon: DensityMediumOutlined,
-  },
+  // icons: {
+  //   EditIcon: EditIcon,
+  //   ViewListIcon: ViewListOutlined,
+  //   FullscreenIcon: FullscreenOutlined,
+  //   FullscreenExitIcon: FullscreenExitOutlined,
+  //   VisibilityIcon: VisibilityOutlined,
+  //   FilterListIcon: FilterListOutlined,
+  //   SortIcon: SortOutlined,
+  //   MoreVertIcon: MoreVertOutlined,
+  //   SearchIcon: SearchOutlined,
+  //   SearchOffIcon: ClearOutlined,
+  //   ArrowDownwardIcon: ArrowDownwardOutlined,
+  //   DensityMediumIcon: DensityMediumOutlined,
+  // },
 
   initialState: {
     density: 'comfortable',
-    pagination: { pageIndex: 0, pageSize: 15 },
-    sorting: [{ id: 'createdAt', desc: true }],
+    pagination: { pageIndex: 0, pageSize: 30 },
+    sorting: [{ id: 'created_at', desc: false }],
     columnFiltersOpen: false,
     columnPinning: {
       right: ['mrt-row-actions'],

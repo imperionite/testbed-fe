@@ -87,7 +87,7 @@ export default function StudentProfilePage() {
   const internshipStatus = student.currentInternship?.status
 
   return (
-    <Box sx={{ p: 3, bgcolor: 'background.default', minHeight: '100vh' }}>
+    <Box>
       <Card sx={{ maxWidth: 800, mx: 'auto', p: 2 }}>
         <CardContent>
           <Box

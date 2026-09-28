@@ -7,6 +7,7 @@ import AddIcon from '@mui/icons-material/Add'
 import AccessTimeIcon from '@mui/icons-material/AccessTime'
 import { BadgeAttendanceStatus } from './BadgeAttendanceStatus'
 import dayjs from 'dayjs'
+import { defaultTableConfig } from '../../shared/config/defaultTableConfig'
 
 export default function AttendanceTable({
   data = [],
@@ -76,11 +77,13 @@ export default function AttendanceTable({
   )
 
   const table = useMaterialReactTable({
+    ...defaultTableConfig,
     columns,
     data: sortedData,
-    enableSorting: true,
-    enableColumnFilters: true,
-    enablePagination: true,
+    initialState: {
+      ...defaultTableConfig.initialState,
+      sorting: [{ id: 'attendance_date', desc: false }],
+    },
     renderTopToolbarCustomActions: () => (
       <Box
         sx={{

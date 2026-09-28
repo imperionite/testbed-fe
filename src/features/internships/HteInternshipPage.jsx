@@ -6,6 +6,7 @@ import { useModalState } from './hooks/useModalState'
 import HteInternshipTable from './components/HteInternshipTable'
 import HteInternshipDetailsModal from './components/HteInternshipDetailsModal'
 import { MODES } from '../students/form/formConfig'
+import PageTitleAndSubtitle from '../shared/components/PageTitleAndSubtitle'
 
 export default function HteStudentsPage() {
   const { user, isLoading: isAuthLoading } = useAuth()
@@ -53,9 +54,10 @@ export default function HteStudentsPage() {
           mb: 3,
         }}
       >
-        <Typography variant="h5" fontWeight={600}>
-          Internship Records
-        </Typography>
+        <PageTitleAndSubtitle
+          title="Internship Records"
+          subtitle={"View assigned student interns' information."}
+        />
       </Box>
 
       <Box

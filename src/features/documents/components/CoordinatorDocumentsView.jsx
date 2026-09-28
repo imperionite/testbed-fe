@@ -15,10 +15,13 @@ import {
 import { useDocuments } from '../hooks/useDocuments'
 import { useDocumentMutations } from '../hooks/useDocumentMutations'
 import DocumentItem from './DocumentItem'
+import PageTitleAndSubtitle from '../../shared/components/PageTitleAndSubtitle'
+import { useUiPermissions } from '../../shared/hooks/useUiPermissions'
 
 export default function CoordinatorDocumentsView({ internshipId }) {
   const { data: documents = [], isLoading, error } = useDocuments(internshipId)
   const { approveDocument, rejectDocument } = useDocumentMutations(internshipId)
+  const { isCoordinator } = useUiPermissions()
 
   const [rejectDialog, setRejectDialog] = useState({ open: false, documentId: null })
   const [rejectionReason, setRejectionReason] = useState('')
@@ -46,49 +49,68 @@ export default function CoordinatorDocumentsView({ internshipId }) {
 
   return (
     <Box>
-      <Typography variant="h6" gutterBottom>
-        Internship Documents
-      </Typography>
+      <PageTitleAndSubtitle title="Documents List" />
+
       <Stack spacing={1}>
         {documents.length === 0 && <Typography>No documents found.</Typography>}
+
         {documents.map((doc) => (
           <DocumentItem
             key={doc.id}
             document={doc}
-            onApprove={handleApprove}
-            onReject={handleRejectInitiate}
+            onApprove={isCoordinator ? handleApprove : undefined}
+            onReject={isCoordinator ? handleRejectInitiate : undefined}
           />
         ))}
       </Stack>
 
-      <Dialog
-        open={rejectDialog.open}
-        onClose={() => setRejectDialog({ open: false, documentId: null })}
-      >
-        <DialogTitle>Reject Document</DialogTitle>
-        <DialogContent>
-          <TextField
-            fullWidth
-            label="Reason for rejection"
-            multiline
-            rows={3}
-            value={rejectionReason}
-            onChange={(e) => setRejectionReason(e.target.value)}
-            sx={{ mt: 1 }}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setRejectDialog({ open: false, documentId: null })}>Cancel</Button>
-          <Button
-            onClick={handleRejectConfirm}
-            variant="contained"
-            color="error"
-            disabled={!rejectionReason}
-          >
-            Reject
-          </Button>
-        </DialogActions>
-      </Dialog>
+      {isCoordinator && (
+        <Dialog
+          open={rejectDialog.open}
+          onClose={() =>
+            setRejectDialog({
+              open: false,
+              documentId: null,
+            })
+          }
+        >
+          <DialogTitle>Reject Document</DialogTitle>
+
+          <DialogContent>
+            <TextField
+              fullWidth
+              label="Reason for rejection"
+              multiline
+              rows={3}
+              value={rejectionReason}
+              onChange={(event) => setRejectionReason(event.target.value)}
+              sx={{ mt: 1 }}
+            />
+          </DialogContent>
+
+          <DialogActions>
+            <Button
+              onClick={() =>
+                setRejectDialog({
+                  open: false,
+                  documentId: null,
+                })
+              }
+            >
+              Cancel
+            </Button>
+
+            <Button
+              onClick={handleRejectConfirm}
+              variant="contained"
+              color="error"
+              disabled={!rejectionReason.trim()}
+            >
+              Reject
+            </Button>
+          </DialogActions>
+        </Dialog>
+      )}
     </Box>
   )
 }

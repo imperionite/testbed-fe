@@ -46,7 +46,9 @@ const createHteValidationSchema = z.object({
   ),
 
   contact_number: optionalNullableString(20, 'Contact number must be at most 20 characters').refine(
-    (value) => value == null || /^(09|\+639)\d{9}$/.test(value),
+    (value) =>
+      value == null ||
+      /^(09\d{9}|09\d{2}-\d{3}-\d{4}|\+639\d{9}|\+639\d{2}-\d{3}-\d{4})$/.test(value),
     'Contact number must be a valid Philippine mobile number (e.g. 09171234567)',
   ),
 })
@@ -64,7 +66,9 @@ const editHteValidationSchema = z.object({
   ),
 
   contact_number: optionalNullableString(20, 'Contact number must be at most 20 characters').refine(
-    (value) => value == null || /^(09|\+639)\d{9}$/.test(value),
+    (value) =>
+      value == null ||
+      /^(09\d{9}|09\d{2}-\d{3}-\d{4}|\+639\d{9}|\+639\d{2}-\d{3}-\d{4})$/.test(value),
     'Contact number must be a valid Philippine mobile number (e.g. 09171234567)',
   ),
 

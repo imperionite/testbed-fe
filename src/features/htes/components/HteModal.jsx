@@ -128,7 +128,6 @@ export default function HteModal({
       </DialogTitle>
 
       <DialogContent dividers>
-        {error && <Alert severity="error">{error}</Alert>}
         <HteForm
           key={mode}
           role={viewerRole}
@@ -138,6 +137,8 @@ export default function HteModal({
           onSubmit={handleSubmit}
           onInvalid={() => setIsSaving(false)}
         />
+
+        {error && <Alert severity="error">{error}</Alert>}
       </DialogContent>
 
       <DialogActions>
