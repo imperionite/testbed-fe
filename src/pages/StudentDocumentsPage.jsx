@@ -16,7 +16,11 @@ export default function StudentDocumentsPage() {
   const { isStudent, isHteSupervisor, isFacultyAdviser, isReadOnlyStaff } = useUiPermissions()
 
   // 1. Student profile query
-  const { data: studentProfile, isLoading: isStudentLoading, isError: isStudentError } = useStudents(user?.role)
+  const {
+    data: studentProfile,
+    isLoading: isStudentLoading,
+    isError: isStudentError,
+  } = useStudents(user?.role)
 
   // 2. HTE Supervisor students query
   const hteStudentsQuery = useQuery({
@@ -60,34 +64,42 @@ export default function StudentDocumentsPage() {
       return (hteStudentsQuery.data ?? []).map(toInternshipOption).filter(Boolean)
     }
     if (isFacultyAdviser) {
-      return (facultyStudentsQuery.data ?? []).map((student) =>
-        toInternshipOption({
-          ...student,
-          internship_id: student.currentInternship?.id,
-        }),
-      ).filter(Boolean)
+      return (facultyStudentsQuery.data ?? [])
+        .map((student) =>
+          toInternshipOption({
+            ...student,
+            internship_id: student.currentInternship?.id,
+          }),
+        )
+        .filter(Boolean)
     }
     if (isReadOnlyStaff) {
-      return (staffInternshipsQuery.data ?? []).map((internship) => {
-        const student = studentMap[internship.student_id] ?? {}
-        const profile = student.profiles ?? student
-        const studentName = [
-          profile.first_name,
-          profile.middle_name,
-          profile.last_name,
-          profile.suffix,
-        ]
-          .filter(Boolean)
-          .join(' ') || internship.student_id
+      return (staffInternshipsQuery.data ?? [])
+        .map((internship) => {
+          const student = studentMap[internship.student_id] ?? {}
+          const profile = student.profiles ?? student
+          const studentName =
+            [profile.first_name, profile.middle_name, profile.last_name, profile.suffix]
+              .filter(Boolean)
+              .join(' ') || internship.student_id
 
-        return {
-          internshipId: internship.id,
-          studentName,
-        }
-      }).filter(Boolean)
+          return {
+            internshipId: internship.id,
+            studentName,
+          }
+        })
+        .filter(Boolean)
     }
     return []
-  }, [isHteSupervisor, isFacultyAdviser, isReadOnlyStaff, hteStudentsQuery.data, facultyStudentsQuery.data, staffInternshipsQuery.data, studentMap])
+  }, [
+    isHteSupervisor,
+    isFacultyAdviser,
+    isReadOnlyStaff,
+    hteStudentsQuery.data,
+    facultyStudentsQuery.data,
+    staffInternshipsQuery.data,
+    studentMap,
+  ])
 
   const currentSelectionId = selectedInternshipId || internshipOptions[0]?.internshipId || ''
 
@@ -149,4 +161,3 @@ export default function StudentDocumentsPage() {
     </Box>
   )
 }
-
