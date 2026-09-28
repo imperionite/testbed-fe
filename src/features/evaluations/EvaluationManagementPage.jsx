@@ -29,14 +29,22 @@ import { EVALUATION_STATUSES } from '../../shared/constants/constants'
 
 export default function EvaluationManagementPage() {
   const { isHteSupervisor, isFacultyAdviser, isStudent, isReadOnlyStaff } = useUiPermissions()
-  
+
   const isEvaluator = isHteSupervisor || isFacultyAdviser
 
-  const role = isHteSupervisor ? 'hte_supervisor' : isFacultyAdviser ? 'faculty_adviser' : isStudent ? 'student' : isReadOnlyStaff ? 'administrator' : 'guest'
+  const role = isHteSupervisor
+    ? 'hte_supervisor'
+    : isFacultyAdviser
+      ? 'faculty_adviser'
+      : isStudent
+        ? 'student'
+        : isReadOnlyStaff
+          ? 'administrator'
+          : 'guest'
 
   // Fetch all students to map IDs to Names
   const { data: students = [] } = useUsers({ enabled: isReadOnlyStaff })
-  
+
   const studentMap = useMemo(() => {
     return students.reduce((acc, student) => {
       acc[student.id] = student
@@ -193,7 +201,9 @@ export default function EvaluationManagementPage() {
 
   const draftCount = evaluations.filter((item) => item.status === EVALUATION_STATUSES.DRAFT).length
 
-  const submittedCount = evaluations.filter((item) => item.status === EVALUATION_STATUSES.SUBMITTED).length
+  const submittedCount = evaluations.filter(
+    (item) => item.status === EVALUATION_STATUSES.SUBMITTED,
+  ).length
 
   return (
     <Box>
@@ -315,9 +325,11 @@ export default function EvaluationManagementPage() {
             evaluations={evaluations}
             readOnly={!isEvaluator}
             onRowClick={(evaluation) => {
+              const isDraft = evaluation.status === EVALUATION_STATUSES.DRAFT
+              const mode = isEvaluator && isDraft ? MODES.EDIT : MODES.VIEW
               setModal({
                 open: true,
-                mode: MODES.VIEW,
+                mode: mode,
                 evaluation,
               })
             }}

@@ -6,6 +6,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Typography,
 } from '@mui/material'
 
 import EvaluationForm from './EvaluationForm'
@@ -157,6 +158,21 @@ export default function EvaluationModal({
             onSubmit={handleFormSubmit}
           />
         </DialogContent>
+
+        {isView && (
+          <DialogActions
+            sx={{
+              justifyContent: 'space-between',
+              px: 3,
+              py: 2,
+            }}
+          >
+            <Typography variant="body2">Submitted (view only)</Typography>
+            <Button onClick={onClose} color="inherit">
+              Close
+            </Button>
+          </DialogActions>
+        )}
 
         {!isView && (
           <DialogActions>

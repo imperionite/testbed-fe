@@ -51,7 +51,7 @@ describe('InternshipForm Payload Structure', () => {
     render(
       <QueryClientProvider client={queryClient}>
         <InternshipForm mode={MODES.EDIT} internship={mockInternship} onClose={() => {}} />
-      </QueryClientProvider>
+      </QueryClientProvider>,
     )
 
     expect(screen.getByText('Pending')).toBeDefined()

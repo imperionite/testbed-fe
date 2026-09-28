@@ -48,7 +48,11 @@ export function useInternshipsData() {
     internshipMe: internshipMeQuery.data || [],
     studentMap,
     adviserMap,
-    isLoading: internshipsQuery.isLoading || studentsQuery.isLoading || advisersQuery.isLoading || internshipMeQuery.isLoading,
+    isLoading:
+      internshipsQuery.isLoading ||
+      studentsQuery.isLoading ||
+      advisersQuery.isLoading ||
+      internshipMeQuery.isLoading,
     isError: internshipsQuery.isError || studentsQuery.isError || advisersQuery.isError,
     refetch: internshipsQuery.refetch,
   }

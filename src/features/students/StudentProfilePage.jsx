@@ -84,7 +84,7 @@ export default function StudentProfilePage() {
     }
   }
 
-  const internshipStatus = student.currentInternship?.status || 'pending'
+  const internshipStatus = student.currentInternship?.status
 
   return (
     <Box sx={{ p: 3, bgcolor: 'background.default', minHeight: '100vh' }}>
@@ -139,10 +139,14 @@ export default function StudentProfilePage() {
               <Typography variant="subtitle2" color="textSecondary">
                 Internship Status
               </Typography>
-              <Chip
-                label={toSentenceCase(internshipStatus)}
-                color={internshipStatus === 'active' ? 'success' : 'default'}
-              />
+              {!internshipStatus ? (
+                <Typography variant="body2">No Internship</Typography>
+              ) : (
+                <Chip
+                  label={toSentenceCase(internshipStatus)}
+                  color={internshipStatus === 'active' ? 'success' : 'default'}
+                />
+              )}
             </Box>
           </Stack>
 

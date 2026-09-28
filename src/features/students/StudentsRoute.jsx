@@ -3,13 +3,13 @@ import { useUiPermissions } from '../shared/hooks/useUiPermissions'
 import StudentManagementPage from './StudentManagementPage'
 
 export default function StudentsRoute() {
-  const { isStudent, isReadOnlyStaff } = useUiPermissions()
+  const { isStudent, isReadOnlyStaff, isFacultyAdviser } = useUiPermissions()
 
   if (isStudent) {
     return <Navigate to="/students/me" replace />
   }
 
-  if (isReadOnlyStaff) {
+  if (isReadOnlyStaff || isFacultyAdviser) {
     return <StudentManagementPage />
   }
 
