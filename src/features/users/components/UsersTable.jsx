@@ -96,7 +96,7 @@ export function UsersTable({
           }}
           size="small"
         >
-          <EditIcon fontSize="small" />
+          <EditIcon />
         </IconButton>
       </Tooltip>
     ),

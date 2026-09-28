@@ -4,9 +4,9 @@ import { BrowserRouter } from 'react-router-dom'
 import { ThemeContextProvider } from './providers/ThemeContext'
 import QueryProvider from './providers/QueryProvider'
 import { Toaster } from 'react-hot-toast'
+import ErrorBoundary from './pages/ErrorBoundary.jsx'
 
 import '@fontsource/atkinson-hyperlegible'
-
 import './index.css'
 import App from './App.jsx'
 
@@ -30,19 +30,22 @@ async function prepare() {
 prepare().then(() => {
   createRoot(document.getElementById('root')).render(
     <StrictMode>
-      <BrowserRouter>
-        <ThemeContextProvider>
-          <QueryProvider>
-            <App />
-          </QueryProvider>
-          <Toaster
-            position="top-center"
-            toastOptions={{
-              duration: 4000,
-            }}
-          />
-        </ThemeContextProvider>
-      </BrowserRouter>
+      <ErrorBoundary>
+        <BrowserRouter>
+          <ThemeContextProvider>
+            <QueryProvider>
+              <App />
+            </QueryProvider>
+
+            <Toaster
+              position="top-center"
+              toastOptions={{
+                duration: 4000,
+              }}
+            />
+          </ThemeContextProvider>
+        </BrowserRouter>
+      </ErrorBoundary>
     </StrictMode>,
   )
 })

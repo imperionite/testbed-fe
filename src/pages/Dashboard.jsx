@@ -1,8 +1,9 @@
-import { Box, Paper, Stack, Typography } from '@mui/material'
+import { Box, Card, Stack, Typography } from '@mui/material'
 
 import useAuth from '../hooks/useAuth'
 import StudentDashboard from '../features/attendance/components/StudentDashboard'
 import { useStudents } from '../features/students/hooks/useStudents'
+import { formatSentenceCase } from '../features/shared/fieldFormatters'
 
 const roleDashboard = {
   administrator: {
@@ -48,7 +49,7 @@ export default function Dashboard() {
         position: 'relative',
       }}
     >
-      <Paper
+      <Card
         sx={{
           p: 4,
           mb: 3,
@@ -65,9 +66,9 @@ export default function Dashboard() {
 
           <Typography color="text.secondary">{dashboard.description}</Typography>
 
-          <Typography variant="body2">Role: {user.role}</Typography>
+          <Typography variant="body2">Role: {formatSentenceCase(user.role)}</Typography>
         </Stack>
-      </Paper>
+      </Card>
 
       {user.role === 'student' && studentProfile?.currentInternship?.id && (
         <StudentDashboard internshipId={studentProfile.currentInternship.id} />

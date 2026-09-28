@@ -1,5 +1,6 @@
-import { Box, Typography } from '@mui/material'
+import { Box } from '@mui/material'
 import { AuditTable, useAuditLogs } from '../features/audit'
+import PageTitleAndSubtitle from '../features/shared/components/PageTitleAndSubtitle'
 
 export default function AuditLogsPage() {
   const { data: logsPage } = useAuditLogs()
@@ -8,11 +9,11 @@ export default function AuditLogsPage() {
   const logs = logsPage?.items || []
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Typography variant="h4" fontWeight={700} gutterBottom>
-        System Audit Logs
-      </Typography>
-      <AuditTable data={logs} />
+    <Box>
+      <PageTitleAndSubtitle title="System Audit Logs" subtitle="Review system activity and user actions." />
+        <Box sx={{ width: '100%', mt:{xs:2.5, lg:3} }}>
+        <AuditTable data={logs} />
+      </Box>
     </Box>
   )
 }

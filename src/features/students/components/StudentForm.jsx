@@ -106,7 +106,6 @@ export default function StudentForm({
       yearLevel: Number(data.yearLevel),
     }
 
-    // Remove the original camelCase fields to avoid sending duplicate/unnecessary data
     delete cleanedData.firstName
     delete cleanedData.middleName
     delete cleanedData.lastName

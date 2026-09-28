@@ -38,7 +38,7 @@ export default function FacultyStudentDetailsModal({ open, student, onClose }) {
       <DialogTitle>Student Intern Details</DialogTitle>
 
       <DialogContent dividers>
-        <Typography variant="overline" component="h3" color="text.secondary">
+        <Typography variant="h6" fontWeight={600} gutterBottom color="primary">
           Student
         </Typography>
         <Grid container spacing={2} sx={{ mb: 3, mt: 2 }}>
@@ -75,7 +75,7 @@ export default function FacultyStudentDetailsModal({ open, student, onClose }) {
         </Grid>
 
         <Divider sx={{ mb: 2, mt: 1 }} />
-        <Typography variant="overline" component="h3" color="text.secondary">
+        <Typography variant="h6" fontWeight={600} gutterBottom color="primary">
           Internship
         </Typography>
         <Grid container spacing={2} sx={{ mb: 3, mt: 2 }}>

@@ -6,6 +6,7 @@ import { formatSentenceCase } from '../../shared/fieldFormatters'
 import { BadgeStatus } from '../../internships/components/BadgeStatus'
 import { formatUserDate } from '../../shared/fieldFormatters'
 import VisibilityIcon from '@mui/icons-material/Visibility'
+import { defaultTableConfig } from '../../shared/config/defaultTableConfig'
 
 export default function StudentTable({ data, onEdit, onView, role }) {
   const columns = useMemo(() => {
@@ -197,15 +198,28 @@ export default function StudentTable({ data, onEdit, onView, role }) {
 
   return (
     <MaterialReactTable
+      {...defaultTableConfig}
       columns={columns}
       data={data || []}
       initialState={{
-        pagination: { pageSize: 25, pageIndex: 0 },
-        columnPinning: { right: ['actions'] },
+        ...(defaultTableConfig.initialState || {}),
+        columnPinning: {
+          right: ['actions'],
+        },
       }}
-      enableStickyHeader
-      enableColumnPinning
-      muiTableContainerProps={{ sx: { maxHeight: '500px' } }}
+      muiTableContainerProps={{
+        sx: {
+          maxHeight: '500px',
+        },
+      }}
+      // displayColumnDefOptions={{
+      //   actions: {
+      //     sx: {
+      //       maxWidth: 50,
+      //       whiteSpace: 'nowrap',
+      //     },
+      //   },
+      // }}
     />
   )
 }

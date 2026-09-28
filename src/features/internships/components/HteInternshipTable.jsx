@@ -4,6 +4,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility'
 import { formatUserDate } from '../../shared/fieldFormatters'
 import { BadgeStatus } from './BadgeStatus'
 import { formatSentenceCase } from '../../shared/fieldFormatters'
+import { defaultTableConfig } from '../../shared/config/defaultTableConfig'
 
 const defaultEmptyCellValue = '–'
 
@@ -158,10 +159,11 @@ export default function HteInternshipTable({ data, onView }) {
   ]
 
   const table = useMaterialReactTable({
+    ...defaultTableConfig,
     columns: columns,
     data: data || [],
     initialState: {
-      pagination: { pageSize: 25, pageIndex: 0 },
+      ...defaultTableConfig.initialState,
       columnPinning: { right: ['actions'] },
       columnVisibility: {
         internship_id: false,
@@ -169,10 +171,6 @@ export default function HteInternshipTable({ data, onView }) {
         updated_at: false,
       },
     },
-    enableStickyHeader: true,
-    enableColumnOrdering: true,
-    enableGrouping: true,
-    enableColumnPinning: true,
     muiTableContainerProps: { sx: { maxHeight: '500px' } },
     enableExpanding: true,
     renderDetailPanel: ({ row }) => (

@@ -7,7 +7,7 @@ import {
   // Stack,
   // Button,
   // Chip,
-  Paper,
+  // Paper,
 } from '@mui/material'
 // import AddIcon from '@mui/icons-material/Add'
 // import AccessTimeIcon from '@mui/icons-material/AccessTime'
@@ -69,7 +69,7 @@ export default function StudentDashboard({ internshipId }) {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
       {/* Attendance Section */}
-      <Paper variant="outlined" sx={{ borderRadius: 2 }}>
+      {/* <Paper variant="outlined" sx={{ borderRadius: 2 }}> */}
         {isAttendanceLoading ? (
           <Typography color="text.secondary" sx={{ py: 4, textAlign: 'center' }}>
             Loading attendance records...
@@ -86,7 +86,7 @@ export default function StudentDashboard({ internshipId }) {
             renderedHours={renderedHours?.totalHours || 0}
           />
         )}
-      </Paper>
+      {/* </Paper> */}
 
       {/* Reusable Form Modal for Create & Edit */}
       <AttendanceFormModal
