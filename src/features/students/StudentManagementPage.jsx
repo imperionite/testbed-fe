@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Box, Typography, CircularProgress, Alert, Button } from '@mui/material'
+import { Box, Typography, CircularProgress, Alert, Button, Grid } from '@mui/material'
 import { Add as AddIcon } from '@mui/icons-material'
 import CardStat from '../shared/components/CardStat'
 import StudentTable from './components/StudentTable'
@@ -16,10 +16,11 @@ import { mapStudentData } from './utils/studentUtils'
 import { useUiPermissions } from '../shared/hooks/useUiPermissions'
 import FacultyStudentDetailsModal from './components/FacultyStudentDetailsModal'
 import notify from '../../utils/toast'
+import PageTitleAndSubtitle from '../shared/components/PageTitleAndSubtitle'
 
 export default function StudentManagementPage() {
   const { user, isLoading: isAuthLoading } = useAuth()
-  const { isReadOnlyStaff } = useUiPermissions()
+  const { isReadOnlyStaff, isFacultyAdviser } = useUiPermissions()
   const {
     data: students,
     isLoading: isStudentsLoading,
@@ -104,18 +105,28 @@ export default function StudentManagementPage() {
     )
 
   return (
-    <Box sx={{ minHeight: '100vh' }}>
+    <Box>
       <Box
         sx={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          mb: 3,
+          flexWrap: 'wrap',
+          gap: 1,
+          mb: 2,
+          width: '100%',
         }}
       >
-        <Typography variant="h5" fontWeight={600}>
-          Student Records
-        </Typography>
+        <PageTitleAndSubtitle
+          title="Student Records"
+          subtitle={
+            isReadOnlyStaff
+              ? 'Manage student records and related information.'
+              : isFacultyAdviser
+                ? "View your assigned students' records."
+                : ' '
+          }
+        />
         {permissions.canCreate && (
           <Button
             startIcon={<AddIcon />}
@@ -127,16 +138,19 @@ export default function StudentManagementPage() {
         )}
       </Box>
 
-      <Box
-        sx={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-          gap: 2,
-          mb: 4,
-        }}
-      >
-        <CardStat title="Total Student Records" value={mergedStudents.length} />
-      </Box>
+      {/* Stats Cards */}
+      <Grid container spacing={1} sx={{ mb: { xs: 2.5, lg: 3 } }}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 6,
+            md: 4.5,
+            lg: 2.5,
+          }}
+        >
+          <CardStat title="Total Student Records" value={mergedStudents.length} />
+        </Grid>
+      </Grid>
 
       <StudentTable
         data={mergedStudents}

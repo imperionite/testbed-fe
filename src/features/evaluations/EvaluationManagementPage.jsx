@@ -8,7 +8,7 @@ import {
   Paper,
   Stack,
   TextField,
-  Typography,
+  Grid,
 } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
 
@@ -26,6 +26,7 @@ import { useEvaluationMutations } from './hooks/useEvaluationMutations'
 import { useUsers } from '../users/hooks/useUsers'
 import notify from '../../utils/toast'
 import { EVALUATION_STATUSES } from '../../shared/constants/constants'
+import PageTitleAndSubtitle from '../shared/components/PageTitleAndSubtitle'
 
 export default function EvaluationManagementPage() {
   const { isHteSupervisor, isFacultyAdviser, isStudent, isReadOnlyStaff } = useUiPermissions()
@@ -206,154 +207,173 @@ export default function EvaluationManagementPage() {
   ).length
 
   return (
-    <Box>
-      <Stack spacing={2}>
-        {/* ----------------------------------------------------
+    <Stack spacing={2}>
+      {/* ----------------------------------------------------
             Page Header
         ----------------------------------------------------- */}
-        <Stack
-          direction={{
-            xs: 'column',
-            sm: 'row',
-          }}
-          spacing={2}
-          sx={{
-            justifyContent: 'space-between',
-            alignItems: {
-              xs: 'stretch',
-              sm: 'center',
-            },
-          }}
-        >
-          <Box>
-            <Typography variant="h5" fontWeight={600}>
-              Evaluations
-            </Typography>
-
-            <Typography variant="body2" color="text.secondary">
-              {isEvaluator
+      <Stack
+        direction={{
+          xs: 'column',
+          sm: 'row',
+        }}
+        spacing={2}
+        sx={{
+          justifyContent: 'space-between',
+          alignItems: {
+            xs: 'stretch',
+            sm: 'center',
+          },
+        }}
+      >
+        <Box>
+          <PageTitleAndSubtitle
+            title="Evaluations"
+            subtitle={
+              isEvaluator
                 ? 'Manage your assigned internship evaluations.'
                 : isStudent
                   ? 'View submitted evaluation results for your internship.'
-                  : 'View evaluation records by internship.'}
-            </Typography>
-          </Box>
+                  : 'View evaluation records by internship.'
+            }
+          />
+        </Box>
 
-          {permissions.canCreate && (
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={openCreate}
-              sx={{
-                width: { xs: '100%', sm: 'auto' },
-                alignSelf: { xs: 'stretch', sm: 'center' },
-              }}
-            >
-              New Evaluation
-            </Button>
-          )}
-        </Stack>
-
-        {/* ----------------------------------------------------
-            Admin / Coordinator internship selector
-        ----------------------------------------------------- */}
-        {isReadOnlyStaff && (
-          <Paper sx={{ p: 2 }}>
-            <TextField
-              select
-              fullWidth
-              size="small"
-              label="Select Internship"
-              value={selectedInternshipId}
-              onChange={(event) => setSelectedInternshipId(event.target.value)}
-            >
-              <MenuItem value="">
-                <em>Select internship</em>
-              </MenuItem>
-
-              {staffInternships.map((internship) => (
-                <MenuItem key={internship.id} value={internship.id}>
-                  {internshipLabels[internship.id] ?? internship.id}
-                </MenuItem>
-              ))}
-            </TextField>
-          </Paper>
-        )}
-
-        {/* ----------------------------------------------------
-            Statistics
-        ----------------------------------------------------- */}
-        <Stack
-          direction={{
-            xs: 'column',
-            sm: 'row',
-          }}
-          spacing={2}
-        >
-          <CardStat title="Total Evaluations" value={evaluations.length} />
-
-          <CardStat title="Draft" value={draftCount} />
-
-          <CardStat title="Submitted" value={submittedCount} />
-        </Stack>
-
-        {/* ----------------------------------------------------
-            Loading
-        ----------------------------------------------------- */}
-        {isLoading ? (
-          <Box
+        {permissions.canCreate && (
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={openCreate}
             sx={{
-              display: 'flex',
-              justifyContent: 'center',
-              py: 5,
+              width: { xs: '100%', sm: 'auto' },
+              alignSelf: { xs: 'stretch', sm: 'center' },
             }}
           >
-            <CircularProgress />
-          </Box>
-        ) : isError ? (
-          <Alert severity="error">
-            {error?.response?.data?.message ?? error?.message ?? 'Unable to load evaluations.'}
-          </Alert>
-        ) : isReadOnlyStaff && !selectedInternshipId ? (
-          <Alert severity="info">Select an internship to view its evaluations.</Alert>
-        ) : evaluations.length === 0 ? (
-          <Alert severity="info">
-            {isStudent ? 'No submitted evaluations are available yet.' : 'No evaluations found.'}
-          </Alert>
-        ) : (
-          <EvaluationTable
-            evaluations={evaluations}
-            readOnly={!isEvaluator}
-            onRowClick={(evaluation) => {
-              const isDraft = evaluation.status === EVALUATION_STATUSES.DRAFT
-              const mode = isEvaluator && isDraft ? MODES.EDIT : MODES.VIEW
-              setModal({
-                open: true,
-                mode: mode,
-                evaluation,
-              })
-            }}
-          />
-        )}
-
-        {/* ----------------------------------------------------
-            Evaluation Modal
-        ----------------------------------------------------- */}
-        {permissions.canView && (
-          <EvaluationModal
-            open={modal.open}
-            onClose={closeModal}
-            mode={modal.mode}
-            role={role}
-            evaluation={modal.evaluation}
-            internshipOptions={internshipOptions}
-            onCreate={createEvaluation.mutateAsync}
-            onUpdate={updateEvaluation.mutateAsync}
-            onSubmitEvaluation={submitEvaluation.mutateAsync}
-            onSuccess={notify.success}
-          />
+            New Evaluation
+          </Button>
         )}
       </Stack>
-    </Box>
+
+      {/* ----------------------------------------------------
+            Admin / Coordinator internship selector
+        ----------------------------------------------------- */}
+      {isReadOnlyStaff && (
+        <Paper sx={{ p: 2 }}>
+          <TextField
+            select
+            fullWidth
+            size="small"
+            label="Select Internship"
+            value={selectedInternshipId}
+            onChange={(event) => setSelectedInternshipId(event.target.value)}
+          >
+            <MenuItem value="">
+              <em>Select internship</em>
+            </MenuItem>
+
+            {staffInternships.map((internship) => (
+              <MenuItem key={internship.id} value={internship.id}>
+                {internshipLabels[internship.id] ?? internship.id}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Paper>
+      )}
+
+      {/* ----------------------------------------------------
+            Statistics
+        ----------------------------------------------------- */}
+
+      <Grid container spacing={1}>
+        <Grid
+          size={{
+            xs: 12,
+            md: 3,
+            lg: 2.4,
+          }}
+        >
+          <CardStat title="Total Evaluations" value={evaluations.length} />
+        </Grid>
+
+        {!isStudent && (
+          <Grid
+            size={{
+              xs: 6,
+              md: 3,
+              lg: 2.4,
+            }}
+          >
+            <CardStat title="Draft" value={draftCount} />
+          </Grid>
+        )}
+
+        {!isStudent && (
+          <Grid
+            size={{
+              xs: 6,
+              md: 3,
+              lg: 2.4,
+            }}
+          >
+            <CardStat title="Submitted" value={submittedCount} />
+          </Grid>
+        )}
+      </Grid>
+
+      {/* ----------------------------------------------------
+            Loading
+        ----------------------------------------------------- */}
+      {isLoading ? (
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+          }}
+        >
+          <CircularProgress />
+        </Box>
+      ) : isError ? (
+        <Alert severity="error">
+          {error?.response?.data?.message ?? error?.message ?? 'Unable to load evaluations.'}
+        </Alert>
+      ) : isReadOnlyStaff && !selectedInternshipId ? (
+        <Alert severity="info">Select an internship to view its evaluations.</Alert>
+      ) : evaluations.length === 0 ? (
+        <Alert severity="info">
+          {isStudent ? 'No submitted evaluations are available yet.' : 'No evaluations found.'}
+        </Alert>
+      ) : (
+        <EvaluationTable
+          evaluations={evaluations}
+          readOnly={!isEvaluator}
+          onRowClick={(evaluation) => {
+            const isDraft = evaluation.status === EVALUATION_STATUSES.DRAFT
+            const mode = isEvaluator && isDraft ? MODES.EDIT : MODES.VIEW
+            setModal({
+              open: true,
+              mode: mode,
+              evaluation,
+            })
+          }}
+        />
+      )}
+
+      {/* ----------------------------------------------------
+            Evaluation Modal
+        ----------------------------------------------------- */}
+      {permissions.canView && (
+        <EvaluationModal
+          open={modal.open}
+          onClose={closeModal}
+          mode={modal.mode}
+          role={role}
+          evaluation={modal.evaluation}
+          internshipOptions={internshipOptions}
+          onCreate={createEvaluation.mutateAsync}
+          onUpdate={updateEvaluation.mutateAsync}
+          onSubmitEvaluation={submitEvaluation.mutateAsync}
+          onSuccess={notify.success}
+        />
+      )}
+    </Stack>
   )
 }

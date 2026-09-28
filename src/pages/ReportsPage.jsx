@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import {
   Box,
-  Typography,
   Button,
   Dialog,
   DialogTitle,
@@ -16,6 +15,7 @@ import DownloadIcon from '@mui/icons-material/Download'
 import Papa from 'papaparse'
 import { jsPDF } from 'jspdf'
 import autoTable from 'jspdf-autotable'
+import PageTitleAndSubtitle from '../features/shared/components/PageTitleAndSubtitle'
 
 import {
   ReportSummaryCards,
@@ -103,11 +103,19 @@ export default function ReportsPage() {
   }
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-        <Typography variant="h4" fontWeight={700}>
-          Internship Reports
-        </Typography>
+    <Box>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: 1,
+            mb: 2,
+            width: '100%',
+          }}
+        >
+          <PageTitleAndSubtitle title="Internship Reports" subtitle="View and download internship reports." />
         {isReadOnlyStaff && (
           <Button variant="contained" startIcon={<DownloadIcon />} onClick={handleOpen}>
             Download Report

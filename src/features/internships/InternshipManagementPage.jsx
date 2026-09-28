@@ -7,15 +7,17 @@ import {
   Stack,
   IconButton,
   Tooltip,
+  Grid,
 } from '@mui/material'
 import {
   Add as AddIcon,
   FilterList as FilterListIcon,
-  Edit as EditIcon,
+  // Edit as EditIcon,
   PersonAdd as PersonAddIcon,
   EditNote as EditNoteIcon,
-  History as HistoryIcon,
 } from '@mui/icons-material'
+import DateRangeIcon from '@mui/icons-material/DateRange';
+import DomainAddIcon from '@mui/icons-material/DomainAdd';
 import { useMaterialReactTable } from '@glebcha/material-react-table'
 import { useMemo, useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
@@ -29,6 +31,10 @@ import { useInternshipMutations } from './hooks/useInternshipMutations'
 import { useInternshipsData } from './hooks/useInternshipsData'
 import { MODES } from './form/formConfig'
 import { useUiPermissions } from '../shared/hooks/useUiPermissions'
+import PageTitleAndSubtitle from '../shared/components/PageTitleAndSubtitle'
+import { formatSentenceCase } from '../shared/fieldFormatters'
+import { defaultTableConfig } from '../shared/config/defaultTableConfig'
+// import { DateRangeIcon } from '@mui/x-date-pickers'
 
 function ProgressCell({ internshipId, requiredHours }) {
   const { isStudent, isCoordinator } = useUiPermissions()
@@ -54,7 +60,7 @@ function ProgressCell({ internshipId, requiredHours }) {
 }
 
 export default function InternshipManagementPage() {
-  const { isCoordinator } = useUiPermissions()
+  const { isCoordinator, isReadOnlyStaff } = useUiPermissions()
   const canEditAttendance = isCoordinator
 
   const [modalState, setModalState] = useState({
@@ -159,7 +165,7 @@ export default function InternshipManagementPage() {
         id: 'status',
         accessorKey: 'status',
         header: 'Status',
-        Cell: ({ cell }) => <BadgeStatus value={cell.getValue()} />,
+        Cell: ({ cell }) => <BadgeStatus value={formatSentenceCase(cell.getValue())} />,
       },
       {
         id: 'actions',
@@ -187,14 +193,14 @@ export default function InternshipManagementPage() {
                 size="small"
                 onClick={() => handleOpenModal(MODES.EDIT_DETAILS, row.original)}
               >
-                <EditIcon />
+                <DomainAddIcon />
               </IconButton>
             </Tooltip>
 
             {!!canEditAttendance && (
               <Tooltip title="View Attendance">
                 <IconButton size="small" onClick={() => handleOpenAttendance(row.original)}>
-                  <HistoryIcon />
+                  <DateRangeIcon />
                 </IconButton>
               </Tooltip>
             )}
@@ -215,19 +221,19 @@ export default function InternshipManagementPage() {
   }, [studentMap, adviserMap, canEditAttendance])
 
   const table = useMaterialReactTable({
+    ...defaultTableConfig,
     columns,
     data: internships,
-    enableSorting: true,
-    enableGrouping: true,
-    enableColumnFilters: true,
-    enablePagination: true,
-    enableHiding: false,
     enableColumnActions: false,
-    enableColumnPinning: true,
-    enableStickyHeader: true,
     positionActionsColumn: 'last',
+    initialState: {
+      ...defaultTableConfig.initialState,
+      columnPinning: {
+      right: ['actions'],
+    },
+    },
     displayColumnDefOptions: {
-      'mrt-row-actions': { size: 100 },
+      'actions': { size: 100 },
     },
     muiPaginationProps: {
       showFirstButton: false,
@@ -264,12 +270,27 @@ export default function InternshipManagementPage() {
   }
 
   return (
-    <Box sx={{ p: 3, bgcolor: 'background.default', minHeight: '100vh' }}>
+    <Box>
       {/* Header Section */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4" fontWeight={600}>
-          Internship Overview
-        </Typography>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: 1,
+          mb: 2,
+          width: '100%',
+        }}
+      >
+                <PageTitleAndSubtitle
+                  title="Internship Overview"
+                  subtitle={
+                    isReadOnlyStaff
+                      ? 'Manage the internship lifecycle.'
+                      : ' '
+                  }
+                />
         <Button
           variant="contained"
           startIcon={<AddIcon />}
@@ -280,25 +301,76 @@ export default function InternshipManagementPage() {
       </Box>
 
       {/* Summary Metrics */}
-      <Stack direction="row" spacing={2} sx={{ mb: 4 }}>
-        <CardStat
-          title="Deployed Interns"
-          value={internships.filter((i) => i.status === 'active').length}
-        />
-        <CardStat
-          title="Pending Interns"
-          value={internships.filter((i) => i.status === 'pending').length}
-        />
-        <CardStat
-          title="Completed Internships"
-          value={internships.filter((i) => i.status === 'completed').length}
-        />
-        <CardStat title="HTE Partners" value={new Set(internships.map((i) => i.hte_id)).size} />
-      </Stack>
+
+      <Grid container spacing={1}>
+        <Grid
+          size={{
+            xs: 6,
+            md: 3,
+            lg: 2.4,
+          }}
+        >
+          <CardStat
+            sx={{ height: '100%' }}
+            title="Deployed Interns"
+            value={internships.filter((i) => i.status === 'active').length}
+          />
+        </Grid>
+
+        <Grid
+          size={{
+            xs: 6,
+            md: 3,
+            lg: 2.4,
+          }}
+        >
+          <CardStat
+            sx={{ height: '100%' }}
+            title="Pending Interns"
+            value={internships.filter((i) => i.status === 'pending').length}
+          />
+        </Grid>
+
+        <Grid
+          size={{
+            xs: 6,
+            md: 3,
+            lg: 2.4,
+          }}
+        >
+          <CardStat
+            sx={{ height: '100%' }}
+            title="Completed Internships"
+            value={internships.filter((i) => i.status === 'completed').length}
+          />
+        </Grid>
+
+        <Grid
+          size={{
+            xs: 6,
+            md: 3,
+            lg: 2.4,
+          }}
+        >
+          <CardStat
+            sx={{ height: '100%' }}
+            title="HTE Partners"
+            value={new Set(internships.map((i) => i.hte_id)).size}
+          />
+        </Grid>
+      </Grid>
 
       {/* Toolbar & Controls */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-        <Typography variant="h6">Interns List</Typography>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          mt: { xs: 4, lg: 5 },
+          mb: 1,
+        }}
+      >
+        <PageTitleAndSubtitle title="Interns List" />
         <Button
           variant="outlined"
           startIcon={<FilterListIcon />}

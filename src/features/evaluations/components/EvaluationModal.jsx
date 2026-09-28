@@ -143,12 +143,6 @@ export default function EvaluationModal({
         </DialogTitle>
 
         <DialogContent dividers>
-          {error && (
-            <Alert severity="error" sx={{ mb: 2 }}>
-              {error}
-            </Alert>
-          )}
-
           <EvaluationForm
             id="evaluation-form"
             mode={mode}
@@ -157,6 +151,12 @@ export default function EvaluationModal({
             internshipOptions={internshipOptions}
             onSubmit={handleFormSubmit}
           />
+
+          {error && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {error}
+            </Alert>
+          )}
         </DialogContent>
 
         {isView && (

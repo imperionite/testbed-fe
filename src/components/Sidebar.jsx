@@ -16,7 +16,8 @@ import WorkOutlineOutlinedIcon from '@mui/icons-material/WorkOutlineOutlined'
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined'
 import AssessmentOutlinedIcon from '@mui/icons-material/AssessmentOutlined'
 import SecurityOutlinedIcon from '@mui/icons-material/SecurityOutlined'
-import FactCheckOutlinedIcon from '@mui/icons-material/FactCheckOutlined'
+// import FactCheckOutlinedIcon from '@mui/icons-material/FactCheckOutlined'
+import RateReviewOutlinedIcon from '@mui/icons-material/RateReviewOutlined';
 
 import { Link, useLocation } from 'react-router-dom'
 
@@ -65,7 +66,7 @@ const menuItems = [
   {
     label: 'Evaluations',
     path: '/evaluations',
-    icon: <FactCheckOutlinedIcon />,
+    icon: <RateReviewOutlinedIcon />,
     roles: [
       'hte_supervisor',
       'internship_coordinator',
@@ -110,7 +111,7 @@ export default function Sidebar({ role, mobileOpen, onMobileClose }) {
   const navigation = (
     <Box
       sx={{
-        width: { xs: 100, sm: 172, md: 188 },
+        width: { xs: 200, sm: 172, md: 188 },
         flexShrink: 0,
         alignSelf: 'stretch',
         borderRight: 1,

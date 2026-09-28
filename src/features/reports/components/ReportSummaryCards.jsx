@@ -1,5 +1,5 @@
-import { Paper, Typography, Grid } from '@mui/material'
-
+import { Grid } from '@mui/material'
+import CardStat from '../../shared/components/CardStat'
 export default function ReportSummaryCards({ summary }) {
   if (!summary) return null
 
@@ -13,17 +13,17 @@ export default function ReportSummaryCards({ summary }) {
   ]
 
   return (
-    <Grid container spacing={2} sx={{ mb: 4 }}>
+    <Grid container spacing={1} sx={{ width: '100%', mb:{xs:2.5, lg:3} }}>
       {cards.map((card, index) => (
-        <Grid xs={12} sm={6} md={4} lg={2} key={index}>
-          <Paper sx={{ p: 2, textAlign: 'center' }}>
-            <Typography variant="subtitle2" color="text.secondary">
-              {card.label}
-            </Typography>
-            <Typography variant="h5" fontWeight="bold">
-              {card.value}
-            </Typography>
-          </Paper>
+        <Grid
+          size={{
+            xs: 6,
+            md: 4,
+            lg: 2.5,
+          }}
+          key={index}
+        >
+          <CardStat sx={{ height: '100%' }} title={card.label} value={card.value} />
         </Grid>
       ))}
     </Grid>

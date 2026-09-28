@@ -5,6 +5,7 @@ import notify from '../utils/toast'
 import logo from '../assets/logo.webp'
 import useAuth, { useLogout } from '../hooks/useAuth'
 import { HeaderDropdownMenu } from './AppHeaderDropdownMenu'
+import { formatSentenceCase } from '../features/shared/fieldFormatters'
 
 export default function AppHeader({ onMenuClick }) {
   const { user } = useAuth()
@@ -110,7 +111,7 @@ export default function AppHeader({ onMenuClick }) {
             </Typography>
 
             <Typography variant="caption" color="text.secondary" noWrap>
-              {user?.role}
+              {formatSentenceCase(user?.role)}
             </Typography>
           </Box>
 
