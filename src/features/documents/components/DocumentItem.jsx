@@ -2,9 +2,10 @@ import { Box, Typography, Stack, IconButton, Tooltip, Button } from '@mui/materi
 import DownloadIcon from '@mui/icons-material/Download'
 import CheckIcon from '@mui/icons-material/Check'
 import CloseIcon from '@mui/icons-material/Close'
+import DeleteIcon from '@mui/icons-material/Delete'
 import { documentsApi } from '../../../api/documents'
 
-export default function DocumentItem({ document, onApprove, onReject }) {
+export default function DocumentItem({ document, onApprove, onReject, onDelete }) {
   const handleDownload = async () => {
     try {
       const { url } = await documentsApi.getDocumentDetails(document.id)
@@ -86,6 +87,14 @@ export default function DocumentItem({ document, onApprove, onReject }) {
             <DownloadIcon />
           </IconButton>
         </Tooltip>
+
+        {onDelete && (
+          <Tooltip title="Delete Document">
+            <IconButton onClick={() => onDelete(document.id)} size="small" color="error">
+              <DeleteIcon />
+            </IconButton>
+          </Tooltip>
+        )}
       </Stack>
     </Box>
   )
