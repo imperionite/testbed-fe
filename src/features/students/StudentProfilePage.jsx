@@ -13,9 +13,11 @@ import {
   Stack,
 } from '@mui/material'
 import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import useAuth from '../../hooks/useAuth'
 import { useStudents } from './hooks/useStudents'
 import { useStudentMutations } from './hooks/useStudentMutations'
+import { StudentValidationSchema } from './form/StudentValidationSchema'
 import { toSentenceCase } from './utils/formatters'
 
 export default function StudentProfilePage() {
@@ -24,7 +26,20 @@ export default function StudentProfilePage() {
   const { onUpdate } = useStudentMutations()
   const [isEditing, setIsEditing] = useState(false)
 
-  const { register, handleSubmit, reset } = useForm({
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(
+      StudentValidationSchema.pick({
+        contactNumber: true,
+        address: true,
+        emergencyContactName: true,
+        emergencyContactNumber: true,
+      }),
+    ),
     defaultValues: {
       contactNumber: student?.contact_number || '',
       address: student?.address || '',
@@ -107,8 +122,15 @@ export default function StudentProfilePage() {
                 <Button onClick={() => setIsEditing(false)} sx={{ mr: 1 }}>
                   Cancel
                 </Button>
-                <Button variant="contained" color="success" onClick={handleSubmit(onSubmit)}>
-                  Save Changes
+                <Button
+                  variant="contained"
+                  onClick={handleSubmit(onSubmit)}
+                  disabled={onUpdate.isPending}
+                  startIcon={
+                    onUpdate.isPending ? <CircularProgress size={18} color="inherit" /> : null
+                  }
+                >
+                  {onUpdate.isPending ? 'Saving...' : 'Save Changes'}
                 </Button>
               </Box>
             )}
@@ -162,7 +184,14 @@ export default function StudentProfilePage() {
                   {field.label}
                 </Typography>
                 {isEditing ? (
-                  <TextField fullWidth {...register(field.name)} size="small" margin="dense" />
+                  <TextField
+                    fullWidth
+                    {...register(field.name)}
+                    size="small"
+                    margin="dense"
+                    error={!!errors[field.name]}
+                    helperText={errors[field.name]?.message}
+                  />
                 ) : (
                   <Typography variant="body1">{field.value || 'N/A'}</Typography>
                 )}

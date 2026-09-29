@@ -1,7 +1,8 @@
 import {
   Box,
   Typography,
-  CircularProgress,
+  // CircularProgress,
+  Skeleton,
   Alert,
   Card,
   CardContent,
@@ -37,7 +38,7 @@ export default function StudentInternshipProfilePage() {
   if (isAuthLoading || isInternshipLoading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-        <CircularProgress />
+        <Skeleton variant="rounded" animation="wave" />
       </Box>
     )
   }
@@ -128,7 +129,7 @@ export default function StudentInternshipProfilePage() {
                     Rendered Hours
                   </Typography>
                   <Typography variant="body1">
-                    {isRenderedLoading ? <CircularProgress size={16} /> : `${renderedHours} hrs`}
+                    {isRenderedLoading ? <Skeleton animation="wave" variant='rounded' width={30} /> : `${renderedHours} hrs`}
                   </Typography>
                 </Grid>
               </Grid>

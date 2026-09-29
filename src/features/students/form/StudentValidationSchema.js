@@ -15,22 +15,20 @@ export const StudentValidationSchema = z.object({
     .min(1, 'Year Level must be at least 1')
     .max(5, 'Year Level must be at most 5'),
   section: z.string().max(10, 'Section too long').optional().nullable(),
-  contactNumber: z.string().regex(phoneRegex, 'Invalid phone number format').optional().nullable(),
+  contactNumber: z
+    .union([z.string().regex(phoneRegex, 'Invalid phone number format'), z.literal('')])
+    .optional()
+    .nullable(),
   address: z
-    .string()
-    .min(5, 'Address too short')
-    .max(255, 'Address too long')
+    .union([z.string().min(5, 'Address too short').max(255, 'Address too long'), z.literal('')])
     .optional()
     .nullable(),
   emergencyContactName: z
-    .string()
-    .min(2, 'Name too short')
-    .max(100, 'Name too long')
+    .union([z.string().min(2, 'Name too short').max(100, 'Name too long'), z.literal('')])
     .optional()
     .nullable(),
   emergencyContactNumber: z
-    .string()
-    .regex(phoneRegex, 'Invalid phone number format')
+    .union([z.string().regex(phoneRegex, 'Invalid phone number format'), z.literal('')])
     .optional()
     .nullable(),
 })

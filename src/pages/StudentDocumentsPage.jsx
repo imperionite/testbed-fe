@@ -109,10 +109,11 @@ export default function StudentDocumentsPage() {
     if (isStudentError) return <Alert severity="error">Failed to load student profile.</Alert>
 
     return (
-      <Box sx={{ p: 3 }}>
-        <Typography variant="h4" fontWeight={700} gutterBottom>
-          My Documents
-        </Typography>
+      <Box>
+        <PageTitleAndSubtitle
+        title="My Documents"
+        subtitle="Track own iternship documents."
+      />
         {studentProfile?.currentInternship?.id ? (
           <StudentDocumentsView internshipId={studentProfile.currentInternship.id} />
         ) : (

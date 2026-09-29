@@ -37,6 +37,7 @@ export default function EvaluationForm({
   evaluation = null,
   internshipOptions = [],
   onSubmit,
+  onInvalid,
   formId = 'evaluation-form',
 }) {
   const isReadOnly = mode === 'view'
@@ -64,7 +65,12 @@ export default function EvaluationForm({
   }
 
   return (
-    <Stack component="form" id={formId} onSubmit={handleSubmit(submit)} spacing={2.5}>
+    <Stack
+      component="form"
+      id={formId}
+      onSubmit={handleSubmit(submit, onInvalid)}
+      spacing={2.5}
+    >
       {mode === 'create' && (
         <Controller
           name="internship_id"

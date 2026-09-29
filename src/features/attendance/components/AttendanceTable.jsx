@@ -82,7 +82,7 @@ export default function AttendanceTable({
     data: sortedData,
     initialState: {
       ...defaultTableConfig.initialState,
-      sorting: [{ id: 'attendance_date', desc: false }],
+      sorting: [{ id: 'attendance_date', desc: true }],
     },
     renderTopToolbarCustomActions: () => (
       <Box

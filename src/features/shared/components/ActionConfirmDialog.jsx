@@ -1,4 +1,11 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material'
+import {
+  Button,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+} from '@mui/material'
 
 // REUSABLE ACTION CONFIRM DIALOG
 // Props it accepts:
@@ -32,7 +39,13 @@ export default function ActionConfirmDialog({
         <Button onClick={onCancel} disabled={isLoading}>
           {cancelLabel}
         </Button>
-        <Button onClick={onConfirm} variant="contained" color={confirmColor} disabled={isLoading}>
+        <Button
+          onClick={onConfirm}
+          variant="contained"
+          color={confirmColor}
+          disabled={isLoading}
+          startIcon={isLoading ? <CircularProgress size={16} color="inherit" /> : undefined}
+        >
           {isLoading ? 'Saving...' : confirmLabel}
         </Button>
       </DialogActions>
