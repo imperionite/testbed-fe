@@ -10,6 +10,7 @@ import { defaultTableConfig } from '../../shared/config/defaultTableConfig'
 
 export default function HtesTable({
   htes,
+  isLoading = false,
   permissions,
   supervisorMap = {},
   onBulkStatusChange,
@@ -68,6 +69,7 @@ export default function HtesTable({
     },
     state: {
       rowSelection,
+      isLoading,
       columnVisibility: {
         ...columnVisibility,
         'mrt-row-actions': selectedRowCount === 0,

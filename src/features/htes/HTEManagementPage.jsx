@@ -1,4 +1,4 @@
-import { Alert, Button, CircularProgress, Box, Grid } from '@mui/material'
+import { Alert, Button, Box, Grid } from '@mui/material'
 import { Add as AddIcon } from '@mui/icons-material'
 import CardStat from '../shared/components/CardStat'
 import HteTable from './components/HteTable'
@@ -95,40 +95,26 @@ export default function HteManagementLayout() {
       </Box>
 
       {/* ==================== MAIN SECTION ==================== */}
+
       <Box sx={{ width: '100%', mt: { xs: 2.5, lg: 3 } }}>
-        {!permissions.canView ? (
-          <Alert severity="error">You do not have permission to view HTEs.</Alert>
-        ) : isLoading ? (
-          <Box display="flex" justifyContent="center" py={4}>
-            <CircularProgress size={28} />
-          </Box>
-        ) : isError ? (
+        {/* Error Banner */}
+        {isError ? (
           <Alert
             severity="error"
+            onClose={refetch}
+            sx={{ mt: 2, mb: 2 }}
             action={
               <Button color="inherit" size="small" onClick={refetch}>
                 Retry
               </Button>
             }
           >
-            {error?.response?.data?.message || 'Unable to load HTEs. Please try again.'}
-          </Alert>
-        ) : hteData.length === 0 ? (
-          <Alert
-            severity="info"
-            action={
-              permissions.canCreate ? (
-                <Button color="inherit" size="small" onClick={() => modalState.open('create')}>
-                  Register HTE
-                </Button>
-              ) : undefined
-            }
-          >
-            No HTEs found.
+            Failed to load records. {error?.message}
           </Alert>
         ) : (
           <HteTable
             htes={hteData}
+            isLoading={isLoading}
             permissions={permissions}
             supervisorMap={supervisorMap}
             onBulkStatusChange={bulkUpdateStatus.mutateAsync}
