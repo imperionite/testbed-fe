@@ -19,6 +19,7 @@ export default function ActionConfirmDialog({
   message,
   confirmLabel = 'Confirm',
   cancelLabel = 'Cancel',
+  confirmColor = 'primary',
   onConfirm,
   onCancel,
   isLoading = false,
@@ -31,7 +32,7 @@ export default function ActionConfirmDialog({
         <Button onClick={onCancel} disabled={isLoading}>
           {cancelLabel}
         </Button>
-        <Button onClick={onConfirm} variant="contained" color="primary" disabled={isLoading}>
+        <Button onClick={onConfirm} variant="contained" color={confirmColor} disabled={isLoading}>
           {isLoading ? 'Saving...' : confirmLabel}
         </Button>
       </DialogActions>
