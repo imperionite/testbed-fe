@@ -129,7 +129,11 @@ export default function StudentInternshipProfilePage() {
                     Rendered Hours
                   </Typography>
                   <Typography variant="body1">
-                    {isRenderedLoading ? <Skeleton animation="wave" variant='rounded' width={30} /> : `${renderedHours} hrs`}
+                    {isRenderedLoading ? (
+                      <Skeleton animation="wave" variant="rounded" width={30} />
+                    ) : (
+                      `${renderedHours} hrs`
+                    )}
                   </Typography>
                 </Grid>
               </Grid>

@@ -110,10 +110,7 @@ export default function StudentDocumentsPage() {
 
     return (
       <Box>
-        <PageTitleAndSubtitle
-        title="My Documents"
-        subtitle="Track own iternship documents."
-      />
+        <PageTitleAndSubtitle title="My Documents" subtitle="Track own iternship documents." />
         {studentProfile?.currentInternship?.id ? (
           <StudentDocumentsView internshipId={studentProfile.currentInternship.id} />
         ) : (

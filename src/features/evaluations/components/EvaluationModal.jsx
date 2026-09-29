@@ -190,9 +190,7 @@ export default function EvaluationModal({
             <Button
               onClick={requestDraftSave}
               disabled={isBusy}
-              startIcon={
-                isSavingDraft ? <CircularProgress size={16} color="inherit" /> : undefined
-              }
+              startIcon={isSavingDraft ? <CircularProgress size={16} color="inherit" /> : undefined}
             >
               Save as Draft
             </Button>

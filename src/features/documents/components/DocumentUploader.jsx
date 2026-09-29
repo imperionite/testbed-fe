@@ -7,7 +7,7 @@ import {
   Alert,
   MenuItem,
   TextField,
-  CircularProgress, 
+  CircularProgress,
 } from '@mui/material'
 
 import { useDocumentMutations } from '../hooks/useDocumentMutations'

@@ -65,12 +65,7 @@ export default function EvaluationForm({
   }
 
   return (
-    <Stack
-      component="form"
-      id={formId}
-      onSubmit={handleSubmit(submit, onInvalid)}
-      spacing={2.5}
-    >
+    <Stack component="form" id={formId} onSubmit={handleSubmit(submit, onInvalid)} spacing={2.5}>
       {mode === 'create' && (
         <Controller
           name="internship_id"

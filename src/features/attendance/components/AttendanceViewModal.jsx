@@ -30,6 +30,7 @@ export default function AttendanceViewModal({ open, onClose, internshipId }) {
     useAttendanceByInternship(internshipId)
 
   const { validateAttendance, updateAttendance } = useAttendanceMutations(internshipId)
+  const isSubmitting = validateAttendance.isPending || updateAttendance.isPending
 
   const { data: renderedHours, isLoading: isHoursLoading } = useQuery({
     queryKey: ['renderedHours', internshipId],
@@ -67,13 +68,13 @@ export default function AttendanceViewModal({ open, onClose, internshipId }) {
   }
 
   return (
-    <Modal open={open} onClose={onClose}>
+    <Modal open={open} onClose={isSubmitting ? undefined : onClose}>
       <Box sx={style}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
           <Typography variant="h6" fontWeight={600}>
             Attendance Records & History
           </Typography>
-          <IconButton onClick={onClose}>
+          <IconButton onClick={onClose} disabled={isSubmitting}>
             <CloseIcon />
           </IconButton>
         </Box>
@@ -92,6 +93,7 @@ export default function AttendanceViewModal({ open, onClose, internshipId }) {
             mode="VALIDATE"
             onSubmit={handleValidationSubmit}
             onCancel={() => setValidationData(null)}
+            isSubmitting={validateAttendance.isPending}
           />
         ) : isAttendanceLoading ? (
           <Typography>Loading attendance...</Typography>
@@ -101,6 +103,7 @@ export default function AttendanceViewModal({ open, onClose, internshipId }) {
             onValidate={handleValidate}
             onEdit={handleEdit}
             isStudent={isStudent}
+            isSubmitting={updateAttendance.isPending || validateAttendance.isPending}
           />
         )}
 
@@ -111,6 +114,7 @@ export default function AttendanceViewModal({ open, onClose, internshipId }) {
             onClose={() => setEditModalOpen(false)}
             initialData={selectedEditRecord}
             onSubmit={handleEditSubmit}
+            isSubmitting={updateAttendance.isPending}
           />
         )}
       </Box>
