@@ -1,4 +1,4 @@
-import { IconButton, Menu, MenuItem, Divider, Typography } from '@mui/material'
+import { IconButton, Menu, MenuItem, Divider, Typography, CircularProgress } from '@mui/material'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined'
 import { useState } from 'react'
@@ -13,6 +13,7 @@ export function HeaderDropdownMenu({ onLogout, isLoading }) {
   }
 
   const handleClose = () => {
+    if (isLoading) return
     setAnchorEl(null)
   }
 
@@ -29,12 +30,12 @@ export function HeaderDropdownMenu({ onLogout, isLoading }) {
         disabled={isLoading}
         aria-label="Open account menu"
       >
-        <KeyboardArrowDownIcon />
+        {isLoading ? <CircularProgress size={18} color="inherit" /> : <KeyboardArrowDownIcon />}
       </IconButton>
 
       <Menu
         anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
+        open={Boolean(anchorEl) && !isLoading}
         onClose={handleClose}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
@@ -43,6 +44,7 @@ export function HeaderDropdownMenu({ onLogout, isLoading }) {
             sx: {
               marginTop: '14px',
               minWidth: '160px',
+              pointerEvents: isLoading ? 'none' : 'auto',
             },
           },
         }}
@@ -56,9 +58,13 @@ export function HeaderDropdownMenu({ onLogout, isLoading }) {
           </MenuItem>
         ))}
         <Divider />
-        <MenuItem onClick={handleLogout} sx={{ gap: 1 }}>
-          <LogoutOutlinedIcon />
-          Logout
+        <MenuItem onClick={handleLogout} disabled={isLoading} sx={{ gap: 1 }}>
+          {isLoading ? (
+            <CircularProgress size={18} color="inherit"></CircularProgress>
+          ) : (
+            <LogoutOutlinedIcon />
+          )}
+          {isLoading ? 'Logging out...' : 'Logout'}
         </MenuItem>
       </Menu>
     </>
