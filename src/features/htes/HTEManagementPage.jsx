@@ -96,10 +96,8 @@ export default function HteManagementLayout() {
 
       {/* ==================== MAIN SECTION ==================== */}
 
-
       <Box sx={{ width: '100%', mt: { xs: 2.5, lg: 3 } }}>
-
-                      {/* Error Banner */}
+        {/* Error Banner */}
         {isError ? (
           <Alert
             severity="error"
