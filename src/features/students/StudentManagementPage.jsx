@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Box, Typography, CircularProgress, Alert, Button, Grid } from '@mui/material'
+import { Box, Alert, Button, Grid } from '@mui/material'
 import { Add as AddIcon } from '@mui/icons-material'
 import CardStat from '../shared/components/CardStat'
 import StudentTable from './components/StudentTable'
@@ -19,7 +19,7 @@ import notify from '../../utils/toast'
 import PageTitleAndSubtitle from '../shared/components/PageTitleAndSubtitle'
 
 export default function StudentManagementPage() {
-  const { user, isLoading: isAuthLoading } = useAuth()
+  const { user } = useAuth()
   const { isReadOnlyStaff, isFacultyAdviser } = useUiPermissions()
   const {
     data: students,
@@ -28,13 +28,21 @@ export default function StudentManagementPage() {
     error: studentsError,
     refetch,
   } = useStudents(user?.role)
-  const { data: userData = [], isLoading: isUsersLoading } = useUsers({ enabled: isReadOnlyStaff })
+  const {
+    data: userData = [],
+    isLoading: isUsersLoading,
+    isError: isUsersError,
+    error: usersError,
+  } = useUsers({ enabled: isReadOnlyStaff })
   const modalState = useStudentModalState()
   const { onCreate, onUpdate } = useStudentMutations()
 
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState(null)
   const [viewedStudent, setViewedStudent] = useState(null)
+
+  const hasError = isStudentsError || isUsersError
+  const activeError = studentsError || usersError
 
   const handleSubmit = async (data) => {
     setError(null)
@@ -68,6 +76,8 @@ export default function StudentManagementPage() {
         'Unable to save Student record.'
       setError(errorMsg)
       notify.error(errorMsg)
+    } finally {
+      setIsSaving(false)
     }
   }
 
@@ -86,23 +96,23 @@ export default function StudentManagementPage() {
     })
   }, [students, userData])
 
-  if (isAuthLoading || isStudentsLoading || isUsersLoading) return <CircularProgress />
-  if (!permissions.canView) return <Typography color="error">Access denied.</Typography>
-  if (isStudentsError)
-    return (
-      <Box sx={{ p: 3 }}>
-        <Alert severity="error">
-          <Typography variant="h6">Error Loading Students</Typography>
-          {studentsError?.message ||
-            'An unexpected error occurred while fetching student records. Please contact your system administrator.'}
-          <Box sx={{ mt: 2 }}>
-            <Button variant="outlined" color="inherit" onClick={refetch}>
-              Retry
-            </Button>
-          </Box>
-        </Alert>
-      </Box>
-    )
+  // if (isAuthLoading || isStudentsLoading || isUsersLoading) return <CircularProgress />
+  // if (!permissions.canView) return <Typography color="error">Access denied.</Typography>
+  // if (isStudentsError)
+  //   return (
+  //     <Box sx={{ p: 3 }}>
+  //       <Alert severity="error">
+  //         <Typography variant="h6">Error Loading Students</Typography>
+  //         {studentsError?.message ||
+  //           'An unexpected error occurred while fetching student records. Please contact your system administrator.'}
+  //         <Box sx={{ mt: 2 }}>
+  //           <Button variant="outlined" color="inherit" onClick={refetch}>
+  //             Retry
+  //           </Button>
+  //         </Box>
+  //       </Alert>
+  //     </Box>
+  //   )
 
   return (
     <Box>
@@ -152,12 +162,28 @@ export default function StudentManagementPage() {
         </Grid>
       </Grid>
 
-      <StudentTable
-        data={mergedStudents}
-        role={user?.role}
-        onEdit={(student) => modalState.open(MODES.EDIT, student)}
-        onView={setViewedStudent}
-      />
+      {/* Error Banner */}
+      {hasError ? (
+        <Alert
+          severity="error"
+          onClose={refetch}
+          action={
+            <Button color="inherit" size="small" onClick={refetch}>
+              Retry
+            </Button>
+          }
+        >
+          {activeError?.message || 'Failed to load records.'}
+        </Alert>
+      ) : (
+        <StudentTable
+          isLoading={isStudentsLoading || isUsersLoading}
+          data={mergedStudents}
+          role={user?.role}
+          onEdit={(student) => modalState.open(MODES.EDIT, student)}
+          onView={setViewedStudent}
+        />
+      )}
 
       <FacultyStudentDetailsModal
         open={Boolean(viewedStudent)}

@@ -1,8 +1,8 @@
-import { Button, Grid, Box } from '@mui/material'
+import { Button, Grid, Box, Alert } from '@mui/material'
 import { Add as AddIcon } from '@mui/icons-material'
 
 import CardStat from '../shared/components/CardStat'
-import GuardTableContent from '../shared/components/GuardTableContent'
+// import GuardTableContent from '../shared/components/GuardTableContent'
 
 import UsersTable from './components/UsersTable'
 import UserModal from './components/UserModal'
@@ -175,29 +175,31 @@ export default function UserManagementPage() {
         {/* Table Title Header */}
         <PageTitleAndSubtitle title="User List" />
 
-        {/* Data Grid Table Container */}
-        <Box sx={{ width: '100%', mt: { xs: 2.5, lg: 3 } }}>
-          <GuardTableContent
-            canView={permissions.canView}
-            isLoading={isLoading}
-            isError={isError}
-            error={error}
-            isEmpty={userData.length === 0}
-            resourceName="users"
-            onRetry={refetch}
-            onAdd={permissions.canCreate ? () => modalState.open('create') : undefined}
+        {/* Error Banner */}
+        {isError ? (
+          <Alert
+            severity="error"
+            onClose={refetch}
+            action={
+              <Button color="inherit" size="small" onClick={refetch}>
+                Retry
+              </Button>
+            }
           >
-            <UsersTable
-              users={userData}
-              permissions={permissions}
-              onRoleChange={updateRole.mutateAsync}
-              onStatusChange={updateStatus.mutateAsync}
-              onBulkRoleChange={bulkUpdateRole.mutateAsync}
-              onBulkStatusChange={bulkUpdateStatus.mutateAsync}
-              onEditRow={(selectedUser) => modalState.open('edit', selectedUser)}
-            />
-          </GuardTableContent>
-        </Box>
+            Failed to load records. {error?.message}
+          </Alert>
+        ) : (
+          <UsersTable
+            users={userData}
+            isLoading={isLoading}
+            permissions={permissions}
+            onRoleChange={updateRole.mutateAsync}
+            onStatusChange={updateStatus.mutateAsync}
+            onBulkRoleChange={bulkUpdateRole.mutateAsync}
+            onBulkStatusChange={bulkUpdateStatus.mutateAsync}
+            onEditRow={(selectedUser) => modalState.open('edit', selectedUser)}
+          />
+        )}
       </Box>
 
       {/* ==================== MODAL ==================== */}

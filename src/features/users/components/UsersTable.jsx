@@ -33,6 +33,7 @@ import { bulkActionsConfig } from '../config/bulkActionsConfig.js'
 export function UsersTable({
   users = [],
   permissions = {},
+  isLoading = false,
   columns,
   onEditRow,
   onRoleChange,
@@ -72,6 +73,7 @@ export function UsersTable({
     enableRowActions: permissions.canEdit,
 
     state: {
+      isLoading,
       rowSelection: tableState.rowSelection,
       columnVisibility: {
         ...tableState.columnVisibility,

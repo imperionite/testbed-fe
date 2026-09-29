@@ -1,4 +1,4 @@
-import { Alert, Button, CircularProgress } from '@mui/material'
+import { Alert, Button } from '@mui/material'
 
 // This component acts as an access gatekeeper for table content, checking permissions and handling various UI states before rendering the actual table data.
 
@@ -18,7 +18,7 @@ import { Alert, Button, CircularProgress } from '@mui/material'
 
 export default function GuardTableContent({
   canView = true,
-  isLoading,
+  // isLoading,
   isError,
   error,
   isEmpty,
@@ -32,14 +32,14 @@ export default function GuardTableContent({
     return <Alert severity="error">You do not have permission to view {resourceName}.</Alert>
   }
 
-  // Loading state
-  if (isLoading) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', padding: '32px' }}>
-        <CircularProgress size={28} />
-      </div>
-    )
-  }
+  // // Loading state
+  // if (isLoading) {
+  //   return (
+  //     <div style={{ display: 'flex', justifyContent: 'center', padding: '32px' }}>
+  //       <CircularProgress size={28} />
+  //     </div>
+  //   )
+  // }
 
   // Error state
   if (isError) {

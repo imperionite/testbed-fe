@@ -8,7 +8,7 @@ import { formatUserDate } from '../../shared/fieldFormatters'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import { defaultTableConfig } from '../../shared/config/defaultTableConfig'
 
-export default function StudentTable({ data, onEdit, onView, role }) {
+export default function StudentTable({ data, isLoading = false, onEdit, onView, role }) {
   const columns = useMemo(() => {
     const allColumns = [
       {
@@ -212,6 +212,7 @@ export default function StudentTable({ data, onEdit, onView, role }) {
           maxHeight: '500px',
         },
       }}
+      state={{ isLoading }}
       // displayColumnDefOptions={{
       //   actions: {
       //     sx: {

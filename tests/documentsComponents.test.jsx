@@ -38,7 +38,7 @@ describe('Document Module Components', () => {
     }
     const onDeleteMock = vi.fn()
     render(<DocumentItem document={doc} onDelete={onDeleteMock} />)
-    
+
     const deleteBtn = screen.getByRole('button', { name: /Delete Document/i })
     expect(deleteBtn).toBeDefined()
 
