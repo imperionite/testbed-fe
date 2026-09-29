@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
 import DocumentUploader from '../src/features/documents/components/DocumentUploader'
 import DocumentItem from '../src/features/documents/components/DocumentItem'
@@ -26,5 +26,23 @@ describe('Document Module Components', () => {
     }
     render(<DocumentItem document={doc} />)
     expect(screen.getByText(/RESUME/i)).toBeDefined()
+  })
+
+  it('renders delete button and triggers onDelete when clicked', () => {
+    const doc = {
+      id: '1',
+      document_type: 'resume',
+      file_name: 'test.pdf',
+      status: 'pending',
+      uploaded_at: '2026-09-14T00:00:00Z',
+    }
+    const onDeleteMock = vi.fn()
+    render(<DocumentItem document={doc} onDelete={onDeleteMock} />)
+    
+    const deleteBtn = screen.getByRole('button', { name: /Delete Document/i })
+    expect(deleteBtn).toBeDefined()
+
+    fireEvent.click(deleteBtn)
+    expect(onDeleteMock).toHaveBeenCalledWith('1')
   })
 })
