@@ -55,6 +55,7 @@ export default function AuditTable({ data = [] }) {
     muiCircularProgressProps: { color: 'secondary' },
     initialState: {
       ...defaultTableConfig.initialState,
+      sorting: [{ id: 'created_at', desc: true }],
     },
   })
 
