@@ -3,7 +3,7 @@ import { MaterialReactTable, useMaterialReactTable } from '@glebcha/material-rea
 import { formatSentenceCase } from '../../shared/fieldFormatters'
 import { defaultTableConfig } from '../../shared/config/defaultTableConfig'
 
-export default function ReportTable({ data = [] }) {
+export default function ReportTable({ data = [], isLoading = false }) {
   const columns = useMemo(
     () => [
       { accessorKey: 'student.name', header: 'Student Name' },
@@ -25,6 +25,8 @@ export default function ReportTable({ data = [] }) {
     ...defaultTableConfig,
     columns,
     data,
+    state: { isLoading },
+    muiCircularProgressProps: { color: 'secondary' },
     initialState: {
       ...defaultTableConfig.initialState,
     },

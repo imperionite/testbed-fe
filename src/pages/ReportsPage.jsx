@@ -10,6 +10,7 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Alert,
 } from '@mui/material'
 import DownloadIcon from '@mui/icons-material/Download'
 import Papa from 'papaparse'
@@ -26,9 +27,14 @@ import {
 import { useUiPermissions } from '../features/shared/hooks/useUiPermissions'
 
 export default function ReportsPage() {
-  const { data: summary } = useInternshipReportSummary()
-  const { data: detailedReport = [] } = useInternshipReport()
+  const summaryQuery = useInternshipReportSummary()
+  const reportQuery = useInternshipReport()
   const { isReadOnlyStaff } = useUiPermissions()
+
+  const isLoading = summaryQuery.isLoading || reportQuery.isLoading
+  const isError = summaryQuery.isError || reportQuery.isError
+  const summary = summaryQuery.data
+  const detailedReport = reportQuery.data || []
 
   const [open, setOpen] = useState(false)
   const [format, setFormat] = useState('PDF')
@@ -102,6 +108,10 @@ export default function ReportsPage() {
     handleClose()
   }
 
+  if (isError) {
+    return <Alert severity="error">Failed to load reports data.</Alert>
+  }
+
   return (
     <Box>
       <Box
@@ -146,7 +156,7 @@ export default function ReportsPage() {
       </Dialog>
 
       <ReportSummaryCards summary={summary} />
-      <ReportTable data={detailedReport} />
+      <ReportTable data={detailedReport} isLoading={isLoading} />
     </Box>
   )
 }
