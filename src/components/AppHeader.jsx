@@ -11,6 +11,7 @@ export default function AppHeader({ onMenuClick }) {
   const { user } = useAuth()
   const logout = useLogout()
   const navigate = useNavigate()
+  const isLoggingOut = logout.isPending || logout.isLoading
 
   const handleLogout = () => {
     logout.mutate(undefined, {
@@ -130,7 +131,7 @@ export default function AppHeader({ onMenuClick }) {
           </Avatar>
 
           {/* Dropdown Menu */}
-          <HeaderDropdownMenu onLogout={handleLogout} isLoading={logout.isPending} />
+          <HeaderDropdownMenu onLogout={handleLogout} isLoading={isLoggingOut} />
         </Box>
       </Toolbar>
     </AppBar>

@@ -29,7 +29,7 @@ export function useCurrentUser() {
     queryKey: ['currentUser'],
     queryFn: authApi.getMe,
     enabled: authStorage.hasSession(),
-    initialData: authStorage.getUser(),
+    initialData: authStorage.hasSession() ? authStorage.getUser() : undefined,
     staleTime: 1000 * 60 * 5,
   })
 }
@@ -42,6 +42,7 @@ export function useLogout() {
 
     onSettled: () => {
       authStorage.clearSession()
+      queryClient.setQueryData(['currentUser'], null)
       queryClient.clear()
     },
   })
