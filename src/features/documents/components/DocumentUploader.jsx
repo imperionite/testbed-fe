@@ -1,5 +1,15 @@
 import { useState } from 'react'
-import { Box, Button, Typography, Stack, Alert, MenuItem, TextField } from '@mui/material'
+import {
+  Box,
+  Button,
+  Typography,
+  Stack,
+  Alert,
+  MenuItem,
+  TextField,
+  CircularProgress,
+} from '@mui/material'
+
 import { useDocumentMutations } from '../hooks/useDocumentMutations'
 import { DOCUMENT_TYPES } from '../constants'
 
@@ -75,9 +85,12 @@ export default function DocumentUploader({ internshipId, onUploadSuccess }) {
         <Button
           variant="contained"
           onClick={handleUpload}
-          disabled={!file || !documentType || uploadDocument.isLoading}
+          disabled={!file || !documentType || uploadDocument.isPending}
+          startIcon={
+            uploadDocument.isPending ? <CircularProgress size={18} color="inherit" /> : null
+          }
         >
-          {uploadDocument.isLoading ? 'Uploading...' : 'Upload'}
+          {uploadDocument.isPending ? 'Uploading...' : 'Upload'}
         </Button>
       </Stack>
     </Box>
