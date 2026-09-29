@@ -32,6 +32,9 @@ export const defaultTableConfig = {
   positionActionsColumn: 'last',
   positionGlobalFilter: 'right',
 
+  muiCircularProgressProps: { color: 'secondary' },
+  muiSkeletonProps: { animation: 'wave' },
+
   // icons: {
   //   EditIcon: EditIcon,
   //   ViewListIcon: ViewListOutlined,
