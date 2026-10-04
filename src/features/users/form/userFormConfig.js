@@ -118,7 +118,7 @@ export const userFormConfig = [
   {
     name: 'password',
     label: 'Password',
-    type: 'text',
+    type: 'password',
     rbac: {
       [ROLES.ADMIN]: {
         [MODES.CREATE]: FIELD_RULES.REQUIRED,

@@ -9,6 +9,7 @@ import {
   Stack,
   TextField,
   Grid,
+  Typography,
 } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
 
@@ -29,7 +30,7 @@ import { EVALUATION_STATUSES } from '../../shared/constants/constants'
 import PageTitleAndSubtitle from '../shared/components/PageTitleAndSubtitle'
 
 export default function EvaluationManagementPage() {
-  const { isHteSupervisor, isFacultyAdviser, isStudent, isReadOnlyStaff } = useUiPermissions()
+  const { isHteSupervisor, isFacultyAdviser, isStudent, isAdminOrCoordinator } = useUiPermissions()
 
   const isEvaluator = isHteSupervisor || isFacultyAdviser
 
@@ -39,12 +40,12 @@ export default function EvaluationManagementPage() {
       ? 'faculty_adviser'
       : isStudent
         ? 'student'
-        : isReadOnlyStaff
+        : isAdminOrCoordinator
           ? 'administrator'
           : 'guest'
 
   // Fetch all students to map IDs to Names
-  const { data: students = [] } = useUsers({ enabled: isReadOnlyStaff })
+  const { data: students = [] } = useUsers({ enabled: isAdminOrCoordinator })
 
   const studentMap = useMemo(() => {
     return students.reduce((acc, student) => {
@@ -55,13 +56,13 @@ export default function EvaluationManagementPage() {
 
   // Compatibility mapping for existing component logic
   const permissions = {
-    canView: isHteSupervisor || isFacultyAdviser || isStudent || isReadOnlyStaff,
+    canView: isHteSupervisor || isFacultyAdviser || isStudent || isAdminOrCoordinator,
     canCreate: isEvaluator,
     canEdit: isEvaluator,
     canSubmit: isEvaluator,
     isEvaluator: isEvaluator,
     isStudent: isStudent,
-    isReadOnlyStaff: isReadOnlyStaff,
+    isAdminOrCoordinator: isAdminOrCoordinator,
   }
 
   const context = useEvaluationContext(role)
@@ -112,7 +113,10 @@ export default function EvaluationManagementPage() {
   // ------------------------------------------------------------
   // Staff evaluation query
   // ------------------------------------------------------------
-  const selectedStaffEvaluationsQuery = useInternEvaluations(selectedInternshipId, isReadOnlyStaff)
+  const selectedStaffEvaluationsQuery = useInternEvaluations(
+    selectedInternshipId,
+    isAdminOrCoordinator,
+  )
 
   const staffEvaluations = selectedStaffEvaluationsQuery.data ?? []
 
@@ -156,17 +160,25 @@ export default function EvaluationManagementPage() {
   // ------------------------------------------------------------
   const internshipLabels = useMemo(() => {
     // Admin / Coordinator
-    if (isReadOnlyStaff) {
+    if (isAdminOrCoordinator) {
       return Object.fromEntries(
         staffInternships.map((internship) => {
           const student = studentMap[internship.student_id] ?? {}
+          const suffix = student.suffix || ''
 
           const name =
-            [student.firstName, student.middleName, student.lastName, student.suffix]
+            [student.firstName, student.middleName, student.lastName, suffix]
               .filter(Boolean)
               .join(' ') || internship.student_id
+          const email = student.email
 
-          return [internship.id, name]
+          return [
+            internship.id,
+            <Box key={internship.id} sx={{ display: 'flex', flexDirection: 'column' }}>
+              {name}
+              {email && <Typography variant="caption">{email}</Typography>}
+            </Box>,
+          ]
         }),
       )
     }
@@ -175,7 +187,7 @@ export default function EvaluationManagementPage() {
     return Object.fromEntries(
       internshipOptions.map((option) => [option.internshipId, option.studentName]),
     )
-  }, [isReadOnlyStaff, staffInternships, internshipOptions, studentMap])
+  }, [isAdminOrCoordinator, staffInternships, internshipOptions, studentMap])
 
   // ------------------------------------------------------------
   // Modal handlers
@@ -256,7 +268,7 @@ export default function EvaluationManagementPage() {
       {/* ----------------------------------------------------
             Admin / Coordinator internship selector
         ----------------------------------------------------- */}
-      {isReadOnlyStaff && (
+      {isAdminOrCoordinator && (
         <Paper sx={{ p: 2 }}>
           <TextField
             select
@@ -335,7 +347,7 @@ export default function EvaluationManagementPage() {
         <Alert severity="error">
           {error?.response?.data?.message ?? error?.message ?? 'Unable to load evaluations.'}
         </Alert>
-      ) : isReadOnlyStaff && !selectedInternshipId ? (
+      ) : isAdminOrCoordinator && !selectedInternshipId ? (
         <Alert severity="info">Select an internship to view its evaluations.</Alert>
       ) : evaluations.length === 0 ? (
         <Alert severity="info">

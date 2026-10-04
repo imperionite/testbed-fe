@@ -53,7 +53,7 @@ export const defaultTableConfig = {
   initialState: {
     density: 'comfortable',
     pagination: { pageIndex: 0, pageSize: 30 },
-    sorting: [{ id: 'created_at', desc: false }],
+    sorting: [{ id: 'created_at', desc: true }],
     columnFiltersOpen: false,
     columnPinning: {
       right: ['mrt-row-actions'],

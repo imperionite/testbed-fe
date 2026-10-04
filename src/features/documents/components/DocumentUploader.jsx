@@ -4,7 +4,6 @@ import {
   Button,
   Typography,
   Stack,
-  Alert,
   MenuItem,
   TextField,
   CircularProgress,
@@ -12,23 +11,22 @@ import {
 
 import { useDocumentMutations } from '../hooks/useDocumentMutations'
 import { DOCUMENT_TYPES } from '../constants'
+import notify from '../../../utils/toast'
 
 const MAX_FILE_SIZE_MB = 10
 
 export default function DocumentUploader({ internshipId, onUploadSuccess }) {
   const [file, setFile] = useState(null)
   const [documentType, setDocumentType] = useState('')
-  const [error, setError] = useState(null)
   const { uploadDocument } = useDocumentMutations(internshipId)
 
   const handleFileChange = (event) => {
     const selectedFile = event.target.files[0]
     if (selectedFile) {
       if (selectedFile.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
-        setError(`File size exceeds ${MAX_FILE_SIZE_MB}MB limit.`)
+        notify.error(`File size exceeds ${MAX_FILE_SIZE_MB}MB limit.`)
         setFile(null)
       } else {
-        setError(null)
         setFile(selectedFile)
       }
     }
@@ -36,7 +34,7 @@ export default function DocumentUploader({ internshipId, onUploadSuccess }) {
 
   const handleUpload = async () => {
     if (!file || !documentType) {
-      setError('Please select both a document type and a file.')
+      notify.error('Please select both a document type and a file.')
       return
     }
 
@@ -46,7 +44,7 @@ export default function DocumentUploader({ internshipId, onUploadSuccess }) {
       setDocumentType('')
       if (onUploadSuccess) onUploadSuccess()
     } catch (err) {
-      setError(err.message || 'Upload failed.')
+      notify.error(err?.response?.data?.message || err?.message || 'Upload failed.')
     }
   }
 
@@ -55,12 +53,6 @@ export default function DocumentUploader({ internshipId, onUploadSuccess }) {
       <Typography variant="h6" gutterBottom>
         Upload Document
       </Typography>
-
-      {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {error}
-        </Alert>
-      )}
 
       <Stack spacing={2}>
         <TextField

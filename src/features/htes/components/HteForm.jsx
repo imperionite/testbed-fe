@@ -10,11 +10,14 @@ import {
   Stack,
   Switch,
   TextField,
+  Box,
+  Typography,
 } from '@mui/material'
 import { hteFormConfig } from '../form/formConfig'
 import { getHteFormPermissions, getVisibleHteFields } from '../htePermissions'
 import getValidationSchema from '../form/HteValidationSchema'
 import { formatAccountStatus, formatDate } from '../form/fieldFormatters'
+import { formatPersonName } from '../../shared/fieldFormatters'
 
 export default function HteForm({
   role,
@@ -55,6 +58,7 @@ export default function HteForm({
     <Stack
       component="form"
       id={formId}
+      noValidate
       onSubmit={handleSubmit(handleSubmitData, onInvalid)}
       spacing={2}
     >
@@ -73,7 +77,7 @@ export default function HteForm({
                 if (isDisabled) {
                   const match = supervisorOptions.find((u) => u.id === rhfField.value)
                   const displayName = match
-                    ? [match.last_name, match.first_name].filter(Boolean).join(', ')
+                    ? formatPersonName(match)
                     : (rhfField.value ?? 'No Supervisor')
                   return (
                     <TextField
@@ -94,7 +98,10 @@ export default function HteForm({
                       </MenuItem>
                       {supervisorOptions.map((u) => (
                         <MenuItem key={u.id} value={u.id}>
-                          {[u.last_name, u.first_name].filter(Boolean).join(', ')}
+                          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                            {formatPersonName(u)}
+                            <Typography variant="caption">{u.email}</Typography>
+                          </Box>
                         </MenuItem>
                       ))}
                     </Select>

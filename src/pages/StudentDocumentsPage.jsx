@@ -14,7 +14,7 @@ import PageTitleAndSubtitle from '../features/shared/components/PageTitleAndSubt
 
 export default function StudentDocumentsPage() {
   const { user } = useAuth()
-  const { isStudent, isHteSupervisor, isFacultyAdviser, isReadOnlyStaff } = useUiPermissions()
+  const { isStudent, isHteSupervisor, isFacultyAdviser, isAdminOrCoordinator } = useUiPermissions()
 
   // 1. Student profile query
   const {
@@ -41,13 +41,13 @@ export default function StudentDocumentsPage() {
   const staffInternshipsQuery = useQuery({
     queryKey: ['internships', 'all'],
     queryFn: internshipsApi.listInternships,
-    enabled: isReadOnlyStaff,
+    enabled: isAdminOrCoordinator,
   })
 
   const { data: allStudents = [] } = useQuery({
     queryKey: ['users', 'student'],
     queryFn: () => usersApi.getUsersByRole('student'),
-    enabled: isReadOnlyStaff,
+    enabled: isAdminOrCoordinator,
   })
 
   const studentMap = useMemo(() => {
@@ -74,11 +74,12 @@ export default function StudentDocumentsPage() {
         )
         .filter(Boolean)
     }
-    if (isReadOnlyStaff) {
+    if (isAdminOrCoordinator) {
       return (staffInternshipsQuery.data ?? [])
         .map((internship) => {
           const student = studentMap[internship.student_id] ?? {}
           const profile = student.profiles ?? student
+          const email = student.email
           const studentName =
             [profile.first_name, profile.middle_name, profile.last_name, profile.suffix]
               .filter(Boolean)
@@ -87,6 +88,7 @@ export default function StudentDocumentsPage() {
           return {
             internshipId: internship.id,
             studentName,
+            email,
           }
         })
         .filter(Boolean)
@@ -95,7 +97,7 @@ export default function StudentDocumentsPage() {
   }, [
     isHteSupervisor,
     isFacultyAdviser,
-    isReadOnlyStaff,
+    isAdminOrCoordinator,
     hteStudentsQuery.data,
     facultyStudentsQuery.data,
     staffInternshipsQuery.data,
@@ -130,7 +132,7 @@ export default function StudentDocumentsPage() {
     <Box>
       <PageTitleAndSubtitle
         title="Internship Documents Management"
-        subtitle="Track submitted iternship documents."
+        subtitle="Track submitted internship documents."
       />
 
       <Box sx={{ mb: { xs: 3, lg: 4 } }} />
@@ -148,7 +150,10 @@ export default function StudentDocumentsPage() {
           >
             {internshipOptions.map((option) => (
               <MenuItem key={option.internshipId} value={option.internshipId}>
-                {option.studentName}
+                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                  {option.studentName}
+                  <Typography variant="caption">{option.email}</Typography>
+                </Box>
               </MenuItem>
             ))}
           </TextField>

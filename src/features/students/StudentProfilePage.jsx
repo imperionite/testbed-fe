@@ -110,7 +110,7 @@ export default function StudentProfilePage() {
           >
             <Typography variant="h5" fontWeight={600}>
               {student.profiles
-                ? `${student.profiles.first_name || ''} ${student.profiles.last_name || ''}`.trim()
+                ? `${student.profiles.first_name || ''} ${student.profiles.middle_name || ''} ${student.profiles.last_name || ''} ${student.profiles.suffix || ''}`.trim()
                 : 'My Profile'}
             </Typography>
             {!isEditing ? (

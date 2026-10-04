@@ -6,19 +6,19 @@ import { usersApi } from '../../../api/users'
 import { useUiPermissions } from '../../shared/hooks/useUiPermissions'
 
 export function useInternshipsData() {
-  const { isStudent, isReadOnlyStaff } = useUiPermissions()
+  const { isStudent, isAdminOrCoordinator: isAdminOrCoordinator } = useUiPermissions()
   const internshipsQuery = useInternships()
 
   const studentsQuery = useQuery({
     queryKey: ['users', 'student'],
     queryFn: () => usersApi.getUsersByRole('student'),
-    enabled: isReadOnlyStaff,
+    enabled: isAdminOrCoordinator,
   })
 
   const advisersQuery = useQuery({
     queryKey: ['users', 'faculty_adviser'],
     queryFn: () => usersApi.getUsersByRole('faculty_adviser'),
-    enabled: isReadOnlyStaff,
+    enabled: isAdminOrCoordinator,
   })
 
   const internshipMeQuery = useQuery({

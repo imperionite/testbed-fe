@@ -1,12 +1,10 @@
 import { MaterialReactTable, useMaterialReactTable } from '@glebcha/material-react-table'
 import { IconButton, Box, Typography, Tooltip } from '@mui/material'
 import VisibilityIcon from '@mui/icons-material/Visibility'
-import { formatUserDate } from '../../shared/fieldFormatters'
+import { formatDate, defaultEmptyCellValue } from '../../shared/fieldFormatters'
 import { BadgeStatus } from './BadgeStatus'
 import { formatSentenceCase } from '../../shared/fieldFormatters'
 import { defaultTableConfig } from '../../shared/config/defaultTableConfig'
-
-const defaultEmptyCellValue = '–'
 
 export default function HteInternshipTable({ data, onView }) {
   const columns = [
@@ -136,12 +134,12 @@ export default function HteInternshipTable({ data, onView }) {
     {
       id: 'created_at',
       header: 'Created at',
-      accessorFn: (row) => formatUserDate(row.student_profiles.created_at) || defaultEmptyCellValue,
+      accessorFn: (row) => formatDate(row.student_profiles.created_at) || defaultEmptyCellValue,
     },
     {
       id: 'updated_at',
       header: 'Updated',
-      accessorFn: (row) => formatUserDate(row.student_profiles.updated_at) || defaultEmptyCellValue,
+      accessorFn: (row) => formatDate(row.student_profiles.updated_at) || defaultEmptyCellValue,
     },
 
     {

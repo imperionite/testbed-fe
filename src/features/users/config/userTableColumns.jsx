@@ -2,15 +2,13 @@ import { MenuItem } from '@mui/material'
 import BadgeRole from '../components/BadgeRole'
 import BadgeStatus from '../components/BadgeStatus'
 import { ROLE_OPTIONS } from '../../shared/constants/constants'
-import { formatUserDate } from '../../shared/fieldFormatters'
+import { formatDate, defaultEmptyCellValue } from '../../shared/fieldFormatters'
 
 //-----------------
 // HELPERS
 //-----------------
 
 const formatRole = (role) => ROLE_OPTIONS.find((option) => option.value === role)?.label ?? role
-
-const defaultEmptyCellValue = '–'
 
 //-----------------
 // MAIN FUNCTION
@@ -111,7 +109,7 @@ export function createUserTableColumns({ canEdit }) {
     },
     {
       id: 'createdAt',
-      accessorFn: (row) => formatUserDate(row.createdAt) || defaultEmptyCellValue,
+      accessorFn: (row) => formatDate(row.createdAt) || defaultEmptyCellValue,
       header: 'Created',
       size: 130,
       enableColumnFilter: true,
