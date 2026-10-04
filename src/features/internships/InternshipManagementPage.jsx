@@ -35,11 +35,15 @@ import { useUiPermissions } from '../shared/hooks/useUiPermissions'
 import PageTitleAndSubtitle from '../shared/components/PageTitleAndSubtitle'
 import { formatSentenceCase } from '../shared/fieldFormatters'
 import { defaultTableConfig } from '../shared/config/defaultTableConfig'
-import { defaultEmptyCellValue, formatDate, formatPersonName, formatDateOnly } from '../shared/fieldFormatters'
+import {
+  defaultEmptyCellValue,
+  formatDate,
+  formatPersonName,
+  formatDateOnly,
+} from '../shared/fieldFormatters'
 import notify from '../../utils/toast'
 
 // import { DateRangeIcon } from '@mui/x-date-pickers'
-
 
 function ProgressCell({ internshipId, requiredHours }) {
   const { isStudent, isCoordinator } = useUiPermissions()
@@ -65,11 +69,13 @@ function ProgressCell({ internshipId, requiredHours }) {
   const required = Number(requiredHours) || 0
   const progressPercent = required > 0 ? Math.min((renderedHours / required) * 100, 100) : 0
   return (
-    <Box sx={{ 
-      minWidth: 100, 
-      width: 160, 
-      // maxWidth: 210
-      }}>
+    <Box
+      sx={{
+        minWidth: 100,
+        width: 160,
+        // maxWidth: 210
+      }}
+    >
       <LinearProgress
         variant="determinate"
         value={progressPercent}
@@ -154,7 +160,9 @@ export default function InternshipManagementPage() {
         header: 'Name',
         accessorFn: (row) => {
           const student = studentMap[row.student_id] || {}
-          const fullName = [student.firstName, student.middleName, student.lastName, student.suffix].filter(Boolean).join(' ')
+          const fullName = [student.firstName, student.middleName, student.lastName, student.suffix]
+            .filter(Boolean)
+            .join(' ')
           return fullName.trim() || row.student_profiles?.student_number
         },
         Cell: ({ row, cell }) => {

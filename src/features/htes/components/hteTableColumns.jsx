@@ -1,4 +1,4 @@
-import { MenuItem, Box, Typography} from '@mui/material'
+import { MenuItem, Box, Typography } from '@mui/material'
 import BadgeStatus from './BadgeStatus'
 import { defaultEmptyCellValue, formatDate } from '../../shared/fieldFormatters'
 
@@ -45,8 +45,7 @@ export function createHteTableColumns({ canEdit, supervisorMap = {} }) {
       enableEditing: false,
       Cell: ({ row, cell }) => {
         const name = cell.getValue()
-        const email =
-          row.original.contact_email || ''
+        const email = row.original.contact_email || ''
 
         return (
           <Box sx={{ display: 'flex', flexDirection: 'column' }}>

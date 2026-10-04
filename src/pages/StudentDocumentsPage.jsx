@@ -88,7 +88,7 @@ export default function StudentDocumentsPage() {
           return {
             internshipId: internship.id,
             studentName,
-            email
+            email,
           }
         })
         .filter(Boolean)

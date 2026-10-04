@@ -28,17 +28,16 @@ export default function EvaluationTable({ evaluations = [], onRowClick, readOnly
         accessorKey: 'student.full_name',
         header: 'Student Intern',
         Cell: ({ row, cell }) => {
-        const name = cell.getValue() || 'Unknown student'
-        const email =
-          row.original.student?.email || ''
+          const name = cell.getValue() || 'Unknown student'
+          const email = row.original.student?.email || ''
 
-        return (
-          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-            {name}
-            <Typography variant="caption">{email}</Typography>
-          </Box>
-        )
-      },
+          return (
+            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+              {name}
+              <Typography variant="caption">{email}</Typography>
+            </Box>
+          )
+        },
       },
 
       // {
@@ -181,8 +180,8 @@ export default function EvaluationTable({ evaluations = [], onRowClick, readOnly
         },
       ],
       columnVisibility: {
-        internship_id: false
-      }
+        internship_id: false,
+      },
     },
   })
 

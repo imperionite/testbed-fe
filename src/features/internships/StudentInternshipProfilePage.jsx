@@ -77,7 +77,9 @@ export default function StudentInternshipProfilePage() {
     requiredHours > 0 ? Math.min(Math.round((renderedHours / requiredHours) * 100), 100) : 0
 
   const profileName = user
-    ? [user.firstName, user.middleName, user.lastName, user.suffix].filter(Boolean).join(' ') || user.email || 'Student Profile'
+    ? [user.firstName, user.middleName, user.lastName, user.suffix].filter(Boolean).join(' ') ||
+      user.email ||
+      'Student Profile'
     : 'Student Profile'
 
   return (

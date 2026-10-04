@@ -57,8 +57,7 @@ export function FormField({
       control={control}
       render={({ field: rhfField }) => {
         // Handle date formatting for display
-        const displayValue =
-          field.format === 'date' ? formatDate(rhfField.value) : rhfField.value
+        const displayValue = field.format === 'date' ? formatDate(rhfField.value) : rhfField.value
 
         // Supervisor select field type
         if (field.type === 'supervisor-select') {

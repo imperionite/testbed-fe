@@ -16,7 +16,7 @@ import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import getValidationSchema from '../validation/InternshipValidationSchema'
 
-export default function InternshipStatusForm({ internship, mode, onSubmit, onCancel, isLoading}) {
+export default function InternshipStatusForm({ internship, mode, onSubmit, onCancel, isLoading }) {
   const currentStatus = internship?.status || 'pending'
   const isCompleted = currentStatus === 'completed'
 

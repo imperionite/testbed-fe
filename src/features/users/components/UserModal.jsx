@@ -36,9 +36,7 @@ export function UserModal({
           mutations,
         })
       } catch (error) {
-        notify.error(
-          error?.response?.data?.message || error?.message || 'Unable to save user.',
-        )
+        notify.error(error?.response?.data?.message || error?.message || 'Unable to save user.')
         throw error
       }
     },
