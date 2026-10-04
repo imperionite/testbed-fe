@@ -1,5 +1,13 @@
 import { useEffect, useMemo } from 'react'
-import { Box, TextField, MenuItem, Button, Stack } from '@mui/material'
+import {
+  Box,
+  TextField,
+  MenuItem,
+  Button,
+  Stack,
+  CircularProgress,
+  Typography,
+} from '@mui/material'
 import { useForm, Controller, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import getValidationSchema from '../validation/InternshipValidationSchema'
@@ -9,21 +17,31 @@ import { useUsers } from '../../users/hooks/useUsers'
 import { useInternshipMutations } from '../hooks/useInternshipMutations'
 import { MODES } from '../form/formConfig'
 import { useUiPermissions } from '../../shared/hooks/useUiPermissions'
+import { formatPersonName } from '../../shared/fieldFormatters'
 
-export default function InternshipForm({ mode, internships = [], internship, onClose, onSubmit }) {
-  const { isReadOnlyStaff } = useUiPermissions()
+export default function InternshipForm({
+  mode,
+  internships = [],
+  internship,
+  onClose,
+  onSubmit,
+  isLoading = false,
+}) {
+  const { isAdminOrCoordinator: isAdminOrCoordinator } = useUiPermissions()
   const {
     data: students = [],
     isLoading: isStudentsLoading,
     isError: isStudentsError,
   } = useStudents('administrator')
   const { data: htes = [] } = useHtes()
-  const { data: users = [] } = useUsers({ enabled: isReadOnlyStaff })
+  const { data: users = [] } = useUsers({ enabled: isAdminOrCoordinator })
   const facultyAdvisers = users.filter((u) => u.role === 'faculty_adviser')
 
   const { updateInternship, updateStatus, assignAdviser } = useInternshipMutations()
 
   const isViewOrEdit = mode !== MODES.CREATE
+  const isSubmitting =
+    isLoading || updateInternship.isPending || updateStatus.isPending || assignAdviser.isPending
 
   // const studentsWithInternships = useMemo(() => new Set(
   //   internships
@@ -171,12 +189,17 @@ export default function InternshipForm({ mode, internships = [], internship, onC
                 const userProfile = s.profiles || {}
                 const firstName = userProfile.first_name || ''
                 const lastName = userProfile.last_name || ''
-                const fullName = [firstName, lastName].filter(Boolean).join(' ')
+                const middleName = userProfile.middle_name || ''
+                const suffix = userProfile.suffix || ''
+                const fullName = [firstName, middleName, lastName, suffix].filter(Boolean).join(' ')
                 const displayName = fullName.trim() || s.student_number || s.id
 
                 return (
                   <MenuItem key={s.id} value={s.id}>
-                    {displayName}
+                    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                      {displayName}
+                      <Typography variant="caption">{userProfile.email}</Typography>
+                    </Box>
                   </MenuItem>
                 )
               })}
@@ -220,7 +243,10 @@ export default function InternshipForm({ mode, internships = [], internship, onC
               <MenuItem value="">None</MenuItem>
               {facultyAdvisers.map((u) => (
                 <MenuItem key={u.id} value={u.id}>
-                  {u.email}
+                  <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                    {formatPersonName(u)}
+                    <Typography variant="caption">{u.email}</Typography>
+                  </Box>
                 </MenuItem>
               ))}
             </TextField>
@@ -235,7 +261,7 @@ export default function InternshipForm({ mode, internships = [], internship, onC
               inputRef={ref}
               type="date"
               label="Start Date"
-              InputLabelProps={{ shrink: true }}
+              slotProps={{ inputLabel: { shrink: true } }}
               disabled={mode === MODES.VIEW}
               error={!!errors.startDate}
               helperText={errors.startDate?.message}
@@ -251,7 +277,7 @@ export default function InternshipForm({ mode, internships = [], internship, onC
               inputRef={ref}
               type="date"
               label="End Date"
-              InputLabelProps={{ shrink: true }}
+              slotProps={{ inputLabel: { shrink: true } }}
               disabled={mode === MODES.VIEW}
               error={!!errors.endDate}
               helperText={errors.endDate?.message}
@@ -293,8 +319,19 @@ export default function InternshipForm({ mode, internships = [], internship, onC
           )}
         />
         {mode !== MODES.VIEW && (
-          <Button type="submit" variant="contained">
-            {mode === MODES.CREATE ? 'Create Internship' : 'Update Internship'}
+          <Button
+            type="submit"
+            variant="contained"
+            disabled={isSubmitting}
+            startIcon={isSubmitting ? <CircularProgress size={16} color="inherit" /> : null}
+          >
+            {isSubmitting
+              ? mode === MODES.CREATE
+                ? 'Creating...'
+                : 'Updating...'
+              : mode === MODES.CREATE
+                ? 'Create Internship'
+                : 'Update Internship'}
           </Button>
         )}
       </Stack>

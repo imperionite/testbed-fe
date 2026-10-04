@@ -29,7 +29,7 @@ import { useUiPermissions } from '../features/shared/hooks/useUiPermissions'
 export default function ReportsPage() {
   const summaryQuery = useInternshipReportSummary()
   const reportQuery = useInternshipReport()
-  const { isReadOnlyStaff } = useUiPermissions()
+  const { isAdminOrCoordinator } = useUiPermissions()
 
   const isLoading = summaryQuery.isLoading || reportQuery.isLoading
   const isError = summaryQuery.isError || reportQuery.isError
@@ -129,7 +129,7 @@ export default function ReportsPage() {
           title="Internship Reports"
           subtitle="View and download internship reports."
         />
-        {isReadOnlyStaff && (
+        {isAdminOrCoordinator && (
           <Button variant="contained" startIcon={<DownloadIcon />} onClick={handleOpen}>
             Download Report
           </Button>

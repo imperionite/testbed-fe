@@ -10,12 +10,13 @@ import {
   DialogContent,
   DialogActions,
   Typography,
+  CircularProgress,
 } from '@mui/material'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import getValidationSchema from '../validation/InternshipValidationSchema'
 
-export default function InternshipStatusForm({ internship, mode, onSubmit, onCancel }) {
+export default function InternshipStatusForm({ internship, mode, onSubmit, onCancel, isLoading}) {
   const currentStatus = internship?.status || 'pending'
   const isCompleted = currentStatus === 'completed'
 
@@ -133,12 +134,17 @@ export default function InternshipStatusForm({ internship, mode, onSubmit, onCan
           />
         )}
         <Stack direction="row" spacing={2}>
-          <Button onClick={onCancel} variant="outlined">
+          <Button onClick={onCancel} variant="outlined" disabled={isLoading}>
             Cancel
           </Button>
           {!isCompleted && (
-            <Button type="submit" variant="contained">
-              Update Status
+            <Button
+              type="submit"
+              variant="contained"
+              disabled={isLoading}
+              startIcon={isLoading ? <CircularProgress size={16} color="inherit" /> : null}
+            >
+              {isLoading ? 'Saving...' : 'Update Status'}
             </Button>
           )}
         </Stack>

@@ -34,8 +34,12 @@ export default function DocumentItem({ document, onApprove, onReject, onDelete }
         <Typography variant="caption" color="textSecondary">
           {document.file_name} • {new Date(document.uploaded_at).toLocaleDateString()}
           {document.rejection_reason && (
-            <Typography variant="caption" color="error" display="block">
-              Reason: {document.rejection_reason}
+            <Typography
+              variant="caption"
+              color="error"
+              sx={{ display: 'block'}}
+            >
+              Rejection reason: {document.rejection_reason}
             </Typography>
           )}
         </Typography>

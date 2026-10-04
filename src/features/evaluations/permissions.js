@@ -31,7 +31,7 @@ export function getEvaluationPermissions(role) {
 
     isStudent: normalizedRole === ROLES.STUDENT,
 
-    isReadOnlyStaff: normalizedRole === ROLES.ADMIN || normalizedRole === ROLES.COORDINATOR,
+    isAdminOrCoordinator: normalizedRole === ROLES.ADMIN || normalizedRole === ROLES.COORDINATOR,
   }
 }
 

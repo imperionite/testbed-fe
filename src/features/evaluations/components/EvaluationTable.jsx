@@ -1,11 +1,12 @@
 import { useMemo } from 'react'
-import { Stack, Typography, Tooltip, IconButton } from '@mui/material'
+import { Stack, Typography, Tooltip, IconButton, Box } from '@mui/material'
 import { MaterialReactTable, useMaterialReactTable } from '@glebcha/material-react-table'
 import EditIcon from '@mui/icons-material/Edit'
 import { BadgeEvaluations } from '../../shared/components/BadgeEvaluations'
 import { EVALUATION_CRITERIA } from '../form/evaluationConfig'
 import { formatDate } from '../../htes/form/fieldFormatters'
 import { defaultTableConfig } from '../../shared/config/defaultTableConfig'
+import { defaultEmptyCellValue } from '../../shared/fieldFormatters'
 
 const formatPerson = (person) => person?.full_name || 'Not assigned'
 
@@ -26,25 +27,36 @@ export default function EvaluationTable({ evaluations = [], onRowClick, readOnly
       {
         accessorKey: 'student.full_name',
         header: 'Student Intern',
-        Cell: ({ row }) => row.original.student?.full_name || 'Unknown student',
+        Cell: ({ row, cell }) => {
+        const name = cell.getValue() || 'Unknown student'
+        const email =
+          row.original.student?.email || ''
+
+        return (
+          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+            {name}
+            <Typography variant="caption">{email}</Typography>
+          </Box>
+        )
+      },
       },
 
-      {
-        accessorKey: 'student.email',
-        header: 'Student Email',
-        Cell: ({ row }) => row.original.student?.email || '—',
-      },
+      // {
+      //   accessorKey: 'student.email',
+      //   header: 'Student Email',
+      //   Cell: ({ row }) => row.original.student?.email || '—',
+      // },
 
       {
         accessorKey: 'student.program',
         header: 'Program',
-        Cell: ({ row }) => row.original.student?.program || '—',
+        Cell: ({ row }) => row.original.student?.program || defaultEmptyCellValue,
       },
 
       {
         accessorKey: 'student.student_number',
         header: 'Student Number',
-        Cell: ({ row }) => row.original.student?.student_number || '—',
+        Cell: ({ row }) => row.original.student?.student_number || defaultEmptyCellValue,
       },
 
       {
@@ -54,10 +66,10 @@ export default function EvaluationTable({ evaluations = [], onRowClick, readOnly
           const student = row.original.student
 
           if (!student) {
-            return '—'
+            return defaultEmptyCellValue
           }
 
-          return `${student.year_level ?? '—'} / ${student.section ?? '—'}`
+          return `${student.year_level ?? defaultEmptyCellValue} / ${student.section ?? defaultEmptyCellValue}`
         },
       },
 
@@ -108,7 +120,7 @@ export default function EvaluationTable({ evaluations = [], onRowClick, readOnly
             <Stack spacing={0.5}>
               {EVALUATION_CRITERIA.map(({ key, label }) => (
                 <Typography key={key} variant="body2">
-                  <strong>{label}:</strong> {responses[key] ?? '—'}
+                  <strong>{label}:</strong> {responses[key] ?? defaultEmptyCellValue}
                 </Typography>
               ))}
             </Stack>
@@ -119,7 +131,7 @@ export default function EvaluationTable({ evaluations = [], onRowClick, readOnly
       {
         accessorKey: 'comments',
         header: 'Comments',
-        Cell: ({ cell }) => cell.getValue() || '—',
+        Cell: ({ cell }) => cell.getValue() || defaultEmptyCellValue,
       },
 
       {
@@ -131,7 +143,7 @@ export default function EvaluationTable({ evaluations = [], onRowClick, readOnly
       {
         accessorKey: 'submitted_at',
         header: 'Submitted',
-        Cell: ({ cell }) => formatDate(cell.getValue()) || '—',
+        Cell: ({ cell }) => formatDate(cell.getValue()) || defaultEmptyCellValue,
       },
     ],
     [],
@@ -168,6 +180,9 @@ export default function EvaluationTable({ evaluations = [], onRowClick, readOnly
           desc: false,
         },
       ],
+      columnVisibility: {
+        internship_id: false
+      }
     },
   })
 

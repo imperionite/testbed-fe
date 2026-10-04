@@ -9,7 +9,7 @@ import {
   Divider,
   Grid,
 } from '@mui/material'
-import { formatUserDate, formatSentenceCase } from '../../shared/fieldFormatters'
+import { formatDate, formatSentenceCase } from '../../shared/fieldFormatters'
 import { BadgeStatus } from '../../internships/components/BadgeStatus'
 
 const emptyValue = '–'
@@ -85,7 +85,7 @@ export default function FacultyStudentDetailsModal({ open, student, onClose }) {
           <Grid size={{ xs: 12, sm: 6 }}>
             <Detail label="HTE Contact" value={hteProfile.contact_person} />
             <Typography variant="body2" color="text.secondary">
-              {hteProfile.contact_email || emptyValue}
+              {hteProfile.contact_email || ''}
             </Typography>
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
@@ -110,10 +110,10 @@ export default function FacultyStudentDetailsModal({ open, student, onClose }) {
         <Divider sx={{ mb: 2, mt: 1 }} />
         <Grid container spacing={2} sx={{ mb: 0, mt: 1 }}>
           <Grid size={{ xs: 12, sm: 6 }}>
-            <Detail label="Created At" value={formatUserDate(student?.created_at)} />
+            <Detail label="Created At" value={formatDate(student?.created_at)} />
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
-            <Detail label="Updated At" value={formatUserDate(student?.updated_at)} />
+            <Detail label="Updated At" value={formatDate(student?.updated_at)} />
           </Grid>
         </Grid>
       </DialogContent>

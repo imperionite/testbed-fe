@@ -20,7 +20,7 @@ import PageTitleAndSubtitle from '../shared/components/PageTitleAndSubtitle'
 
 export default function StudentManagementPage() {
   const { user } = useAuth()
-  const { isReadOnlyStaff, isFacultyAdviser } = useUiPermissions()
+  const { isAdminOrCoordinator, isFacultyAdviser } = useUiPermissions()
   const {
     data: students,
     isLoading: isStudentsLoading,
@@ -33,13 +33,18 @@ export default function StudentManagementPage() {
     isLoading: isUsersLoading,
     isError: isUsersError,
     error: usersError,
-  } = useUsers({ enabled: isReadOnlyStaff })
+  } = useUsers({ enabled: isAdminOrCoordinator })
   const modalState = useStudentModalState()
   const { onCreate, onUpdate } = useStudentMutations()
 
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState(null)
   const [viewedStudent, setViewedStudent] = useState(null)
+
+  const handleModalClose = () => {
+    setError(null)
+    modalState.close()
+  }
 
   const hasError = isStudentsError || isUsersError
   const activeError = studentsError || usersError
@@ -130,7 +135,7 @@ export default function StudentManagementPage() {
         <PageTitleAndSubtitle
           title="Student Records"
           subtitle={
-            isReadOnlyStaff
+            isAdminOrCoordinator
               ? 'Manage student records and related information.'
               : isFacultyAdviser
                 ? "View your assigned students' records."
@@ -197,7 +202,7 @@ export default function StudentManagementPage() {
         mode={modalState.mode}
         student={modalState.selectedStudent}
         permissions={permissions}
-        onClose={modalState.close}
+        onClose={handleModalClose}
         onSubmit={handleSubmit}
         isStudent={false}
         isSaving={isSaving}

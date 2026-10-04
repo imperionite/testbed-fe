@@ -1,39 +1,13 @@
-import { MenuItem } from '@mui/material'
+import { MenuItem, Box, Typography} from '@mui/material'
 import BadgeStatus from './BadgeStatus'
+import { defaultEmptyCellValue, formatDate } from '../../shared/fieldFormatters'
 
-//-----------------
-// HELPERS
-//-----------------
-
-const formatCellDate = (value) => {
-  if (!value && value !== 0) return null
-
-  try {
-    const dateObj = new Date(value)
-
-    if (isNaN(dateObj.getTime())) return null
-
-    return new Intl.DateTimeFormat('en-US', {
-      month: 'numeric',
-      day: '2-digit',
-      year: 'numeric',
-      timeZone: 'UTC',
-    }).format(dateObj)
-  } catch (error) {
-    console.error('Date formatting error:', error)
-    return null
-  }
-}
-
-//-----------------
-// MAIN FUNCTION
-//-----------------
 export function createHteTableColumns({ canEdit, supervisorMap = {} }) {
   return [
     {
       accessorKey: 'id',
       header: 'ID',
-      size: 80,
+      size: 100,
       enableColumnFilter: true,
       enableEditing: false,
       muiTableBodyCellProps: {
@@ -52,34 +26,6 @@ export function createHteTableColumns({ canEdit, supervisorMap = {} }) {
       enableEditing: false,
     },
     {
-      accessorKey: 'address',
-      header: 'Address',
-      size: 200,
-      enableColumnFilter: true,
-      enableEditing: false,
-    },
-    {
-      accessorKey: 'contact_person',
-      header: 'Contact Person',
-      size: 200,
-      enableColumnFilter: true,
-      enableEditing: false,
-    },
-    {
-      accessorKey: 'contact_email',
-      header: 'Contact Email',
-      size: 220,
-      enableColumnFilter: true,
-      enableEditing: false,
-    },
-    {
-      accessorKey: 'contact_number',
-      header: 'Contact Number',
-      size: 200,
-      enableColumnFilter: true,
-      enableEditing: false,
-    },
-    {
       accessorKey: 'supervisor_id',
       header: 'Supervisor',
       size: 200,
@@ -87,9 +33,51 @@ export function createHteTableColumns({ canEdit, supervisorMap = {} }) {
       enableEditing: false,
       Cell: ({ cell }) => {
         const id = cell.getValue()
-        if (!id) return 'No Supervisor'
+        if (!id) return defaultEmptyCellValue
         return supervisorMap[id] ?? id
       },
+    },
+    {
+      accessorKey: 'contact_person',
+      header: 'Contact Person',
+      size: 200,
+      enableColumnFilter: true,
+      enableEditing: false,
+      Cell: ({ row, cell }) => {
+        const name = cell.getValue()
+        const email =
+          row.original.contact_email || ''
+
+        return (
+          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+            {name}
+            <Typography variant="caption">{email}</Typography>
+          </Box>
+        )
+      },
+    },
+    // {
+    //   accessorKey: 'contact_email',
+    //   header: 'Contact Email',
+    //   size: 220,
+    //   enableColumnFilter: true,
+    //   enableEditing: false,
+    // },
+    {
+      accessorKey: 'contact_number',
+      header: 'Contact Number',
+      size: 200,
+      enableColumnFilter: true,
+      enableEditing: false,
+      Cell: ({ cell }) => cell.getValue() || defaultEmptyCellValue,
+    },
+    {
+      accessorKey: 'address',
+      header: 'Address',
+      size: 200,
+      enableColumnFilter: true,
+      enableEditing: false,
+      Cell: ({ cell }) => cell.getValue() || defaultEmptyCellValue,
     },
     {
       accessorKey: 'is_active',
@@ -120,7 +108,7 @@ export function createHteTableColumns({ canEdit, supervisorMap = {} }) {
       size: 160,
       enableColumnFilter: false,
       enableEditing: false,
-      Cell: ({ cell }) => formatCellDate(cell.getValue()),
+      Cell: ({ cell }) => formatDate(cell.getValue()),
     },
     // {
     //   accessorKey: 'updated_at',
@@ -128,7 +116,7 @@ export function createHteTableColumns({ canEdit, supervisorMap = {} }) {
     //   size: 160,
     //   enableColumnFilter: false,
     //   enableEditing: false,
-    //   Cell: ({ cell }) => formatCellDate(cell.getValue()),
+    //   Cell: ({ cell }) => formatDate(cell.getValue()),
     // },
   ]
 }

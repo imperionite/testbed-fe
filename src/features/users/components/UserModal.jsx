@@ -28,12 +28,19 @@ export function UserModal({
       canSubmit: mode === 'create' ? permissions?.canCreate : permissions?.canEdit,
     },
     onSubmit: async (filteredPayload) => {
-      await executeUserSave({
-        mode,
-        user,
-        filteredPayload,
-        mutations,
-      })
+      try {
+        await executeUserSave({
+          mode,
+          user,
+          filteredPayload,
+          mutations,
+        })
+      } catch (error) {
+        notify.error(
+          error?.response?.data?.message || error?.message || 'Unable to save user.',
+        )
+        throw error
+      }
     },
     onSuccess: () => {
       notify.success(mode === 'create' ? 'User created successfully' : 'User updated successfully')
@@ -50,7 +57,6 @@ export function UserModal({
       title={modalTitle}
       mode={mode}
       isSaving={formSubmission.isSaving}
-      error={formSubmission.error}
       canEdit={permissions?.canEdit}
       onEdit={() => onModeChange?.('edit')}
       onSave={formSubmission.formMethods.handleSubmit(formSubmission.onSubmit)}

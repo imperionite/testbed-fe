@@ -12,7 +12,7 @@ const mockAssignAdviser = vi.fn().mockResolvedValue({})
 const mockUpdateInternship = vi.fn().mockResolvedValue({})
 
 vi.mock('../src/features/shared/hooks/useUiPermissions', () => ({
-  useUiPermissions: () => ({ isReadOnlyStaff: true }),
+  useUiPermissions: () => ({ isAdminOrCoordinator: true }),
 }))
 
 // ... (rest of the mocks)

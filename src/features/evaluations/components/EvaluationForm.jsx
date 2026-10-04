@@ -8,6 +8,7 @@ import {
   TextField,
   Typography,
   MenuItem,
+  Box,
 } from '@mui/material'
 
 import { EVALUATION_CRITERIA, getEvaluationTypeForRole } from '../form/evaluationConfig'
@@ -85,8 +86,10 @@ export default function EvaluationForm({
 
                 {internshipOptions.map((option) => (
                   <MenuItem key={option.internshipId} value={option.internshipId}>
-                    {option.studentName}
-                    {option.studentNumber ? ` — ${option.studentNumber}` : ''}
+                    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                      {option.studentName}
+                      <Typography variant="caption">{option.email}</Typography>
+                    </Box>
                   </MenuItem>
                 ))}
               </TextField>

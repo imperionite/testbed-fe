@@ -1,4 +1,4 @@
-export function formatUserDate(value) {
+export function formatDate(value) {
   if (!value && value !== 0) return null
   try {
     const dateObj = new Date(value)
