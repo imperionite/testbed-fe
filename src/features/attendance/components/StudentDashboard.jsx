@@ -95,6 +95,7 @@ export default function StudentDashboard({ internshipId }) {
         onClose={handleCloseModal}
         initialData={selectedEditRecord}
         onSubmit={selectedEditRecord ? handleEditSubmit : handleCreateSubmit}
+        isSubmitting={createAttendance.isPending || updateAttendance.isPending}
       />
     </Box>
   )

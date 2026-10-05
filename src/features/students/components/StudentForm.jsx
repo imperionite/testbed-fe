@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { TextField, Stack, MenuItem } from '@mui/material'
+import { TextField, Stack, MenuItem, Box, Typography } from '@mui/material'
 import { StudentValidationSchema } from '../form/StudentValidationSchema'
 import { MODES } from '../form/formConfig'
 
@@ -136,7 +136,11 @@ export default function StudentForm({
                 ) : (
                   availableUsers.map((user) => (
                     <MenuItem key={user.id} value={user.id}>
-                      {user.first_name} {user.last_name} ({user.email})
+                      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                        {user.first_name || ''} {user.middle_name || ''} {user.last_name || ''}{' '}
+                        {user.suffix || ''}
+                        <Typography variant="caption">{user.email || ''}</Typography>
+                      </Box>
                     </MenuItem>
                   ))
                 )}
@@ -184,7 +188,7 @@ export default function StudentForm({
         )}
 
         <TextField
-          label="Student ID"
+          label="Student Number"
           {...register('studentNumber')}
           error={!!errors.studentNumber}
           helperText={errors.studentNumber?.message}

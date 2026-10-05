@@ -2,6 +2,10 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { documentsApi } from '../../../api/documents'
 import notify from '../../../utils/toast'
 
+const notifyMutationError = (error, action) => {
+  notify.error(error?.response?.data?.message || error?.message || `Failed to ${action}.`)
+}
+
 export function useDocumentMutations(internshipId) {
   const queryClient = useQueryClient()
   const invalidateDocuments = () =>
@@ -17,6 +21,7 @@ export function useDocumentMutations(internshipId) {
 
   const approveDocument = useMutation({
     mutationFn: (documentId) => documentsApi.approveDocument(documentId),
+    onError: (error) => notifyMutationError(error, 'approve document'),
     onSuccess: () => {
       invalidateDocuments()
       notify.success('Document approved successfully!')
@@ -25,6 +30,7 @@ export function useDocumentMutations(internshipId) {
 
   const rejectDocument = useMutation({
     mutationFn: ({ documentId, reason }) => documentsApi.rejectDocument(documentId, reason),
+    onError: (error) => notifyMutationError(error, 'reject document'),
     onSuccess: () => {
       invalidateDocuments()
       notify.success('Document rejected.')
@@ -33,6 +39,7 @@ export function useDocumentMutations(internshipId) {
 
   const deleteDocument = useMutation({
     mutationFn: (documentId) => documentsApi.deleteDocument(documentId),
+    onError: (error) => notifyMutationError(error, 'delete document'),
     onSuccess: () => {
       invalidateDocuments()
       notify.success('Document deleted successfully!')

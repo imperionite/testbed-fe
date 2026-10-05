@@ -18,8 +18,8 @@ import notify from '../../utils/toast'
 // MAIN PAGE COMPONENT
 // ============================================
 export default function UserManagementPage() {
-  const { isAdmin, isReadOnlyStaff, isCoordinator } = useUiPermissions()
-  const canView = isReadOnlyStaff // Based on original permissions: isAdmin || isCoordinator
+  const { isAdmin, isAdminOrCoordinator, isCoordinator } = useUiPermissions()
+  const canView = isAdminOrCoordinator // Based on original permissions: isAdmin || isCoordinator
 
   // 1. Hook for fetching data (Query)
   const {

@@ -1,11 +1,17 @@
-import { Box, TextField, MenuItem, Button, Stack } from '@mui/material'
+import { Box, TextField, MenuItem, Button, Stack, CircularProgress } from '@mui/material'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import getValidationSchema from '../validation/InternshipValidationSchema'
 import { useHtes } from '../../htes/hooks/useHtes'
 
-export default function InternshipDetailsForm({ internship, mode, onSubmit, onCancel }) {
-  const { data: htes = [], isLoading } = useHtes()
+export default function InternshipDetailsForm({
+  internship,
+  mode,
+  onSubmit,
+  onCancel,
+  isLoading = false,
+}) {
+  const { data: htes = [], isLoading: isHtesLoading } = useHtes()
 
   const {
     control,
@@ -19,7 +25,7 @@ export default function InternshipDetailsForm({ internship, mode, onSubmit, onCa
     },
   })
 
-  if (isLoading) return <Box>Loading HTEs...</Box>
+  if (isHtesLoading) return <Box>Loading HTEs...</Box>
 
   return (
     <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ mt: 2 }}>
@@ -57,11 +63,16 @@ export default function InternshipDetailsForm({ internship, mode, onSubmit, onCa
           )}
         />
         <Stack direction="row" spacing={2}>
-          <Button onClick={onCancel} variant="outlined">
+          <Button onClick={onCancel} variant="outlined" disabled={isLoading}>
             Cancel
           </Button>
-          <Button type="submit" variant="contained">
-            Update Details
+          <Button
+            type="submit"
+            variant="contained"
+            disabled={isLoading}
+            startIcon={isLoading ? <CircularProgress size={16} color="inherit" /> : null}
+          >
+            {isLoading ? 'Saving...' : 'Update Details'}
           </Button>
         </Stack>
       </Stack>

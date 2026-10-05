@@ -1,9 +1,15 @@
-import { Box, MenuItem, TextField, Button, Stack } from '@mui/material'
+import { Box, MenuItem, TextField, Button, Stack, CircularProgress } from '@mui/material'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import getValidationSchema from '../validation/AttendanceValidationSchema'
 
-export default function AttendanceValidationForm({ attendance, mode, onSubmit, onCancel }) {
+export default function AttendanceValidationForm({
+  attendance,
+  mode,
+  onSubmit,
+  onCancel,
+  isSubmitting = false,
+}) {
   const {
     control,
     handleSubmit,
@@ -24,6 +30,7 @@ export default function AttendanceValidationForm({ attendance, mode, onSubmit, o
               {...field}
               select
               label="Status"
+              disabled={isSubmitting}
               error={!!errors.validation_status}
               helperText={errors.validation_status?.message}
             >
@@ -33,11 +40,16 @@ export default function AttendanceValidationForm({ attendance, mode, onSubmit, o
           )}
         />
         <Stack direction="row" spacing={2}>
-          <Button onClick={onCancel} variant="outlined">
+          <Button onClick={onCancel} variant="outlined" disabled={isSubmitting}>
             Cancel
           </Button>
-          <Button type="submit" variant="contained">
-            Validate
+          <Button
+            type="submit"
+            variant="contained"
+            disabled={isSubmitting}
+            startIcon={isSubmitting ? <CircularProgress size={16} color="inherit" /> : undefined}
+          >
+            {isSubmitting ? 'Saving...' : 'Validate'}
           </Button>
         </Stack>
       </Stack>

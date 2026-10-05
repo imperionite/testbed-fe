@@ -108,7 +108,7 @@ export default function AppHeader({ onMenuClick }) {
             }}
           >
             <Typography variant="body2" fontWeight={600} noWrap>
-              {user?.firstName} {user?.lastName}
+              {user?.firstName} {user?.middleName} {user?.lastName} {user?.suffix}
             </Typography>
 
             <Typography variant="caption" color="text.secondary" noWrap>

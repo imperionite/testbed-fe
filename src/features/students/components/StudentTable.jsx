@@ -4,9 +4,10 @@ import { IconButton, Typography, Box } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import { formatSentenceCase } from '../../shared/fieldFormatters'
 import { BadgeStatus } from '../../internships/components/BadgeStatus'
-import { formatUserDate } from '../../shared/fieldFormatters'
+import { formatDate } from '../../shared/fieldFormatters'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import { defaultTableConfig } from '../../shared/config/defaultTableConfig'
+import { defaultEmptyCellValue } from '../../shared/fieldFormatters'
 
 export default function StudentTable({ data, isLoading = false, onEdit, onView, role }) {
   const columns = useMemo(() => {
@@ -18,33 +19,73 @@ export default function StudentTable({ data, isLoading = false, onEdit, onView, 
           const firstName = row.firstName || row.first_name || ''
           const middleName = row.middleName || row.middle_name || ''
           const lastName = row.lastName || row.last_name || ''
+          const suffix = row.suffix || row.Suffix || ''
 
-          const fullName = [firstName, middleName, lastName].filter(Boolean).join(' ')
+          const fullName = [firstName, middleName, lastName, suffix].filter(Boolean).join(' ')
 
           if (!fullName.trim()) return row.student_number || 'N/A'
           return fullName
         },
         size: 200,
+        Cell: ({ row, cell }) => {
+          const name = cell.getValue()
+          const email = row.original.profiles?.email || 'N/A'
+
+          return (
+            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+              {name}
+              <Typography variant="caption">{email}</Typography>
+            </Box>
+          )
+        },
       },
       {
         id: 'student_number',
         header: 'Student Number',
-        accessorFn: (row) => row?.student_number || 'N/A',
+        accessorFn: (row) => row?.student_number || defaultEmptyCellValue,
+      },
+      // {
+      //   id: 'email',
+      //   header: 'Email',
+      //   accessorFn: (row) => row?.profiles?.email || row?.email || 'N/A',
+      // },
+      {
+        id: 'program',
+        size: 200,
+        header: 'Program',
+        accessorFn: (row) => row?.program || defaultEmptyCellValue,
       },
       {
-        id: 'email',
-        header: 'Email',
-        accessorFn: (row) => row?.profiles?.email || row?.email || 'N/A',
+        id: 'year_level',
+        header: 'Year Level',
+        size: 100,
+        accessorFn: (row) => row?.year_level || defaultEmptyCellValue,
       },
-      { id: 'program', header: 'Program', accessorFn: (row) => row?.program || 'N/A' },
-      { id: 'year_level', header: 'Year', accessorFn: (row) => row?.year_level || 'N/A' },
-      { id: 'section', header: 'Section', accessorFn: (row) => row?.section || 'N/A' },
+      {
+        id: 'internship_status',
+        header: 'Internship Status',
+        accessorFn: (row) => {
+          const internship = row?.currentInternship || row?.current_internship
+          return internship?.status || 'Not Registered'
+        },
+        Cell: ({ cell }) => <BadgeStatus value={formatSentenceCase(cell.getValue())} />,
+      },
+      {
+        id: 'section',
+        size: 120,
+        header: 'Section',
+        accessorFn: (row) => row?.section || defaultEmptyCellValue,
+      },
       {
         id: 'contact_number',
         header: 'Contact Number',
-        accessorFn: (row) => row?.contact_number || 'N/A',
+        accessorFn: (row) => row?.contact_number || defaultEmptyCellValue,
       },
-      { id: 'address', header: 'Address', accessorFn: (row) => row?.address || 'N/A' },
+      {
+        id: 'address',
+        header: 'Address',
+        accessorFn: (row) => row?.address || defaultEmptyCellValue,
+      },
 
       // { id: 'emergency_contact_name', header: 'Emergency Contact', accessorFn: (row) => row?.emergency_contact_name || 'N/A' },
       // { id: 'emergency_contact_number', header: 'Emergency Phone', accessorFn: (row) => row?.emergency_contact_number || 'N/A' },
@@ -53,24 +94,15 @@ export default function StudentTable({ data, isLoading = false, onEdit, onView, 
         id: 'emergency_contact',
         header: 'Emergency Contact',
         accessorFn: (row) => {
-          row?.emergency_contact_name || 'N/A'
+          row?.emergency_contact_name
         },
         Cell: ({ row }) => {
-          const emergencyContactName = row.original?.emergency_contact_name
-          const emergencyContactNumber = row.original?.emergency_contact_number
-          if (!emergencyContactName && !emergencyContactNumber) {
-            return (
-              <Typography variant="body2" color="text.secondary">
-                N/A
-              </Typography>
-            )
-          }
+          const emergencyContactName = row.original?.emergency_contact_name || ''
+          const emergencyContactNumber = row.original?.emergency_contact_number || ''
           return (
-            <Box>
-              <Typography variant="body2">{emergencyContactName || 'N/A'}</Typography>
-              <Typography variant="body2" color="text.secondary">
-                {emergencyContactNumber || 'N/A'}
-              </Typography>
+            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+              {emergencyContactName}
+              <Typography variant="caption">{emergencyContactNumber}</Typography>
             </Box>
           )
         },
@@ -111,15 +143,6 @@ export default function StudentTable({ data, isLoading = false, onEdit, onView, 
         },
       },
       {
-        id: 'internship_status',
-        header: 'Internship Status',
-        accessorFn: (row) => {
-          const internship = row?.currentInternship || row?.current_internship
-          return internship?.status || 'N/A'
-        },
-        Cell: ({ cell }) => <BadgeStatus value={formatSentenceCase(cell.getValue())} />,
-      },
-      {
         id: 'required_hours',
         header: 'Required Hours',
         accessorFn: (row) => {
@@ -130,17 +153,18 @@ export default function StudentTable({ data, isLoading = false, onEdit, onView, 
 
       {
         accessorKey: 'created_at',
-        header: 'Created At',
-        Cell: ({ cell }) => formatUserDate(cell.getValue()),
+        header: 'Created',
+        Cell: ({ cell }) => formatDate(cell.getValue()),
       },
       {
         accessorKey: 'updated_at',
-        header: 'Updated At',
-        Cell: ({ cell }) => formatUserDate(cell.getValue()),
+        header: 'Updated',
+        Cell: ({ cell }) => formatDate(cell.getValue()),
       },
 
       {
         id: 'actions',
+        size: 50,
         header: 'Actions',
         Cell: ({ row }) =>
           role === 'faculty_adviser' ? (
@@ -205,6 +229,9 @@ export default function StudentTable({ data, isLoading = false, onEdit, onView, 
         ...(defaultTableConfig.initialState || {}),
         columnPinning: {
           right: ['actions'],
+        },
+        columnVisibility: {
+          updated_at: false,
         },
       }}
       muiTableContainerProps={{

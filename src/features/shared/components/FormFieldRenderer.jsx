@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Controller } from 'react-hook-form'
 import {
   TextField,
@@ -8,10 +9,13 @@ import {
   FormControlLabel,
   FormLabel,
   Switch,
+  IconButton,
+  InputAdornment,
   // CircularProgress,
 } from '@mui/material'
+import { Visibility, VisibilityOff } from '@mui/icons-material'
 
-import { formatUserDate, formatAccountStatus } from '../fieldFormatters'
+import { formatDate, formatAccountStatus } from '../fieldFormatters'
 
 /**
  * Generic form field renderer
@@ -45,14 +49,15 @@ export function FormField({
   isSupervisorLoading = false,
   supervisorError = null,
 }) {
+  const [showPassword, setShowPassword] = useState(false)
+
   return (
     <Controller
       name={field.name}
       control={control}
       render={({ field: rhfField }) => {
         // Handle date formatting for display
-        const displayValue =
-          field.format === 'date' ? formatUserDate(rhfField.value) : rhfField.value
+        const displayValue = field.format === 'date' ? formatDate(rhfField.value) : rhfField.value
 
         // Supervisor select field type
         if (field.type === 'supervisor-select') {
@@ -129,7 +134,7 @@ export function FormField({
           case 'select':
             return (
               <FormControl fullWidth size="small" error={!!error}>
-                <InputLabel shrink>{field.label}</InputLabel>
+                <InputLabel>{field.label}</InputLabel>
                 <Select
                   {...rhfField}
                   value={rhfField.value ?? ''}
@@ -175,14 +180,34 @@ export function FormField({
                 {...rhfField}
                 value={displayValue ?? ''}
                 label={field.label}
-                type={field.type}
+                type={field.type === 'password' && showPassword ? 'text' : field.type}
                 disabled={isDisabled}
                 required={isRequired}
                 error={!!error}
                 helperText={error?.message}
                 fullWidth
                 size="small"
-                slotProps={{ inputLabel: { shrink: true } }}
+                slotProps={
+                  field.type === 'password'
+                    ? {
+                        input: {
+                          endAdornment: (
+                            <InputAdornment position="end">
+                              <IconButton
+                                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                                title={showPassword ? 'Hide password' : 'Show password'}
+                                onClick={() => setShowPassword((visible) => !visible)}
+                                edge="end"
+                                disabled={isDisabled}
+                              >
+                                {showPassword ? <VisibilityOff /> : <Visibility />}
+                              </IconButton>
+                            </InputAdornment>
+                          ),
+                        },
+                      }
+                    : undefined
+                }
               />
             )
 
@@ -217,7 +242,6 @@ export function FormField({
                 helperText={error?.message}
                 fullWidth
                 size="small"
-                slotProps={{ inputLabel: { shrink: true } }}
               />
             )
         }

@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
 import {
-  Alert,
   Button,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -13,6 +13,7 @@ import EvaluationForm from './EvaluationForm'
 import { MODES } from '../form/evaluationConfig'
 import ActionConfirmDialog from '../../shared/components/ActionConfirmDialog'
 import { EVALUATION_STATUSES } from '../../../shared/constants/constants'
+import notify from '../../../utils/toast'
 
 function getServerMessage(error) {
   return error?.response?.data?.message ?? error?.message ?? 'Unable to save the evaluation.'
@@ -32,20 +33,26 @@ export default function EvaluationModal({
 }) {
   const submitIntent = useRef(EVALUATION_STATUSES.DRAFT)
   const [pendingFormData, setPendingFormData] = useState(null)
+  const [isSavingDraft, setIsSavingDraft] = useState(false)
+  const [isPreparingSubmit, setIsPreparingSubmit] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [error, setError] = useState(null)
+  const isBusy = isSavingDraft || isPreparingSubmit || isSubmitting
 
   const isView = mode === MODES.VIEW
   const isCreate = mode === MODES.CREATE
   const isEdit = mode === MODES.EDIT
 
   const requestDraftSave = () => {
+    if (isBusy) return
     submitIntent.current = EVALUATION_STATUSES.DRAFT
+    setIsSavingDraft(true)
     document.getElementById('evaluation-form')?.requestSubmit()
   }
 
   const requestSubmit = () => {
+    if (isBusy) return
     submitIntent.current = 'submit'
+    setIsPreparingSubmit(true)
     document.getElementById('evaluation-form')?.requestSubmit()
   }
 
@@ -98,33 +105,39 @@ export default function EvaluationModal({
   }
 
   const handleFormSubmit = async (data) => {
-    setError(null)
-
     if (submitIntent.current === 'submit') {
       setPendingFormData(data)
+      setIsPreparingSubmit(false)
       return
     }
 
     try {
       await saveDraft(data)
     } catch (err) {
-      setError(getServerMessage(err))
+      notify.error(getServerMessage(err))
     } finally {
+      setIsSavingDraft(false)
       submitIntent.current = EVALUATION_STATUSES.DRAFT
     }
+  }
+
+  const handleFormInvalid = () => {
+    setIsSavingDraft(false)
+    setIsPreparingSubmit(false)
+    submitIntent.current = EVALUATION_STATUSES.DRAFT
+    notify.error('Please correct the highlighted fields before continuing.')
   }
 
   const confirmSubmit = async () => {
     if (!pendingFormData) return
 
     setIsSubmitting(true)
-    setError(null)
 
     try {
       await submitEvaluation(pendingFormData)
       setPendingFormData(null)
     } catch (err) {
-      setError(getServerMessage(err))
+      notify.error(getServerMessage(err))
     } finally {
       setIsSubmitting(false)
     }
@@ -137,7 +150,7 @@ export default function EvaluationModal({
 
   return (
     <>
-      <Dialog open={open} onClose={isSubmitting ? undefined : onClose} maxWidth="sm" fullWidth>
+      <Dialog open={open} onClose={isBusy ? undefined : onClose} maxWidth="sm" fullWidth>
         <DialogTitle>
           {isView ? 'View Evaluation' : isCreate ? 'New Evaluation' : 'Edit Evaluation'}
         </DialogTitle>
@@ -150,13 +163,8 @@ export default function EvaluationModal({
             evaluation={evaluation}
             internshipOptions={internshipOptions}
             onSubmit={handleFormSubmit}
+            onInvalid={handleFormInvalid}
           />
-
-          {error && (
-            <Alert severity="error" sx={{ mb: 2 }}>
-              {error}
-            </Alert>
-          )}
         </DialogContent>
 
         {isView && (
@@ -179,10 +187,21 @@ export default function EvaluationModal({
             <Button onClick={onClose} color="inherit">
               Cancel
             </Button>
-            <Button onClick={requestDraftSave} disabled={isSubmitting}>
+            <Button
+              onClick={requestDraftSave}
+              disabled={isBusy}
+              startIcon={isSavingDraft ? <CircularProgress size={16} color="inherit" /> : undefined}
+            >
               Save as Draft
             </Button>
-            <Button onClick={requestSubmit} variant="contained" disabled={isSubmitting}>
+            <Button
+              onClick={requestSubmit}
+              variant="contained"
+              disabled={isBusy}
+              startIcon={
+                isPreparingSubmit ? <CircularProgress size={16} color="inherit" /> : undefined
+              }
+            >
               Submit
             </Button>
           </DialogActions>
@@ -192,10 +211,10 @@ export default function EvaluationModal({
       <ActionConfirmDialog
         open={Boolean(pendingFormData)}
         title="Submit Evaluation"
-        description="Are you sure you want to submit this evaluation? This action is permanent."
+        message="Are you sure you want to submit this evaluation? This action is permanent."
         onConfirm={confirmSubmit}
         onCancel={cancelSubmit}
-        isSubmitting={isSubmitting}
+        isLoading={isSubmitting}
       />
     </>
   )

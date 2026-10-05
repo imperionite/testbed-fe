@@ -16,6 +16,7 @@ export default function AttendanceTable({
   onLogAttendance,
   renderedHours,
   isStudent = false,
+  isSubmitting = false,
 }) {
   const sortedData = useMemo(() => {
     return [...data].sort((a, b) => dayjs(b.attendance_date).diff(dayjs(a.attendance_date)))
@@ -52,7 +53,12 @@ export default function AttendanceTable({
           if (!isStudent && onValidate && record.validation_status === 'pending') {
             return (
               <Tooltip title="Validate Attendance">
-                <IconButton onClick={() => onValidate(record)} size="small" color="primary">
+                <IconButton
+                  onClick={() => onValidate(record)}
+                  size="small"
+                  color="primary"
+                  disabled={isSubmitting}
+                >
                   <CheckCircleIcon />
                 </IconButton>
               </Tooltip>
@@ -62,7 +68,12 @@ export default function AttendanceTable({
           if (isStudent && onEdit && record.validation_status === 'pending') {
             return (
               <Tooltip title="Edit Record">
-                <Button size="small" startIcon={<EditIcon />} onClick={() => onEdit(record)}>
+                <Button
+                  size="small"
+                  startIcon={<EditIcon />}
+                  onClick={() => onEdit(record)}
+                  disabled={isSubmitting}
+                >
                   Edit
                 </Button>
               </Tooltip>
@@ -73,7 +84,7 @@ export default function AttendanceTable({
         },
       },
     ],
-    [onValidate, onEdit, isStudent],
+    [onValidate, onEdit, isStudent, isSubmitting],
   )
 
   const table = useMaterialReactTable({
@@ -82,7 +93,7 @@ export default function AttendanceTable({
     data: sortedData,
     initialState: {
       ...defaultTableConfig.initialState,
-      sorting: [{ id: 'attendance_date', desc: false }],
+      sorting: [{ id: 'attendance_date', desc: true }],
     },
     renderTopToolbarCustomActions: () => (
       <Box
@@ -96,7 +107,12 @@ export default function AttendanceTable({
       >
         <Box sx={{ justifySelf: 'start' }}>
           {isStudent && (
-            <Button variant="contained" startIcon={<AddIcon />} onClick={onLogAttendance}>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={onLogAttendance}
+              disabled={isSubmitting}
+            >
               Log Attendance
             </Button>
           )}

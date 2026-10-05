@@ -10,7 +10,7 @@ const ThemeContext = createContext()
 export const useThemeContext = () => useContext(ThemeContext)
 
 export const ThemeContextProvider = ({ children }) => {
-  const [mode, setMode] = useState(() => localStorage.getItem('themeMode') || 'system')
+  const [mode, setMode] = useState(() => localStorage.getItem('themeMode') || 'light')
 
   const systemMode = useMemo(() => {
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'

@@ -21,6 +21,7 @@ export default function InternshipModal({
   mode,
   internship,
   internships,
+  isSubmitting = false,
   onClose,
   onUpdateStatus,
   onAssignAdviser,
@@ -50,6 +51,7 @@ export default function InternshipModal({
           <InternshipForm
             mode={mode}
             internships={internships}
+            isLoading={isSubmitting}
             onSubmit={onCreate}
             onCancel={onClose}
           />
@@ -59,6 +61,7 @@ export default function InternshipModal({
           <InternshipStatusForm
             internship={internship}
             mode={mode}
+            isLoading={isSubmitting}
             onSubmit={onUpdateStatus}
             onCancel={onClose}
           />
@@ -68,6 +71,7 @@ export default function InternshipModal({
           <InternshipAdviserForm
             internship={internship}
             mode={mode}
+            isLoading={isSubmitting}
             onSubmit={onAssignAdviser}
             onCancel={onClose}
           />
@@ -78,6 +82,7 @@ export default function InternshipModal({
           <InternshipDetailsForm
             internship={internship}
             mode={mode}
+            isLoading={isSubmitting}
             onSubmit={onUpdateDetails}
             onCancel={onClose}
           />
@@ -90,7 +95,7 @@ export default function InternshipModal({
   }
 
   return (
-    <Modal open={open} onClose={onClose} disableRestoreFocus>
+    <Modal open={open} onClose={isSubmitting ? undefined : onClose} disableRestoreFocus>
       <Box sx={style}>
         <Typography variant="h6">
           {mode === MODES.CREATE && 'Add New Intern'}

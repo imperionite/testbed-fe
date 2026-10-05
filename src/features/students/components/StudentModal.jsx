@@ -4,7 +4,7 @@ import {
   DialogContent,
   DialogActions,
   Button,
-  Alert,
+  // Alert,
   IconButton,
   CircularProgress,
 } from '@mui/material'
@@ -20,7 +20,7 @@ export default function StudentModal({
   onClose,
   onSubmit,
   isSaving = false,
-  error = null,
+  // error = null,
 }) {
   const handleFormSubmit = async (data) => {
     await onSubmit(data)
@@ -43,14 +43,12 @@ export default function StudentModal({
           onSubmit={handleFormSubmit}
           formId="student-form"
         />
-
-        {error && (
-          <Alert severity="error" sx={{ mt: 2 }}>
-            {error}
-          </Alert>
-        )}
       </DialogContent>
-
+      {/* {error && (
+        <Alert severity="error" sx={{ mt: 2 }}>
+          {error}
+        </Alert>
+      )} */}
       <DialogActions>
         <Button onClick={onClose} disabled={isSaving}>
           Cancel

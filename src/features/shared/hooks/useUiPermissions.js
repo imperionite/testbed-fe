@@ -22,6 +22,6 @@ export function useUiPermissions() {
     isStudent: isRole('student'),
 
     // Helper to check for staff roles that are generally read-only in this context
-    isReadOnlyStaff: isRole('administrator') || isRole('internship_coordinator'),
+    isAdminOrCoordinator: isRole('administrator') || isRole('internship_coordinator'),
   }
 }

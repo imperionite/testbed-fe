@@ -8,6 +8,7 @@ import {
   TextField,
   Typography,
   MenuItem,
+  Box,
 } from '@mui/material'
 
 import { EVALUATION_CRITERIA, getEvaluationTypeForRole } from '../form/evaluationConfig'
@@ -37,6 +38,7 @@ export default function EvaluationForm({
   evaluation = null,
   internshipOptions = [],
   onSubmit,
+  onInvalid,
   formId = 'evaluation-form',
 }) {
   const isReadOnly = mode === 'view'
@@ -64,7 +66,7 @@ export default function EvaluationForm({
   }
 
   return (
-    <Stack component="form" id={formId} onSubmit={handleSubmit(submit)} spacing={2.5}>
+    <Stack component="form" id={formId} onSubmit={handleSubmit(submit, onInvalid)} spacing={2.5}>
       {mode === 'create' && (
         <Controller
           name="internship_id"
@@ -84,8 +86,10 @@ export default function EvaluationForm({
 
                 {internshipOptions.map((option) => (
                   <MenuItem key={option.internshipId} value={option.internshipId}>
-                    {option.studentName}
-                    {option.studentNumber ? ` — ${option.studentNumber}` : ''}
+                    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                      {option.studentName}
+                      <Typography variant="caption">{option.email}</Typography>
+                    </Box>
                   </MenuItem>
                 ))}
               </TextField>

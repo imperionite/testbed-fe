@@ -14,7 +14,9 @@ export default function AuditTable({ data = [] }) {
       try {
         const users = await usersApi.listUsers()
         const map = users.reduce((acc, user) => {
-          acc[user.id] = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email
+          acc[user.id] =
+            `${user.firstName || user.first_name} ${user.middleName || user.middle_name || ''} ${user.lastName || user.last_name} ${user.suffix || ''}`.trim() ||
+            user.email
           return acc
         }, {})
         setUserMap(map)
