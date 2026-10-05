@@ -188,7 +188,7 @@ export default function StudentForm({
         )}
 
         <TextField
-          label="Student ID"
+          label="Student Number"
           {...register('studentNumber')}
           error={!!errors.studentNumber}
           helperText={errors.studentNumber?.message}
