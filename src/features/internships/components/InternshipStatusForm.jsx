@@ -1,15 +1,9 @@
-import { useState, useEffect } from 'react'
 import {
   Box,
   TextField,
   MenuItem,
   Button,
   Stack,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Typography,
   CircularProgress,
 } from '@mui/material'
 import { useForm, Controller } from 'react-hook-form'
@@ -20,12 +14,8 @@ export default function InternshipStatusForm({ internship, mode, onSubmit, onCan
   const currentStatus = internship?.status || 'pending'
   const isCompleted = currentStatus === 'completed'
 
-  const [warningDialogOpen, setWarningDialogOpen] = useState(false)
-  const [confirmationDialogOpen, setConfirmationDialogOpen] = useState(false)
-  const [pendingData, setPendingData] = useState(null)
-
-  const [isWarningReady, setIsWarningReady] = useState(false)
-  const [isConfirmationReady, setIsConfirmationReady] = useState(false)
+  const today = new Date().toISOString().split('T')[0]
+  const isFutureStartDate = internship?.start_date && internship.start_date > today
 
   const {
     control,
@@ -36,56 +26,21 @@ export default function InternshipStatusForm({ internship, mode, onSubmit, onCan
     defaultValues: { status: currentStatus },
   })
 
-  // Timer for 3-second delay on Warning
-  useEffect(() => {
-    if (!warningDialogOpen) return
-    const timer = setTimeout(() => setIsWarningReady(true), 3000)
-    return () => clearTimeout(timer)
-  }, [warningDialogOpen])
-
-  // Timer for 2-second delay on Confirmation
-  useEffect(() => {
-    if (!confirmationDialogOpen) return
-    const timer = setTimeout(() => setIsConfirmationReady(true), 2000)
-    return () => clearTimeout(timer)
-  }, [confirmationDialogOpen])
-
   const getDisabledStatus = (option) => {
     if (currentStatus === option) return true
     if (isCompleted) return true
     if (currentStatus === 'active' && option === 'pending') return true
+    if (option === 'active' && isFutureStartDate) return true
+    if (option === 'completed' && currentStatus !== 'active') return true
     return false
   }
 
-  const checkAndSubmit = (data) => {
-    if (data.status === 'active' && new Date() < new Date(internship.start_date)) {
-      // Include startDate update in pending data
-      setPendingData({
-        ...data,
-        updateStartDate: new Date().toISOString().split('T')[0],
-      })
-      setIsWarningReady(false)
-      setWarningDialogOpen(true)
-    } else {
-      onSubmit(data)
-    }
-  }
-
-  const handleWarningConfirm = () => {
-    if (!isWarningReady) return
-    setWarningDialogOpen(false)
-    setIsConfirmationReady(false)
-    setConfirmationDialogOpen(true)
-  }
-
-  const handleFinalConfirm = () => {
-    if (!isConfirmationReady) return
-    setConfirmationDialogOpen(false)
-    onSubmit(pendingData)
+  const onSubmitHandler = (data) => {
+    onSubmit(data)
   }
 
   return (
-    <Box component="form" onSubmit={handleSubmit(checkAndSubmit)} sx={{ mt: 2 }}>
+    <Box component="form" onSubmit={handleSubmit(onSubmitHandler)} sx={{ mt: 2 }}>
       <Stack spacing={2}>
         {isCompleted ? (
           <TextField
@@ -118,7 +73,12 @@ export default function InternshipStatusForm({ internship, mode, onSubmit, onCan
                 select
                 label="Status"
                 error={!!errors.status}
-                helperText={errors.status?.message}
+                helperText={
+                  errors.status?.message ||
+                  (isFutureStartDate
+                    ? `Active status is disabled due to the start date (${internship.start_date}) being in the future.`
+                    : '')
+                }
               >
                 <MenuItem value="pending" disabled={getDisabledStatus('pending')}>
                   Pending
@@ -149,48 +109,6 @@ export default function InternshipStatusForm({ internship, mode, onSubmit, onCan
           )}
         </Stack>
       </Stack>
-
-      {/* Warning Dialog - 3s delay */}
-      <Dialog open={warningDialogOpen} onClose={() => setWarningDialogOpen(false)}>
-        <DialogTitle>Early Activation Warning</DialogTitle>
-        <DialogContent>
-          <Typography>
-            You are trying to activate this internship before the original start date (
-            {internship.start_date}). The start date will be changed to today (
-            {new Date().toISOString().split('T')[0]}).
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setWarningDialogOpen(false)}>Cancel</Button>
-          <Button
-            onClick={handleWarningConfirm}
-            variant="contained"
-            color="warning"
-            disabled={!isWarningReady}
-          >
-            {isWarningReady ? 'Proceed' : 'Please wait...'}
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Final Confirmation Dialog - 2s delay */}
-      <Dialog open={confirmationDialogOpen} onClose={() => setConfirmationDialogOpen(false)}>
-        <DialogTitle>Final Confirmation</DialogTitle>
-        <DialogContent>
-          <Typography>This action cannot be undone. Are you sure you want to proceed?</Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setConfirmationDialogOpen(false)}>Cancel</Button>
-          <Button
-            onClick={handleFinalConfirm}
-            variant="contained"
-            color="error"
-            disabled={!isConfirmationReady}
-          >
-            {isConfirmationReady ? 'Confirm' : 'Please wait...'}
-          </Button>
-        </DialogActions>
-      </Dialog>
     </Box>
   )
 }

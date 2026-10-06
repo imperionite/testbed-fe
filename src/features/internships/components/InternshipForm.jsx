@@ -74,7 +74,6 @@ export default function InternshipForm({
         : '',
       hteId: internship?.hte_id || '',
       requiredHours: internship?.required_hours || 480,
-      status: internship?.status || 'pending',
       facultyAdviserId: internship?.faculty_adviser_id || '',
       startDate: internship?.start_date || '',
       endDate: internship?.end_date || '',
@@ -297,25 +296,6 @@ export default function InternshipForm({
               error={!!errors.requiredHours}
               helperText={errors.requiredHours?.message}
             />
-          )}
-        />
-        <Controller
-          name="status"
-          control={control}
-          render={({ field: { ref, ...field } }) => (
-            <TextField
-              {...field}
-              inputRef={ref}
-              select
-              label="Status"
-              disabled
-              error={!!errors.status}
-              helperText={errors.status?.message}
-            >
-              <MenuItem value="pending">Pending</MenuItem>
-              <MenuItem value="active">Active</MenuItem>
-              <MenuItem value="completed">Completed</MenuItem>
-            </TextField>
           )}
         />
         {mode !== MODES.VIEW && (
