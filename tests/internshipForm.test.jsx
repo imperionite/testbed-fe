@@ -15,7 +15,6 @@ vi.mock('../src/features/shared/hooks/useUiPermissions', () => ({
   useUiPermissions: () => ({ isAdminOrCoordinator: true }),
 }))
 
-// ... (rest of the mocks)
 vi.mock('../src/features/internships/hooks/useInternshipMutations', () => ({
   useInternshipMutations: () => ({
     createInternship: { mutate: vi.fn() },
@@ -37,8 +36,8 @@ vi.mock('../src/features/users/hooks/useUsers', () => ({
   useUsers: () => ({ data: [{ id: 'u1', role: 'faculty_adviser', email: 'adviser@test.com' }] }),
 }))
 
-describe('InternshipForm Payload Structure', () => {
-  it('submits correct payload for status update', async () => {
+describe('InternshipForm Rendering', () => {
+  it('renders required internship form fields', async () => {
     const mockInternship = {
       id: 'i1',
       student_id: 's1',
@@ -54,6 +53,6 @@ describe('InternshipForm Payload Structure', () => {
       </QueryClientProvider>,
     )
 
-    expect(screen.getByText('Pending')).toBeDefined()
+    expect(screen.getByLabelText(/Required Hours/i)).toBeDefined()
   })
 })
