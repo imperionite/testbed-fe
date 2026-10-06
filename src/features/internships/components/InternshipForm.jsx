@@ -308,7 +308,7 @@ export default function InternshipForm({
               inputRef={ref}
               select
               label="Status"
-              disabled={mode === MODES.VIEW}
+              disabled
               error={!!errors.status}
               helperText={errors.status?.message}
             >
