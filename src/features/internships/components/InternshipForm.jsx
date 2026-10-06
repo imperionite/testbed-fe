@@ -298,6 +298,13 @@ export default function InternshipForm({
             />
           )}
         />
+        <TextField
+          label="Status"
+          value="Pending"
+          disabled
+          fullWidth
+          slotProps={{ inputLabel: { shrink: true } }}
+        />
         {mode !== MODES.VIEW && (
           <Button
             type="submit"
