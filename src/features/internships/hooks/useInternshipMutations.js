@@ -11,33 +11,43 @@ export function useInternships(options = {}) {
 
 export function useInternshipMutations() {
   const queryClient = useQueryClient()
-  const invalidateInternships = () => queryClient.invalidateQueries({ queryKey: ['internships'] })
+
+  const invalidateInternshipRelatedQueries = async () => {
+    await Promise.all([
+      queryClient.invalidateQueries({
+        queryKey: ['internships'],
+      }),
+      queryClient.invalidateQueries({
+        queryKey: ['students'],
+      }),
+    ])
+  }
 
   const createInternship = useMutation({
     mutationFn: (payload) => internshipsApi.createInternship(payload),
-    onSuccess: invalidateInternships,
+    onSuccess: invalidateInternshipRelatedQueries,
   })
 
   const updateStatus = useMutation({
     mutationFn: ({ id, status }) => internshipsApi.updateInternshipStatus(id, status),
-    onSuccess: invalidateInternships,
+    onSuccess: invalidateInternshipRelatedQueries,
   })
 
   const bulkUpdateStatus = useMutation({
     mutationFn: ({ ids, status }) =>
       Promise.all(ids.map((id) => internshipsApi.updateInternshipStatus(id, status))),
-    onSuccess: invalidateInternships,
+    onSuccess: invalidateInternshipRelatedQueries,
   })
 
   const updateInternship = useMutation({
     mutationFn: ({ id, payload }) => internshipsApi.updateInternship(id, payload),
-    onSuccess: invalidateInternships,
+    onSuccess: invalidateInternshipRelatedQueries,
   })
 
   const assignAdviser = useMutation({
     mutationFn: ({ id, facultyAdviserId }) =>
       internshipsApi.assignFacultyAdviser(id, facultyAdviserId),
-    onSuccess: invalidateInternships,
+    onSuccess: invalidateInternshipRelatedQueries,
   })
 
   return {
