@@ -53,11 +53,7 @@ export default function Header() {
 
         {/* Theme Selector Burger Menu Button */}
         <Box>
-          <IconButton
-            size="small"
-            onClick={handleOpen}
-            aria-label="Open theme selection menu"
-          >
+          <IconButton size="small" onClick={handleOpen} aria-label="Open theme selection menu">
             <MenuIcon />
           </IconButton>
 
@@ -73,7 +69,10 @@ export default function Header() {
               },
             }}
           >
-            <Typography variant="overline" sx={{ px: 2, display: 'block', color: 'text.secondary' }}>
+            <Typography
+              variant="overline"
+              sx={{ px: 2, display: 'block', color: 'text.secondary' }}
+            >
               Theme
             </Typography>
             {['light', 'dark', 'system'].map((m) => (

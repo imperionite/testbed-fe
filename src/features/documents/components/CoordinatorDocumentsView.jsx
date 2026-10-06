@@ -129,7 +129,9 @@ export default function CoordinatorDocumentsView({ internshipId }) {
               variant="contained"
               color="error"
               disabled={!rejectionReason.trim() || rejectDocument.isPending}
-              startIcon={rejectDocument.isPending ? <CircularProgress size={16} color="inherit" /> : null}
+              startIcon={
+                rejectDocument.isPending ? <CircularProgress size={16} color="inherit" /> : null
+              }
             >
               {rejectDocument.isPending ? 'Rejecting...' : 'Reject'}
             </Button>
