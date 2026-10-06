@@ -1,33 +1,36 @@
-import { useMemo, useState, useEffect } from 'react'
+import { useMemo } from 'react'
+import { Box, TablePagination } from '@mui/material'
 import { MaterialReactTable, useMaterialReactTable } from '@glebcha/material-react-table'
-import { usersApi } from '../../../api/users'
+
 import { formatDate } from '../../htes/form/fieldFormatters'
 import { defaultTableConfig } from '../../shared/config/defaultTableConfig'
-// import { CircularProgress } from '@mui/material'
 
-export default function AuditTable({ data = [] }) {
-  const [userMap, setUserMap] = useState({})
-  const [isLoadingUsers, setIsLoadingUsers] = useState(true)
+function getUserName(user) {
+  if (!user) return null
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const users = await usersApi.listUsers()
-        const map = users.reduce((acc, user) => {
-          acc[user.id] =
-            `${user.firstName || user.first_name} ${user.middleName || user.middle_name || ''} ${user.lastName || user.last_name} ${user.suffix || ''}`.trim() ||
-            user.email
-          return acc
-        }, {})
-        setUserMap(map)
-      } catch (error) {
-        console.error('Failed to fetch users for audit mapping', error)
-      } finally {
-        setIsLoadingUsers(false)
-      }
-    }
-    fetchUsers()
-  }, [])
+  const fullName = [user.firstName, user.middleName, user.lastName, user.suffix]
+    .filter(Boolean)
+    .join(' ')
+
+  return fullName || user.email || null
+}
+
+export default function AuditTable({
+  data = [],
+  users = [],
+  isLoading = false,
+  page = 0,
+  rowsPerPage = 20,
+  total = 0,
+  onPageChange,
+  onRowsPerPageChange,
+}) {
+  const userMap = useMemo(() => {
+    return users.reduce((map, user) => {
+      map[user.id] = getUserName(user)
+      return map
+    }, {})
+  }, [users])
 
   const columns = useMemo(
     () => [
@@ -36,30 +39,74 @@ export default function AuditTable({ data = [] }) {
         header: 'Timestamp',
         Cell: ({ cell }) => formatDate(cell.getValue()) || '—',
       },
-      { accessorKey: 'action', header: 'Action' },
-      { accessorKey: 'resource_type', header: 'Resource Type' },
-      { accessorKey: 'resource_id', header: 'Resource ID' },
+      {
+        accessorKey: 'action',
+        header: 'Action',
+      },
+      {
+        accessorKey: 'resource_type',
+        header: 'Resource Type',
+      },
+      {
+        accessorKey: 'resource_id',
+        header: 'Resource ID',
+        Cell: ({ cell }) => cell.getValue() || '—',
+      },
       {
         accessorKey: 'user_id',
         header: 'User',
-        Cell: ({ cell }) => userMap[cell.getValue()] || cell.getValue() || 'System',
+        Cell: ({ cell }) => {
+          const userId = cell.getValue()
+
+          return userMap[userId] || userId || 'System'
+        },
       },
-      { accessorKey: 'ip_address', header: 'IP Address' },
+      {
+        accessorKey: 'ip_address',
+        header: 'IP Address',
+        Cell: ({ cell }) => cell.getValue() || '—',
+      },
     ],
     [userMap],
   )
 
   const table = useMaterialReactTable({
     ...defaultTableConfig,
+
     columns,
     data,
-    state: { isLoading: isLoadingUsers },
-    muiCircularProgressProps: { color: 'secondary' },
+
+    enablePagination: false,
+    enableColumnFilters: false,
+
+    state: {
+      isLoading,
+    },
+
+    muiCircularProgressProps: {
+      color: 'secondary',
+    },
+
     initialState: {
       ...defaultTableConfig.initialState,
       sorting: [{ id: 'created_at', desc: true }],
     },
   })
 
-  return <MaterialReactTable table={table} />
+  return (
+    <Box sx={{ width: '100%' }}>
+      <MaterialReactTable table={table} />
+
+      <TablePagination
+        component="div"
+        count={total}
+        page={page}
+        onPageChange={onPageChange}
+        rowsPerPage={rowsPerPage}
+        onRowsPerPageChange={onRowsPerPageChange}
+        rowsPerPageOptions={[10, 20, 50, 100]}
+        labelRowsPerPage="Rows per page:"
+      />
+    </Box>
+  )
 }
