@@ -77,6 +77,7 @@ export default function LoginPage() {
         elevation={3}
         sx={{
           width: '100%',
+          maxWidth: 520,
           p: 5,
         }}
       >
@@ -84,10 +85,6 @@ export default function LoginPage() {
           <Box sx={{ textAlign: 'center' }}>
             <Typography variant="h5" fontWeight={600}>
               SBIMS Portal
-            </Typography>
-
-            <Typography variant="body2" color="text.secondary" mt={1}>
-              Sign in to access the system
             </Typography>
           </Box>
 
@@ -101,6 +98,13 @@ export default function LoginPage() {
                 {...register('email')}
                 error={!!errors.email}
                 helperText={errors.email?.message}
+                slotProps={{
+                  input: {
+                    sx: {
+                      minHeight: 56,
+                    },
+                  },
+                }}
               />
 
               <TextField
@@ -113,11 +117,14 @@ export default function LoginPage() {
                 helperText={errors.password?.message}
                 slotProps={{
                   input: {
+                    sx: {
+                      minHeight: 56,
+                    },
                     endAdornment: (
                       <InputAdornment position="end">
                         <IconButton
-                          aria-label="toggle password visibility"
-                          onClick={() => setShowPassword((prev) => !prev)}
+                          aria-label={showPassword ? 'Hide password' : 'Show password'}
+                          onClick={() => setShowPassword((visible) => !visible)}
                           edge="end"
                         >
                           {showPassword ? <VisibilityOff /> : <Visibility />}
@@ -128,10 +135,6 @@ export default function LoginPage() {
                 }}
               />
 
-              <Button component={Link} to="/forgot-password" variant="text" size="small">
-                Forgot Password?
-              </Button>
-
               <Button
                 type="submit"
                 variant="contained"
@@ -140,6 +143,10 @@ export default function LoginPage() {
                 loading={login.isPending}
               >
                 Sign In
+              </Button>
+
+              <Button component={Link} to="/forgot-password" variant="text">
+                Forgot Password?
               </Button>
             </Stack>
           </Box>
